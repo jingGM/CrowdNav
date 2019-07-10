@@ -11,3 +11,4 @@ worlds folder: all worlds files
 ped0.sdf: moving obstacles
 others: static obstacles
 
+http://wiki.ros.org/Robots/Jackal
