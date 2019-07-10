@@ -1,0 +1,23 @@
+<launch>
+	<!--arg name="gui" default="true"/>
+	<arg name="verbose" default="true"/>
+	<arg name="world_file"  default="$(find navisim)/worlds/cam.world"/>
+	<include file="$(find gazebo_ros)/launch/empty_world.launch">
+		<arg name="use_sim_time" value="true"/>
+		<arg name="debug" value="false"/>
+		<arg name="gui" value="$(arg gui)" />
+		<arg name="world_name" value="$(arg world_file)"/>
+		<arg name="verbose" value="$(arg gui)"/>
+  	</include-->
+	<include file="$(find gazebo_ros)/launch/empty_world.launch">
+    </include>
+
+	<param name="robot_description" command="$(find xacro)/xacro '$(find navisim)/models/robot.xacro'"/>
+    <node name="spawn_model" pkg="gazebo_ros" type="spawn_model" args="-urdf -param robot_description -model d435"/>
+    <node name="state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+	
+	<!--node name="rviz1" pkg="rviz" type="rviz" args="-d $(find navisim)/launch/rviz/orbslam2_ros.rviz"/-->
+
+
+
+</launch>
