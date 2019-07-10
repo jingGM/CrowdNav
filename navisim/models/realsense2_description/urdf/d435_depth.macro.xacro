@@ -162,7 +162,6 @@ aluminum peripherial evaluation case.
           <robotNamespace>/$(arg namespace)</robotNamespace>
           <alwaysOn>true</alwaysOn>
           <updateRate>60</updateRate>
-          <cameraName>depth</cameraName>
           <imageTopicName>image_raw</imageTopicName>
           <cameraInfoTopicName>camera_info</cameraInfoTopicName>
           <depthImageTopicName>depth/image_raw</depthImageTopicName>
