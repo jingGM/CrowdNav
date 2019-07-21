@@ -3,7 +3,7 @@
   <arg name="headless" default="false" />
   <arg name="gui" default="true"/>
   <arg name="verbose" default="true"/>
-  <arg name="world_file"  default="$(find navisim)/worlds/room.world"/>
+  <arg name="world_file"  default="$(find navisim)/worlds/ped0.sdf"/>
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="debug" value="0" />
     <arg name="gui" value="$(arg gui)" />
@@ -15,22 +15,41 @@
 
 
   <arg name="ns0"        default="jackal0"/>
-  <arg name="ns1"        default="jackal1"/>
   <arg name="config0"    default="base"/>
-  <arg name="config1"    default="front_laser"/>
   <arg name="config0_id" default="0"/>
+  <arg name="ns1"        default="jackal1"/>
+  <arg name="config1"    default="base"/>
   <arg name="config1_id" default="1"/>
+  <arg name="ns2"        default="jackal2"/>
+  <arg name="config2"    default="base"/>
+  <arg name="config2_id" default="2"/>
+  <arg name="ns3"        default="jackal3"/>
+  <arg name="config3"    default="base"/>
+  <arg name="config3_id" default="3"/>
 
-  <!--include file="$(find navisim)/launch/include/jackal_cam/jackal_base.launch">
+  <include file="$(find navisim)/launch/include/jackal_cam/jackal_base.launch">
     <arg name="ns"            value="$(arg ns0)"/>
     <arg name="config"        value="$(arg config0)"/>
     <arg name="config_id"     value="$(arg config0_id)"/>
+    <arg name="y"             value="-2"/>
   </include>
   <include file="$(find navisim)/launch/include/jackal_cam/jackal_base.launch">
     <arg name="ns"            value="$(arg ns1)"/>
     <arg name="config"        value="$(arg config1)"/>
     <arg name="config_id"     value="$(arg config1_id)"/>
     <arg name="x"             value="2"/>
-  </include-->
+  </include>
+  <include file="$(find navisim)/launch/include/jackal_cam/jackal_base.launch">
+    <arg name="ns"            value="$(arg ns2)"/>
+    <arg name="config"        value="$(arg config2)"/>
+    <arg name="config_id"     value="$(arg config2_id)"/>
+    <arg name="x"             value="-2"/>
+  </include>
+  <include file="$(find navisim)/launch/include/jackal_cam/jackal_base.launch">
+    <arg name="ns"            value="$(arg ns3)"/>
+    <arg name="config"        value="$(arg config3)"/>
+    <arg name="config_id"     value="$(arg config3_id)"/>
+    <arg name="y"             value="2"/>
+  </include>
 
 </launch>

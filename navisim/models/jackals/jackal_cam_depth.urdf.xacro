@@ -258,5 +258,8 @@
     <origin xyz="0 0 1" rpy="0 0 0"/>
   </xacro:sensor_d435>
 
-
+  <xacro:include filename="$(find navisim)/models/hokuyo/hokuyo.urdf.xacro"/>
+  <xacro:sensor_hokuyo prefix="" parent="front_mount">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </xacro:sensor_hokuyo>
 </robot>
