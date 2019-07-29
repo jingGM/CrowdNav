@@ -1,0 +1,37 @@
+<launch>
+  <!-- No namespace here as we will share this description.
+       Access with slash at the beginning -->
+  <param name="robot_description"
+    command="$(find xacro)/xacro.py $(find turtlebot_description)/robots/kobuki_hexagons_kinect.urdf.xacro" />
+
+  <!-- <param name="robot_description"
+    command="$(find xacro)/xacro.py $(find naviswarm)/models/turtlebot2/turtlebot.urdf.xacro" /> -->
+
+    <!--OTHER POSSIBLE CONFIGS:create_circles_asus_xtion_pro.urdf.xacro
+      create_circles_kinect.urdf.xacro
+      kobuki_hexagons_astra.urdf.xacro
+      kobuki_hexagons_asus_xtion_pro_offset.urdf.xacro
+      kobuki_hexagons_asus_xtion_pro.urdf.xacro
+      kobuki_hexagons_kinect.urdf.xacro
+      kobuki_hexagons_r200.urdf.xacro
+      roomba_circles_asus_xtion_pro.urdf.xacro
+      roomba_circles_kinect.urdf.xacro   -->
+
+  <!-- BEGIN ROBOT 0-->
+  <group ns="tb0">
+    <param name="tf_prefix" value="tb0" />
+    <include file="$(find naviswarm)/launch/one_robot.launch" >
+      <arg name="init_pose" value="-x 1 -y 1 -z 0" />
+      <arg name="robot_name"  value="tb0" />
+    </include>
+  </group>
+
+  <!-- BEGIN ROBOT 2-->
+  <group ns="tb1">
+    <param name="tf_prefix" value="tb1" />
+    <include file="$(find naviswarm)/launch/one_robot.launch" >
+      <arg name="init_pose" value="-x -1 -y 1 -z 0" />
+      <arg name="robot_name"  value="tb1" />
+    </include>
+  </group>
+</launch>
