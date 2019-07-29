@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<robot name="realsense2_camera" xmlns:xacro="http://ros.org/wiki/xacro">
+  <link name="world"/>
+
+  <xacro:include filename="$(find navisim)/models/realsense2_description/urdf/_d435.macro.xacro" />
+  <xacro:sensor_d435 prefix="" parent="world">
+    <origin xyz="0 0 1" rpy="0 0 0"/>
+  </xacro:sensor_d435>
+
+</robot>

@@ -1,0 +1,132 @@
+resolution 0.001 # set the resolution of the underlying raytrace model in meters
+interval_sim 100 # simulation timestep in milliseconds
+#interval_real 100
+threads 12
+
+window
+( 
+  size [ 800.000 600.000 ] 
+  scale 28.806 
+)
+
+define map model
+(
+  color "gray30"
+  boundary 0 
+  gui_nose 0
+  gui_grid 0
+  gui_move 0
+  gui_outline 1
+  obstacle_return 1
+  gripper_return 0
+  fiducial_return 0
+  laser_return 1
+)
+
+define diff_robot position
+(
+  size [0.24 0.24 0.3]
+  origin [0 0 0 0]
+  gui_nose 1
+  laser_return 1
+	
+  # This block approximates the circular shape of a robot
+  hokuyo( pose [0.0 0 -0.1 0] )
+  drive "diff"
+  bitmap "robot.png"
+)
+
+define hokuyo ranger
+(
+  sensor(
+    range [0.0 4.0]
+    fov 180
+    samples 512
+    size [ 0.05 0.05 0.1 ]
+    )
+  # generic model properties
+  color "black"
+)
+
+
+map
+(
+  name "medium"
+  size [50.0 50.0 0.5]
+  pose [0 0 0 0]
+  bitmap "empty.pgm"
+)
+
+
+define obstacle_robot_0 position
+(
+  size [0.45 0.45 0.3]
+  origin [0 0 0 0]
+  gui_nose 1
+  laser_return 0
+	
+  drive "omni"
+  bitmap "obstacle_0.png"
+)
+
+
+define obstacle_robot_1 position
+(
+  size [0.3 0.3 0.3]
+  origin [0 0 0 0]
+  gui_nose 1
+  laser_return 0
+	
+  drive "omni"
+  bitmap "obstacle_1.png"
+)
+
+define obstacle_robot_2 position
+(
+  size [0.5 0.5 0.3]
+  origin [0 0 0 0]
+  gui_nose 1
+  laser_return 0
+	
+  drive "omni"
+  bitmap "obstacle_2.png"
+)
+
+define obstacle_robot_3 position
+(
+  size [0.2 0.2 0.3]
+  origin [0 0 0 0]
+  gui_nose 1
+  laser_return 0
+	
+  drive "omni"
+)
+
+define obstacle_robot_4 position
+(
+  size [0.4 0.2 0.3]
+  origin [0 0 0 0]
+  gui_nose 1
+  laser_return 0
+	
+  drive "omni"
+)
+
+
+diff_robot(pose [ 3.000000 0.000000 0.0 -180.000000 ] name "robot_0" color "VioletRed")
+diff_robot(pose [ 2.427051 1.763356 0.0 -144.000000 ] name "robot_1" color "tan")
+diff_robot(pose [ 0.927051 2.853170 0.0 -108.000000 ] name "robot_2" color "salmon")
+diff_robot(pose [ -0.927051 2.853170 0.0 -72.000000 ] name "robot_3" color "LightSeaGreen")
+diff_robot(pose [ -2.427051 1.763356 0.0 -36.000000 ] name "robot_4" color "HotPink")
+diff_robot(pose [ -3.000000 0.000000 0.0 -0.000000 ] name "robot_5" color "ForestGreen")
+diff_robot(pose [ -2.427051 -1.763356 0.0 36.000000 ] name "robot_6" color "orange")
+diff_robot(pose [ -0.927051 -2.853170 0.0 72.000000 ] name "robot_7" color "MediumSlateBlue")
+diff_robot(pose [ 0.927051 -2.853170 0.0 108.000000 ] name "robot_8" color "red")
+diff_robot(pose [ 2.427051 -1.763356 0.0 144.000000 ] name "robot_9" color "green")
+diff_robot(pose [ 3.000000 0.000000 0.0 -180.000000 ] name "robot_10" color "VioletRed")
+diff_robot(pose [ 2.427051 1.763356 0.0 -144.000000 ] name "robot_11" color "tan")
+diff_robot(pose [ 0.927051 2.853170 0.0 -108.000000 ] name "robot_12" color "salmon")
+diff_robot(pose [ -0.927051 2.853170 0.0 -72.000000 ] name "robot_13" color "LightSeaGreen")
+diff_robot(pose [ -2.427051 1.763356 0.0 -36.000000 ] name "robot_14" color "HotPink")
+diff_robot(pose [ 2.427051 -1.763356 0.0 144.000000 ] name "robot_9" color "green")
+

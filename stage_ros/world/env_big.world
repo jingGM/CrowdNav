@@ -1,0 +1,294 @@
+resolution 0.001 # set the resolution of the underlying raytrace model in meters
+interval_sim 100 # simulation timestep in milliseconds
+#interval_real 100
+threads 8
+
+window
+( 
+  size [ 800.000 600.000 ] 
+  scale 28.806 
+)
+
+define map model
+(
+  color "gray30"
+  boundary 0
+  gui_nose 0
+  gui_grid 0
+  gui_move 0
+  gui_outline 1
+  obstacle_return 1
+  gripper_return 0
+  fiducial_return 0
+  laser_return 1
+)
+
+define diff_robot position
+(
+  size [0.24 0.24 0.3]
+  origin [0 0 0 0]
+  gui_nose 1
+  laser_return 1
+	
+  # This block approximates the circular shape of a robot
+  hokuyo( pose [0.11 0 -0.1 0] )
+  drive "diff"
+  bitmap "robot.png"
+)
+
+define hokuyo ranger
+(
+  sensor(
+    range [0.0 4.0]
+    fov 180
+    samples 512
+    size [ 0.05 0.05 0.1 ]
+    )
+  # generic model properties
+  color "black"
+)
+
+
+map
+(
+  name "medium"
+  size [50.0 50.0 0.5]
+  pose [0 0 0 0]
+  bitmap "empty.pgm"
+)
+
+
+define obstacle0 position
+(
+  size [2. 0.1 0.3]
+  origin [0 0 0 0]
+  gui_nose 1
+)
+
+define obstacle1 position
+(
+  size [4. 0.1 0.3]
+  origin [0 0 0 0]
+  gui_nose 1
+)
+
+define obstacle2 position
+(
+  size [5. 0.1 0.3]
+  origin [0 0 0 0]
+  gui_nose 1
+)
+
+define obstacle3 position
+(
+  size [1. 0.1 0.3]
+  origin [0 0 0 0]
+  gui_nose 1  
+)
+
+define obstacle4 position
+(
+  size [0.45 0.45 0.3]
+  origin [0 0 0 0]
+  gui_nose 1
+  bitmap "obstacle_0.png"
+)
+
+define obstacle5 position
+(
+  size [0.3 0.3 0.3]
+  origin [0 0 0 0]
+  gui_nose 1
+  bitmap "obstacle_1.png"
+)
+
+define obstacle6 position
+(
+  size [0.5 0.5 0.3]
+  origin [0 0 0 0]
+  gui_nose 1
+  bitmap "obstacle_2.png"
+)
+
+define obstacle7 position
+(
+  size [0.4 0.2 0.3]
+  origin [0 0 0 0]
+  gui_nose 1
+  bitmap "robot_square.png"
+)
+
+define obstacle8 position
+(
+  size [0.3 0.3 0.3]
+  origin [0 0 0 0]
+  gui_nose 1
+  bitmap "robot_square.png"
+)
+
+
+# middle, group crossing, 8 robots
+diff_robot(pose [ 3.0 0.4 0.0 -180.000000 ] name "robot_0" color "VioletRed")
+diff_robot(pose [ 3.0 -0.4 0.0 -180.000000 ] name "robot_1" color "ForestGreen")
+diff_robot(pose [ -3.0 0.4 0.0 0.000000 ] name "robot_2" color "tan")
+diff_robot(pose [ -3.0 -0.4 0.0 0.000000 ] name "robot_3" color "HotPink")
+diff_robot(pose [ 4.0 0.4 0.0 -180.000000 ] name "robot_4" color "salmon")
+diff_robot(pose [ 4.0 -0.4 0.0 -180.000000 ] name "robot_5" color "MediumSlateBlue")
+diff_robot(pose [ -4. 0.4 0.0 0.000000 ] name "robot_6" color "LightSeaGreen")
+diff_robot(pose [ -4. -0.4 0.0 0.000000 ] name "robot_7" color "orange")
+
+# top left, 4 crossing, 4 robots
+diff_robot(pose [ -15. 18.0 0.0 -180.000000 ] name "robot_8" color "VioletRed")
+diff_robot(pose [ -21. 18.0 0.0 0.000000 ] name "robot_9" color "tan")
+diff_robot(pose [ -18. 21.0 0.0 -90.000000 ] name "robot_10" color "salmon")
+diff_robot(pose [ -18. 15.0 0.0 90.000000 ] name "robot_11" color "LightSeaGreen")
+
+# top right, evacuation, 6 robots
+diff_robot(pose [ 10. 10.0 0.0 90.000000 ] name "robot_12" color "VioletRed")
+diff_robot(pose [ 11. 10.0 0.0 90.000000 ] name "robot_13" color "tan")
+diff_robot(pose [ 12. 10.0 0.0 90.000000 ] name "robot_14" color "salmon")
+diff_robot(pose [ 13. 10.0 0.0 90.000000 ] name "robot_15" color "LightSeaGreen")
+diff_robot(pose [ 14. 10.0 0.0 90.000000 ] name "robot_16" color "orange")
+diff_robot(pose [ 15. 10.0 0.0 90.000000 ] name "robot_17" color "MediumSlateBlue")
+
+# top left, crossing with obstacle, 4 robots
+diff_robot(pose [-14.0 9.0 0.0 0.0] name "robot_18" color "VioletRed")
+diff_robot(pose [-11.0 6.0 0.0 90.0] name "robot_19" color "orange")
+diff_robot(pose [-8.0 9.0 0.0 180.0] name "robot_20" color "LightSeaGreen")
+diff_robot(pose [-13.0 12.0 0.0 -90.0] name "robot_21" color "HotPink")
+diff_robot(pose [-14.0 12.0 0.0 -90.0] name "robot_22" color "HotPink")
+diff_robot(pose [-15.0 12.0 0.0 -90.0] name "robot_23" color "HotPink")
+
+
+# middle down, crossing through many obstacles, 4 robots
+diff_robot(pose [-3.0 -10.0 0 90.0] name "robot_24" color "tan")
+diff_robot(pose [-1.0 -10.0 0 90.0] name "robot_25" color "salmon")
+diff_robot(pose [1.0 -10.0 0 90.0] name "robot_26" color "MediumSlateBlue")
+diff_robot(pose [3.0 -10.0 0 90.0] name "robot_27" color "ForestGreen")
+
+# down right, random, 9 robots
+diff_robot(pose [12.0 -4.0 0.0 -45.0] name "robot_28" color "VioletRed")
+diff_robot(pose [20.0 -4.0 0.0 -135.0] name "robot_29" color "tan")
+diff_robot(pose [16.0 -4.0 0.0 -90.0] name "robot_30" color "orange")
+diff_robot(pose [12.0 -8.0 0.0 0.0] name "robot_31" color "salmon")
+diff_robot(pose [12.0 -12.0 0.0 45.0] name "robot_32" color "LightSeaGreen")
+diff_robot(pose [16.0 -8.0 0.0 90.0] name "robot_33" color "MediumSlateBlue")
+diff_robot(pose [16.0 -12.0 0.0 90.0] name "robot_34" color "HotPink")
+diff_robot(pose [20.0 -8.0 0.0 180.0] name "robot_35" color "ForestGreen")
+diff_robot(pose [20.0 -12.0 0.0 135.0] name "robot_36" color "VioletRed")
+
+# down left, demo, 5 robots
+diff_robot(pose [-18.0 0.0 0.0 -90.0] name "robot_37" color "VioletRed")
+diff_robot(pose [-15.0 -2.0 0.0 -120.0] name "robot_38" color "tan")
+diff_robot(pose [-15.0 -5.0 0.0 120.0] name "robot_39" color "orange")
+diff_robot(pose [-21.0 -2.0 0.0 -30.0] name "robot_40" color "salmon")
+diff_robot(pose [-21.0 -5.0 0.0 30.0] name "robot_41" color "LightSeaGreen")
+
+# middle down, T crossing, 4 robots
+diff_robot(pose [-1.5 -16.25 0.0 0.0] name "robot_42" color "VioletRed")
+diff_robot(pose [-2.25 -16.25 0.0 0.0] name "robot_43" color "tan")
+diff_robot(pose [1.5 -16.25 0.0 180.0] name "robot_44" color "orange")
+diff_robot(pose [2.25 -16.25 0.0 180.0] name "robot_45" color "salmon")
+
+# add random agents
+diff_robot(pose [-1.5 -16.25 0.0 0.0] name "robot_46" color "VioletRed")
+diff_robot(pose [-2.25 -16.25 0.0 0.0] name "robot_47" color "tan")
+diff_robot(pose [1.5 -16.25 0.0 180.0] name "robot_48" color "orange")
+diff_robot(pose [2.25 -16.25 0.0 180.0] name "robot_49" color "salmon")
+diff_robot(pose [-1.5 -16.25 0.0 0.0] name "robot_50" color "VioletRed")
+diff_robot(pose [-2.25 -16.25 0.0 0.0] name "robot_51" color "tan")
+diff_robot(pose [1.5 -16.25 0.0 180.0] name "robot_52" color "orange")
+diff_robot(pose [2.25 -16.25 0.0 180.0] name "robot_53" color "salmon")
+diff_robot(pose [-1.5 -16.25 0.0 0.0] name "robot_54" color "VioletRed")
+diff_robot(pose [-2.25 -16.25 0.0 0.0] name "robot_55" color "tan")
+diff_robot(pose [1.5 -16.25 0.0 180.0] name "robot_56" color "orange")
+diff_robot(pose [2.25 -16.25 0.0 180.0] name "robot_57" color "salmon")
+
+
+# middle, group crossing, 6 obstacles
+obstacle2(pose [ -2.5 0.95 0.0 0.000000 ] name "obst_0" color "black")
+obstacle2(pose [ -2.5 -0.95 0.0 0.000000 ] name "obst_1" color "black")
+obstacle2(pose [ 2.5 0.95 0.0 0.000000 ] name "obst_2" color "black")
+obstacle2(pose [ 2.5 -0.95 0.0 0.000000 ] name "obst_3" color "black")
+obstacle0(pose [ 5.0 0.0 0.0 90.000000 ] name "obst_4" color "black")
+obstacle0(pose [ -5.0 0.0 0.0 90.000000 ] name "obst_5" color "black")
+
+# top left, 4 crossing, 12 obstacles
+obstacle1(pose [ -20.75 18.75 0.0 0.000000 ] name "obst_6" color "black")
+obstacle1(pose [ -20.75 17.25 0.0 0.000000 ] name "obst_7" color "black")
+obstacle1(pose [ -15.25 18.75 0.0 0.000000 ] name "obst_8" color "black")
+obstacle1(pose [ -15.25 17.25 0.0 0.000000 ] name "obst_9" color "black")
+obstacle1(pose [ -18.75 15.25 0.0 90.000000 ] name "obst_10" color "black")
+obstacle1(pose [ -17.25 15.25 0.0 90.000000 ] name "obst_11" color "black")
+obstacle1(pose [ -17.25 20.75 0.0 90.000000 ] name "obst_12" color "black")
+obstacle1(pose [ -18.75 20.75 0.0 90.000000 ] name "obst_13" color "black")
+obstacle0(pose [ -18. 13.25 0.0 0.000000 ] name "obst_14" color "black")
+obstacle0(pose [ -18. 22.75 0.0 0.000000 ] name "obst_15" color "black")
+obstacle0(pose [ -22.75 18.0 0.0 90.000000 ] name "obst_16" color "black")
+obstacle0(pose [ -13.25 18.0 0.0 90.000000 ] name "obst_17" color "black")
+
+# top right, evacuation, 9 obstacles
+obstacle2(pose [ 9.5 12.0 0.0 0.000000 ] name "obst_18" color "black")
+obstacle2(pose [ 15.5 12.0 0.0 0.000000 ] name "obst_19" color "black")
+obstacle1(pose [ 7.0  10.0  0.0  90.0] name "obst_20" color "black")
+obstacle1(pose [ 18.0  10.0  0.0  90.0] name "obst_21" color "black")
+obstacle2(pose [ 9.5 8.0 0.0 0.000000 ] name "obst_22" color "black")
+obstacle2(pose [ 12.5 8.0 0.0 0.000000 ] name "obst_23" color "black")
+obstacle2(pose [ 15.5 8.0 0.0 0.000000 ] name "obst_24" color "black")
+obstacle1(pose [ 7.0  14.0  0.0  90.0] name "obst_25" color "black")
+obstacle1(pose [ 18.0  14.0  0.0  90.0] name "obst_26" color "black")
+
+# top left, crossing with obstacle, 4 obstacles
+obstacle3(pose [-11.5  9.0 0.0 90.0] name "obst_27" color "black") 
+obstacle3(pose [-10.5  9.0 0.0 90.0] name "obst_28" color "black") 
+obstacle3(pose [-11.0  9.5 0.0 0.0] name "obst_29" color "black") 
+obstacle3(pose [-11.0  8.5 0.0 0.0] name "obst_30" color "black") 
+
+# middle down, crossing through many obstacles, 17 obstacles
+obstacle2(pose [-5.0 -3.5 0.0 90.0] name "obstacle_31" color "black")
+obstacle2(pose [5.0 -3.5 0.0 90.0] name "obstacle_32" color "black")
+obstacle2(pose [-5.0 -8.5 0.0 90.0] name "obstacle_33" color "black")
+obstacle2(pose [5.0 -8.5 0.0 90.0] name "obstacle_34" color "black")
+obstacle2(pose [-2.5 -11.0 0.0 0.0] name "obstacle_35" color "black")
+obstacle2(pose [2.5 -11.0 0.0 0.0] name "obstacle_36" color "black")
+obstacle3(pose [-3.5 -8.0 0.0 0.0] name "obstacle_37" color "black")
+obstacle3(pose [-3.5 -6.0 0.0 0.0] name "obstacle_38" color "black")
+obstacle3(pose [-1.5 -8.0 0.0 0.0] name "obstacle_39" color "black")
+obstacle3(pose [0.5 -7.0 0.0 0.0] name "obstacle_40" color "black")
+obstacle3(pose [3.5 -7.0 0.0 0.0] name "obstacle_41" color "black")
+obstacle3(pose [1.5 -5.0 0.0 0.0] name "obstacle_42" color "black")
+obstacle3(pose [-2.5 -5.0 0.0 0.0] name "obstacle_43" color "black")
+obstacle3(pose [0.0 -4.0 0.0 0.0] name "obstacle_44" color "black")
+obstacle3(pose [-4.5 -4.0 0.0 0.0] name "obstacle_45" color "black")
+obstacle3(pose [-2.5 -3.0 0.0 0.0] name "obstacle_46" color "black")
+obstacle3(pose [3 -3.0 0.0 0.0] name "obstacle_47" color "black")
+
+# middle down, T crossing
+obstacle2(pose [0.0 -15.5 0.0 0.0] name "obstacle_48" color "black")
+obstacle2(pose [0.0 -22.5 0.0 0.0] name "obstacle_49" color "black")
+obstacle0(pose [-1.75 -17.0 0.0 0.0] name "obstacle_50" color "black")
+obstacle0(pose [1.75 -17.0 0.0 0.0] name "obstacle_51" color "black")
+obstacle0(pose [-1.75 -21.0 0.0 0.0] name "obstacle_52" color "black")
+obstacle0(pose [1.75 -21.0 0.0 0.0] name "obstacle_53" color "black")
+obstacle1(pose [-0.75 -19.0 0.0 90.0] name "obstacle_54" color "black")
+obstacle1(pose [0.75 -19.0 0.0 90.0] name "obstacle_55" color "black")
+obstacle0(pose [-2.75 -16.25 0.0 90.0] name "obstacle_56" color "black")
+obstacle0(pose [2.75 -16.25 0.0 90.0] name "obstacle_57" color "black")
+obstacle0(pose [-2.75 -21.75 0.0 90.0] name "obstacle_58" color "black")
+obstacle0(pose [2.75 -21.75 0.0 90.0] name "obstacle_59" color "black")
+
+# down right, two group crossing, 3 obstacles
+obstacle4(pose [15. -15. 0.0 0.0] name "obstacle_60" color "black")
+obstacle5(pose [17. -15. 0.0 0.0] name "obstacle_61" color "black")
+obstacle6(pose [20. -15. 0.0 0.0] name "obstacle_62" color "black")
+obstacle7(pose [21. -15. 0.0 0.0] name "obstacle_63" color "black")
+obstacle8(pose [22. -15. 0.0 0.0] name "obstacle_64" color "black")
+
+
+
+
+
+
+
+
+

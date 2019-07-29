@@ -1,0 +1,122 @@
+resolution 0.001 # set the resolution of the underlying raytrace model in meters
+interval_sim 100 # simulation timestep in milliseconds
+#interval_real 100
+threads 8
+
+window
+( 
+  size [ 800.000 600.000 ] 
+  scale 28.806 
+)
+
+define map model
+(
+  color "gray30"
+  boundary 0
+  gui_nose 0
+  gui_grid 0
+  gui_move 0
+  gui_outline 1
+  obstacle_return 1
+  gripper_return 0
+  fiducial_return 0
+  laser_return 1
+)
+
+define diff_robot position
+(
+  size [0.24 0.24 0.3]
+  origin [0 0 0 0]
+  gui_nose 1
+  laser_return 1
+	
+  # This block approximates the circular shape of a robot
+  hokuyo( pose [0.01 0 -0.1 0] )
+  drive "diff"
+  bitmap "robot.png"
+)
+
+define hokuyo ranger
+(
+  sensor(
+    range [0.0 4.0]
+    fov 180
+    samples 512
+    size [ 0.05 0.05 0.1 ]
+    )
+  # generic model properties
+  color "black"
+)
+
+
+map
+(
+  name "medium"
+  size [50.0 50.0 0.5]
+  pose [0 0 0 0]
+  bitmap "empty.pgm"
+)
+
+
+define obstacle0 position
+(
+  size [2. 0.1 0.3]
+  origin [0 0 0 0]
+  gui_nose 1
+)
+
+define obstacle1 position
+(
+  size [4. 0.1 0.3]
+  origin [0 0 0 0]
+  gui_nose 1
+)
+
+define obstacle2 position
+(
+  size [3. 0.1 0.3]
+  origin [0 0 0 0]
+  gui_nose 1
+)
+
+define obstacle3 position
+(
+  size [1. 0.1 0.3]
+  origin [0 0 0 0]
+  gui_nose 1  
+)
+
+
+
+
+
+# top right, evacuation, 6 robots
+diff_robot(pose [ 1.25 -1. 0.0 90.000000 ] name "robot_0" color "VioletRed")
+diff_robot(pose [ .75 -1. 0.0 90.000000 ] name "robot_1" color "tan")
+diff_robot(pose [ .25 -1. 0.0 90.000000 ] name "robot_2" color "salmon")
+diff_robot(pose [ -.25 -1. 0.0 90.000000 ] name "robot_3" color "LightSeaGreen")
+diff_robot(pose [ -.75 -1. 0.0 90.000000 ] name "robot_4" color "orange")
+diff_robot(pose [ -1.25 -1. 0.0 90.000000 ] name "robot_5" color "MediumSlateBlue")
+
+# top right, evacuation, 9 obstacles
+obstacle0(pose [ -1.5 .0 0.0 0.000000 ] name "obst_18" color "black")
+obstacle0(pose [ 1.5 .0 0.0 0.000000 ] name "obst_19" color "black")
+obstacle1(pose [ -2.5  0.0  0.0  90.0] name "obst_20" color "black")
+obstacle1(pose [ 2.5  0.0  0.0  90.0] name "obst_21" color "black")
+obstacle0(pose [ 1.5 -2.0 0.0 0.000000 ] name "obst_22" color "black")
+obstacle0(pose [ -1.5 -2.0 0.0 0.000000 ] name "obst_23" color "black")
+obstacle0(pose [ 0. -2.0 0.0 0.000000 ] name "obst_24" color "black")
+obstacle1(pose [ -2.5  4.0  0.0  90.0] name "obst_25" color "black")
+obstacle1(pose [ 2.5  4.0  0.0  90.0] name "obst_26" color "black")
+
+
+
+
+
+
+
+
+
+
+
+

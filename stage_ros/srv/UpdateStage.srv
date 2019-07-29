@@ -1,0 +1,4 @@
+geometry_msgs/Pose[] poses
+geometry_msgs/Point[] points
+---
+bool success

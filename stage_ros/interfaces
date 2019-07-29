@@ -1,0 +1,40 @@
+input:
+	action: action to take
+
+output:
+	state: 	scanObs:
+				stage_ros/Scan scan_pprev
+				stage_ros/Scan scan_prev
+				stage_ros/Scan scan_now
+					float64[] ranges
+			goalObs
+				stage_ros/Goal goal_pprev
+				stage_ros/Goal goal_prev
+				stage_ros/Goal goal_now
+					float64 goal_dist	GetDistance(local_goal.x, local_goal.y);
+					float64 goal_theta	atan2(local_goal.y, local_goal.x);
+			actionObs
+				stage_ros/Action ac_pprev
+				stage_ros/Action ac_prev
+					float64 vx
+					float64 vz
+					(after take action put it to ac_prev)
+			velObs
+				stage_ros/Velocity vel_now
+					float64 vx
+					float64 vz
+
+			ImageObs
+				stage_ros/CamImage image_pprev
+				stage_ros/CamImage image_prev
+				stage_ros/CamImage image_now
+
+	pose
+		float64[] pose	#float64 x,y,z,a
+	reward
+		float32 sum
+		float32 reached_goal
+		float32 collision
+		float32 reward_approaching_goal
+		float32 penalty_for_deviation
+	terminal float64
