@@ -45,6 +45,8 @@ add_message_files(
     Velocities.msg
     VelocityObs.msg
     Reward.msg
+    CameraImage.msg
+    CameraImageObs.msg
 )
 
 add_service_files(
