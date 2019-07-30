@@ -124,20 +124,23 @@ class GazeboTrain {
 ////////////////////////////////////////////////////////----------------------------------------------------------------------------
 	    ros::Subscriber groundtruth_sub; // Subscriber for Groundtruth data from Gazebo
 		ros::Subscriber bumper_sub;
+		ros::Subscriber scan_sub;
+		ros::Subscriber image_sub;
+		ros::Subscriber velocity_sub;
 		ros::Publisher reward_pub;
 
 		geometry_msgs::Pose gpose;
+		naviswarm::CameraImage 	img_data;
 	    //cv::Mat img_data; // stores image frames published in /camera/rgb/image_raw/compressed converted to Mat format.
 	    //cv::Mat depth_data;
 	    naviswarm::Velocity 	odom_data;
 	    naviswarm::Scan 		scan_data;
-	    naviswarm::CameraImage 	depth_data;
-	    naviswarm::CameraImage 	img_data;
 
-	    std_msgs::Header depth_header;
 		std_msgs::Header img_header;
 		std_msgs::Header scan_header;
 		std_msgs::Header odom_header;
+
+		int substatus[5] = {0,0,0,0};//check if get messages
 
 	public:
 	    // Function declarations
@@ -146,11 +149,13 @@ class GazeboTrain {
 	    
 	    void gt_Callback(const gazebo_msgs::ModelStates gt);
 	    void sync_Callback( const sensor_msgs::ImageConstPtr& image,
-							const sensor_msgs::ImageConstPtr& depth_image,
-							const sensor_msgs::LaserScanConstPtr& scan,
-							const nav_msgs::OdometryConstPtr& odom);
+							const sensor_msgs::LaserScanConstPtr& scan);
+	    void image_Callback(const sensor_msgs::ImageConstPtr& image);
+	    void scan_Callback(const sensor_msgs::LaserScanConstPtr& scan);
 	    void bumper_Callback(const kobuki_msgs::BumperEventConstPtr& bumper_msg, int i);
 	    bool cb_update_srv(naviswarm::UpdateModelRequest& request, naviswarm::UpdateModelResponse& response);
+	    void velocity_Callback(const nav_msgs::OdometryConstPtr& odom);
+	    
 
 	    void runvelocity(){
 	    	naviswarm::Action action;
@@ -167,42 +172,49 @@ class GazeboTrain {
 
 				std::string name_space = "/turtlebot" + std::to_string(i);
 
+				/* synchronizer is slow
 				message_filters::Subscriber<sensor_msgs::Image> 	image_sub(nh, name_space + "/camera/image_raw", 1);
-				message_filters::Subscriber<sensor_msgs::Image> 	depth_sub(nh, name_space + "/camera/depth/image_raw", 1);
+				//message_filters::Subscriber<sensor_msgs::Image> 	image_sub(nh, name_space + "/camera/depth/image_raw", 1);
 				message_filters::Subscriber<sensor_msgs::LaserScan> scan_sub(nh, name_space + "/scan", 1);
-				message_filters::Subscriber<nav_msgs::Odometry> 	velocity_sub(nh, name_space + "/odom", 1);
 
-				TimeSynchronizer<sensor_msgs::Image,sensor_msgs::Image,sensor_msgs::LaserScan,nav_msgs::Odometry> sync(image_sub, depth_sub,scan_sub,velocity_sub, 4);
-				sync.registerCallback(boost::bind(& GazeboTrain::sync_Callback,this, _1, _2, _3, _4));
+				//according to situation, choose synchronize odometry or not
+				TimeSynchronizer<sensor_msgs::Image,sensor_msgs::LaserScan> sync(image_sub,scan_sub, 1);
+				sync.registerCallback(boost::bind(& GazeboTrain::sync_Callback,this, _1, _2));
+				*/
 
-				groundtruth_sub = nh.subscribe<gazebo_msgs::ModelStates>("/gazebo/model_states", 100, &GazeboTrain::gt_Callback, this);
-				bumper_sub 		= nh.subscribe<kobuki_msgs::BumperEvent>(name_space + "/mobile_base/events/bumper", 50, boost::bind(&GazeboTrain::bumper_Callback, this, _1, i));
-				//new_robot->reward_pub = nh.advertise<naviswarm::Reward>(name_space + "/reward", 100);
+				image_sub		= nh.subscribe<sensor_msgs::Image>(name_space + "/camera/image_raw", 1, &GazeboTrain::image_Callback, this); //"/camera/depth/image_raw"
+				scan_sub		= nh.subscribe<sensor_msgs::LaserScan>(name_space + "/scan", 1, &GazeboTrain::scan_Callback, this);
+				velocity_sub	= nh.subscribe<nav_msgs::Odometry>(name_space + "/odom", 1, &GazeboTrain::velocity_Callback, this);
+				groundtruth_sub = nh.subscribe<gazebo_msgs::ModelStates>("/gazebo/model_states", 1, &GazeboTrain::gt_Callback, this);
+				bumper_sub 		= nh.subscribe<kobuki_msgs::BumperEvent>(name_space + "/mobile_base/events/bumper", 1, boost::bind(&GazeboTrain::bumper_Callback, this, _1, i));
 
-				ros::Rate loop_rate(50);
-				ros::spin(); // Call the gt, scan and odom callback functions once
+				int checkstatus[5] = {1,1,1,1,1};
+				while(substatus!=checkstatus){
+					ros::spinOnce();
+				}
+				for(int i=0;i<5;i++){substatus[i]=0;}
 			}
 	    }
 
 };
 
-
 void GazeboTrain::sync_Callback(const sensor_msgs::ImageConstPtr& image,
-								const sensor_msgs::ImageConstPtr& depth_image,
-								const sensor_msgs::LaserScanConstPtr& scan,
-								const nav_msgs::OdometryConstPtr& odom){
+								const sensor_msgs::LaserScanConstPtr& scan)
+{
 	int robotindex = current_robot;
+	substatus[0] = 1;
 
-	depth_data.data  = depth_image->data;
 	img_data.data 	 = image->data;
 	scan_data.ranges = scan->ranges;
-	odom_data.vx 	 = odom->twist.twist.linear.x;
-  	odom_data.vz 	 = odom->twist.twist.angular.z;
 
-  	depth_header = depth_image->header;
 	img_header   = image->header;
-	scan_header  = scan->header;
-	odom_header  = odom->header;
+	scan_header	 = scan->header;
+
+	//std::cout<<"----"<<std::endl;
+	std::cout<<scan_header.stamp<<std::endl;
+	//std::cout<<img_header<<std::endl;
+	//std::cout<<odom_header<<std::endl;
+
 
 	float min_range = 0.5;
     collision_status[robotindex] = false; // NOTE: collision status for robot 0 is stored in collision_status[0].
@@ -224,8 +236,37 @@ void GazeboTrain::sync_Callback(const sensor_msgs::ImageConstPtr& image,
 	*/
 }
 
+void GazeboTrain::image_Callback(const sensor_msgs::ImageConstPtr& image){
+	substatus[0] =1;
+	img_data.data 	 = image->data;
+	img_header   = image->header;
+	std::cout<<img_header.stamp<<std::endl;
+}
+
+void GazeboTrain::scan_Callback(const sensor_msgs::LaserScanConstPtr& scan){
+	substatus[1] =1;
+	scan_data.ranges = scan->ranges;
+	scan_header	 = scan->header;
+
+	float min_range = 0.5;
+    collision_status[current_robot] = false; // NOTE: collision status for robot 0 is stored in collision_status[0].
+    for (int j = 0; j < scan->ranges.size(); j++) {
+        if (scan->ranges[j] < min_range) {
+            collision_status[current_robot] = true;  // true indicates presence of obstacle
+        }
+    }
+}
+
+void GazeboTrain::velocity_Callback(const nav_msgs::OdometryConstPtr& odom){
+	substatus[2] =1;
+	odom_data.vx = odom->twist.twist.linear.x;
+  	odom_data.vz = odom->twist.twist.angular.z;
+  	odom_header  = odom->header;
+}
+
 // Bumper CallBack
 void GazeboTrain::bumper_Callback(const kobuki_msgs::BumperEventConstPtr& bumper_msg, int i) {
+	substatus[3] =1;
   // ROS_INFO("bumper hit. value = [%d] for robot %d", bumper_msg->bumper, i);
   if (bumper_msg->bumper == 1)
     collision_status[i] = true;
@@ -234,13 +275,11 @@ void GazeboTrain::bumper_Callback(const kobuki_msgs::BumperEventConstPtr& bumper
 
 // Ground Truth callback
 void GazeboTrain::gt_Callback(const gazebo_msgs::ModelStates gt) {
+		substatus[4] =1;
   // ROS_INFO("Inside GT CallBack and current_robot is %d", current_robot);
-  // std::cout<<gt.name[0] << " "<< gt.name[1]<< " "<< gt.name[2]<<std::endl;
   for (int i = 0; i < gt.name.size(); i++){
     if(gt.name[i].substr(0,2) == "tb" && gt.name[i].compare(2, 1, std::to_string(current_robot)) == 0) {
-      // std::cout <<"Robot "<<gt.name[i][2]<< " found!"<< std::endl;
       gpose = gt.pose[i];
-      // std::cout <<"Robot "<<gt.name[i][2]<< " pose is "<< gpose.position.x << gpose.position.y << std::endl;
     }
   }
 }
