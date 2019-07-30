@@ -9,6 +9,7 @@ project(naviswarm)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   gazebo_ros
+  gazebo_msgs
   rospy
   geometry_msgs
   nav_msgs
@@ -259,13 +260,21 @@ add_executable(drl_gazeboros src/drl_gazeboros.cpp)
 target_link_libraries(drl_gazeboros ${catkin_LIBRARIES} ${OpenCV_LIBS} ${Boost_LIBRARIES} 
 -L/opt/ros/kinetic/lib -lstage  -lfltk_images -lfltk_forms -lfltk_gl -lGL -lfltk -lSM -lICE -lX11 -lXext -lm -lGLU -lGL -lGLU -lGL
 ${${PROJECT_NAME}_extra_libs})
-add_dependencies(drl_gazeboros crowdmove_train_generate_messages_cpp)
-
 if(catkin_EXPORTED_TARGETS)
   add_dependencies(drl_gazeboros ${catkin_EXPORTED_TARGETS})
 endif()
 
-install(TARGETS drl_gazeboros
+
+add_executable(cpptest src/cpptest.cpp)
+target_link_libraries(cpptest ${catkin_LIBRARIES} ${OpenCV_LIBS} ${Boost_LIBRARIES} 
+-L/opt/ros/kinetic/lib -lstage  -lfltk_images -lfltk_forms -lfltk_gl -lGL -lfltk -lSM -lICE -lX11 -lXext -lm -lGLU -lGL -lGLU -lGL
+${${PROJECT_NAME}_extra_libs})
+if(catkin_EXPORTED_TARGETS)
+  add_dependencies(cpptest ${catkin_EXPORTED_TARGETS})
+endif()
+
+
+install(TARGETS drl_gazeboros cpptest
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})

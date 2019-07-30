@@ -34,6 +34,8 @@ from crowdmove_train.msg import Action, Actions, States, Transitions
 from crowdmove_train.srv import UpdateModel, UpdateModelRequest
 from gazebo_msgs.msg import ModelState
 from gazebo_msgs.srv import SetModelState
+from std_srvs.srv import Empty
+
 import math
 from tf.transformations import quaternion_from_euler
 
@@ -338,24 +340,25 @@ class StageEnv(object):
 
         self.perfect_distance = self.get_perfect_distance()
 
+
+
         update_goal_request = UpdateModelRequest()
         state_msg = ModelState()
         i = 0
         for s, g in zip(self.starts, self.goals):
-            state_msg.model_name = 'tb{}'.format(i)
+            state_msg.model_name = "turtlebot%d"%i
             state_msg.pose.position.x = s[0]
             state_msg.pose.position.y = s[1]
             state_msg.pose.orientation.z = np.cos(s[2] / 2)
             state_msg.pose.orientation.w = np.sin(s[2] / 2)
             state_msg.reference_frame = 'ground_plane'
             rospy.wait_for_service('/gazebo/set_model_state')
+
             try:
                 reset_robots = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)
                 reset_robots(state_msg)
-
             except rospy.ServiceException, e:
                 print "Service call failed: %s"%e
-
             i = i+1
             # start = Pose()
             # start.position.x = s[0]
@@ -374,6 +377,11 @@ class StageEnv(object):
         resp = self.update_model_srv(update_goal_request) # Call the service
         time.sleep(2.5)
         return resp.success
+
+    def resetenvironment(self):
+        rospy.wait_for_service('/gazebo/reset_world')
+        reset_simulation = rospy.ServiceProxy('/gazebo/reset_world', Empty)
+        reset_simulation()
 
     # call it every step
     def render(self, options=None):

@@ -1,27 +1,3 @@
-/* Copyright 2018 Adarsh Jagan Sathyamoorthy.  All rights reserved.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-==============================================================================*/
-
-/**
-    In this node,
-    robot make decisions with odoms and scans,
-    collect information from Gazebo simulator, and
-    send/receive state and action through shared memory.
-
-    TODO: * Reward for each robot 'i' will be published in /tbi/reward. The subscriber of that reward should be changed accordingly
-          * Add images as a new state.
-          * (Later) Add positions and velocity of pedestrians to States after prediction is ready
- **/
-
  #include <math.h>
  #include <stdio.h>
  #include <stdlib.h>
@@ -77,7 +53,6 @@ limitations under the License.
  #include <naviswarm/Transition.h>
  #include <naviswarm/Transitions.h>
  #include <naviswarm/RobotStatus.h>
-// #include <naviswarm/UpdateStage.h>
  #include <naviswarm/Reward.h>
 
  // Service header
@@ -115,113 +90,135 @@ limitations under the License.
 
 //Class definition
 class GazeboTrain {
-private:
-ros::NodeHandle nh;
-boost::mutex msg_lock;
+  private:
+    ros::NodeHandle nh;
 
-// for shared memory (sem -> semaphore)
-int share_id, sem_id;
-uint8_t *share_addr;
+    boost::mutex msg_lock;
+    // for shared memory (sem -> semaphore)
+    int share_id, sem_id;
+    uint8_t *share_addr;
 
-int num_robots = 1; // The actual value is assigned in the Constructor. By default it is 1.
-std::vector<bool> collision_status;
-ros::Subscriber groundtruth_sub; // Subscriber for Groundtruth data from Gazebo
+    int num_robots = 1; // The actual value is assigned in the Constructor. By default it is 1.
+    std::vector<bool> collision_status;
+    ros::Subscriber groundtruth_sub; // Subscriber for Groundtruth data from Gazebo
 
-// This structure can be used for defining multiple subscribers for multiple robots
-struct Robot{
-  int robot_id; // Used to number the robots to identify them
-  ros::Subscriber scan_sub;
-  ros::Subscriber odom_sub;
-  ros::Subscriber img_sub;
-  ros::Subscriber bumper_sub;
-  ros::Publisher reward_pub;
-};
+    // This structure can be used for defining multiple subscribers for multiple robots
+    struct Robot{
+      int robot_id; // Used to number the robots to identify them
+      ros::Subscriber scan_sub;
+      ros::Subscriber odom_sub;
+      ros::Subscriber img_sub;
+      ros::Subscriber bumper_sub;
+      ros::Publisher reward_pub;
+    };
 
-// Data members to store the sensor data
-geometry_msgs::Pose gpose;
-nav_msgs::Odometry odom_data;
-cv::Mat img_data; // stores image frames published in /camera/rgb/image_raw/compressed converted to Mat format.
-sensor_msgs::LaserScan scan_data;
+    /*ros::Subscriber scan_sub;
+    ros::Subscriber odom_sub;
+    ros::Subscriber img_sub;
+    ros::Subscriber depth_sub;
+    ros::Subscriber bumper_sub;
+    ros::Publisher  reward_pub;
+*/
+    // Data members to store the sensor data
+    geometry_msgs::Pose gpose;
+    nav_msgs::Odometry odom_data;
+    cv::Mat img_data; // stores image frames published in /camera/rgb/image_raw/compressed converted to Mat format.
+    cv::Mat depth_data;
+    sensor_msgs::LaserScan scan_data;
 
-// Defining vec3 = {x, y, theta}
-typedef struct {
-    double x, y, theta;
-} vec3;
+    // Defining vec3 = {x, y, theta}
+    typedef struct {
+        double x, y, theta;
+    } vec3;
 
-// Defining vec3 = {x, y}
-typedef struct {
-    double x, y;
-} vec2;
+    // Defining vec3 = {x, y}
+    typedef struct {
+        double x, y;
+    } vec2;
 
-// Function to return distance = sqrt(x^2 + y^2) in 2-D
-double GetDistance(double x, double y) {
-    return sqrt(x * x + y * y);
-}
+    // Function to return distance = sqrt(x^2 + y^2) in 2-D
+    double GetDistance(double x, double y) {
+        return sqrt(x * x + y * y);
+    }
 
-// Function returns a transformed point (pt2 = Trans_matrix * pt1)
-vec2 getTransformedPoint(const vec2 &vec, const tf::Transform &gt) {
-    tf::Vector3 tf_vec, new_tf_vec;
-    // Storing contents of vec into a variable of type tf::Vector3 (converting (x,y) -> (x, y, 0))
-    tf_vec.setX(vec.x);
-    tf_vec.setY(vec.y);
-    tf_vec.setZ(0.0);
-    // std::cout << "x: " << vec.x << " ---  y: " << vec.y << std::endl;
-    new_tf_vec = gt * tf_vec; // gt is some representation of a transformation.
-    vec2 new_vec;
-    // Converting (x, y, 0) -> (x, y)
-    new_vec.x = new_tf_vec.getX();
-    new_vec.y = new_tf_vec.getY();
-    return new_vec;
-}
+    // Function returns a transformed point (pt2 = Trans_matrix * pt1)
+    vec2 getTransformedPoint(const vec2 &vec, const tf::Transform &gt) {
+        tf::Vector3 tf_vec, new_tf_vec;
+        // Storing contents of vec into a variable of type tf::Vector3 (converting (x,y) -> (x, y, 0))
+        tf_vec.setX(vec.x);
+        tf_vec.setY(vec.y);
+        tf_vec.setZ(0.0);
+        // std::cout << "x: " << vec.x << " ---  y: " << vec.y << std::endl;
+        new_tf_vec = gt * tf_vec; // gt is some representation of a transformation.
+        vec2 new_vec;
+        // Converting (x, y, 0) -> (x, y)
+        new_vec.x = new_tf_vec.getX();
+        new_vec.y = new_tf_vec.getY();
+        return new_vec;
+    }
 
-// Returns a transformation matrix
-tf::Transform pose2transform(const geometry_msgs::Pose& pose){
-    tf::Quaternion q_pose(pose.orientation.x, pose.orientation.y, pose.orientation.z, pose.orientation.w);
-    tf::Matrix3x3 m(q_pose);
-    double roll, pitch, yaw;
-    m.getRPY(roll, pitch, yaw);
-    q_pose.setRPY(0.0, 0.0, yaw); // Stores the yaw
-    tf::Transform t(q_pose, tf::Point(pose.position.x, pose.position.y, 0.0)); // 1st arg is orientation, 2nd arg is position/translation
-    return t;
-}
+    // Returns a transformation matrix
+    tf::Transform pose2transform(const geometry_msgs::Pose& pose){
+        tf::Quaternion q_pose(pose.orientation.x, pose.orientation.y, pose.orientation.z, pose.orientation.w);
+        tf::Matrix3x3 m(q_pose);
+        double roll, pitch, yaw;
+        m.getRPY(roll, pitch, yaw);
+        q_pose.setRPY(0.0, 0.0, yaw); // Stores the yaw
+        tf::Transform t(q_pose, tf::Point(pose.position.x, pose.position.y, 0.0)); // 1st arg is orientation, 2nd arg is position/translation
+        return t;
+    }
 
-// Used to remember initial poses for soft reset
-// Soft reset is when robots are spawned again in the original initial poses.
-std::vector<geometry_msgs::Pose> initial_poses;
-ros::ServiceServer reset_srv_;
+    // Used to remember initial poses for soft reset
+    // Soft reset is when robots are spawned again in the original initial poses.
+    std::vector<geometry_msgs::Pose> initial_poses;
+    ros::ServiceServer reset_srv_;
 
-// Service to reset simulation with a set new initial poses and goals for each robot.
-ros::ServiceServer update_srv;
+    // Service to reset simulation with a set new initial poses and goals for each robot.
+    ros::ServiceServer update_srv;
 
-// for semaphore operation
-void acquire_semaphore();
-void release_semaphore();
+    // for semaphore operation
+    void acquire_semaphore();
+    void release_semaphore();
 
-// Training parameters
-int num_episode;
-int current_robot;
-std::vector<vec2> current_goal;
-naviswarm::States last_states;
-naviswarm::Actions executed_actions;
-std::vector<double> path_length;
-std::vector<double> time_elapsed;
+    // Training parameters
+    int num_episode;
+    int current_robot;
+    std::vector<vec2> current_goal;
+    naviswarm::States last_states;
+    naviswarm::Actions executed_actions;
+    std::vector<double> path_length;
+    std::vector<double> time_elapsed;
 
-// Other ROS tf broadcaster. (I dont think this is needed for this code)
-tf::TransformBroadcaster tf;
-ros::Time sim_time;
+    // Other ROS tf broadcaster. (I dont think this is needed for this code)
+    tf::TransformBroadcaster tf;
+    ros::Time sim_time;
 
-public:
-// Function declarations
-GazeboTrain(int num_robots);
+    void setvelocities( int robotindex, naviswarm::Action velocity){
+        std::string topicname = "/turtlebot"+std::to_string(robotindex)+"/cmd_vel_mux/input/navi";
+        ros::Publisher pubrobotvelocity = nh.advertise<geometry_msgs::Twist>(topicname, 1000);
+        geometry_msgs::Twist action;
+        action.linear.x = velocity.vx;
+        action.angular.z = velocity.vz;
+        int counter = 0;
+        while ( (counter == 0) && ros::ok()){
+          if (pubrobotvelocity.getNumSubscribers()>0){
+            pubrobotvelocity.publish(action);
+            counter = 1;
+          }
+        }
+      }
+  public:
+    // Function declarations
+    GazeboTrain(int num_robots);
 
-// Scan, odom and ground truth Callback functions
-void scan_Callback(const sensor_msgs::LaserScan::ConstPtr& scan, int i);
-void odom_Callback(const nav_msgs::Odometry::ConstPtr& odom, int i);
-void gt_Callback(const gazebo_msgs::ModelStates gt);
-void image_Callback(const sensor_msgs::ImageConstPtr& img_msg, int i);
-void bumper_Callback(const kobuki_msgs::BumperEventConstPtr& bumper_msg, int i);
-bool cb_update_srv(naviswarm::UpdateModelRequest& request, naviswarm::UpdateModelResponse& response);
-int loop();
+    // Scan, odom and ground truth Callback functions
+    void scan_Callback(const sensor_msgs::LaserScan::ConstPtr& scan, int i);
+    void odom_Callback(const nav_msgs::Odometry::ConstPtr& odom, int i);
+    void gt_Callback(const gazebo_msgs::ModelStates gt);
+    void image_Callback(const sensor_msgs::ImageConstPtr& img_msg, int i);
+    void bumper_Callback(const kobuki_msgs::BumperEventConstPtr& bumper_msg, int i);
+    bool cb_update_srv(naviswarm::UpdateModelRequest& request, naviswarm::UpdateModelResponse& response);
+    int loop();
 };
 
 // Function definitions
@@ -274,6 +271,9 @@ void GazeboTrain::scan_Callback(const sensor_msgs::LaserScan::ConstPtr& scan, in
             collision_status[i] = true;  // true indicates presence of obstacle
         }
     }
+
+    std::cout<<"+++++++++++++++++++++++++++++++++++++++++++++++++++++++"<<std::endl;
+    std::cout << odom_data.twist.twist.linear.x<<std::endl;
 }
 
 //Odom Callback function
@@ -319,8 +319,7 @@ void GazeboTrain::bumper_Callback(const kobuki_msgs::BumperEventConstPtr& bumper
 }
 
 // Update Goal service CallBack
-bool
-GazeboTrain::cb_update_srv(naviswarm::UpdateModelRequest& request, naviswarm::UpdateModelResponse& response)
+bool GazeboTrain::cb_update_srv(naviswarm::UpdateModelRequest& request, naviswarm::UpdateModelResponse& response)
 {
     ROS_INFO("Updatting Gazebo!");
 
@@ -358,6 +357,7 @@ GazeboTrain::cb_update_srv(naviswarm::UpdateModelRequest& request, naviswarm::Up
     return true;
 }
 
+
 // Infinite loop function
 int GazeboTrain::loop(){
   while(ros::ok()){
@@ -375,7 +375,7 @@ int GazeboTrain::loop(){
     }
     path_length.resize(num_robots, 0.0); // Resize to size = no. of robots, init the new spaces to 0.0.
     time_elapsed.resize(num_robots, 0.0);
-
+/*
     share_id = shmget(KEY, SIZE, IPC_CREAT | IPC_EXCL | PERMISSION);
     ROS_INFO("share_id: %d", share_id);
     if (share_id == -1){
@@ -400,24 +400,23 @@ int GazeboTrain::loop(){
     }
 
     release_semaphore();
-
+*/
     for(int i = 0; i < num_robots; i++){
       current_robot = i;
       Robot* new_robot = new Robot; // Can be put inside the for loop also
       new_robot->robot_id = i;
-      // Add namespace in front of the topic name (ex: /tb1/scan)
-      std::string name_space = "/tb" + std::to_string(i);
-      // std::string scan_topic_name = "/" + name_space + "/scan";
-      // std::string odom_topic_name = "/" + name_space + "/odom";
-      // std::string img_topic_name = "/" + name_space + "/camera/rgb/image_raw";
+
+      std::string name_space = "/turtlebot" + std::to_string(i);
 
       groundtruth_sub = nh.subscribe("/gazebo/model_states", 100, &GazeboTrain::gt_Callback, this);
-      new_robot->scan_sub = nh.subscribe<sensor_msgs::LaserScan>(name_space + "/scan", 10, boost::bind(&GazeboTrain::scan_Callback, this, _1, i));
+      new_robot->scan_sub = nh.subscribe<sensor_msgs::LaserScan>(name_space + "/scan", 50, boost::bind(&GazeboTrain::scan_Callback, this, _1, i));
       new_robot->odom_sub = nh.subscribe<nav_msgs::Odometry>(name_space + "/odom", 10, boost::bind(&GazeboTrain::odom_Callback, this, _1, i));
       new_robot->img_sub = nh.subscribe<sensor_msgs::Image>(name_space + "/camera/rgb/image_raw", 1, boost::bind(&GazeboTrain::image_Callback, this, _1, i));
-      new_robot->bumper_sub = nh.subscribe<kobuki_msgs::BumperEvent>(name_space + "/mobile_base/events/bumper", 10, boost::bind(&GazeboTrain::bumper_Callback, this, _1, i));
+      
+      new_robot->bumper_sub = nh.subscribe<kobuki_msgs::BumperEvent>(name_space + "/mobile_base/events/bumper", 50, boost::bind(&GazeboTrain::bumper_Callback, this, _1, i));
       new_robot->reward_pub = nh.advertise<naviswarm::Reward>(name_space + "/reward", 100);
-      ros::Rate loop_rate(10);
+      
+      ros::Rate loop_rate(50);
       ros::spinOnce(); // Call the gt, scan and odom callback functions once
 
       // std::cout<<"Collision status of robot "<< i <<" is "<< collision_status[new_robot->robot_id]<< std::endl;
@@ -428,7 +427,7 @@ int GazeboTrain::loop(){
       current_transition.pose.push_back(gpose.position.x);
       current_transition.pose.push_back(gpose.position.y);
       tf::Quaternion q(gpose.orientation.x, gpose.orientation.y, gpose.orientation.z, gpose.orientation.w);
-      tf::Matrix3x3 m(q);
+      tf::Matrix3x3  m(q);
       double roll, pitch, yaw;
       m.getRPY(roll, pitch, yaw);
       current_transition.pose.push_back(yaw);
@@ -560,70 +559,70 @@ int GazeboTrain::loop(){
       current_states.actionObsBatch.push_back(state.actionObs);
       current_states.velObsBatch.push_back(state.velObs);
       std::cout<<"Im at end of for loop"<<std::endl;
-      } // end of for loop
+    } // end of for loop
 
-      last_states = current_states;
-      // transition_collection.frame.push_back(current_transitions);
-      // send the transition, copy the information into the shared memory
+    last_states = current_states;
+    // transition_collection.frame.push_back(current_transitions);
+    // send the transition, copy the information into the shared memory
+/*    acquire_semaphore();
+    uint32_t length = ros::serialization::serializationLength(current_transitions);
+    // ROS_INFO("current state length is %d", length);
+    boost::shared_array<uint8_t> buffer(new uint8_t[length]);
+    ros::serialization::OStream stream(buffer.get(), length);
+    ros::serialization::serialize(stream, current_transitions);
+    memcpy(share_addr, &length, 4);
+    memcpy(share_addr+4, buffer.get(), length);
+    release_semaphore();
+    // ROS_INFO("lock released");
+
+    // wait command processed
+    bool succ = false;
+    while (!succ && ros::ok()){
+      // wait for client to modify this value
+      ros::Duration(0.005);
       acquire_semaphore();
-      uint32_t length = ros::serialization::serializationLength(current_transitions);
-      // ROS_INFO("current state length is %d", length);
-      boost::shared_array<uint8_t> buffer(new uint8_t[length]);
-      ros::serialization::OStream stream(buffer.get(), length);
-      ros::serialization::serialize(stream, current_transitions);
-      memcpy(share_addr, &length, 4);
-      memcpy(share_addr+4, buffer.get(), length);
-      release_semaphore();
-      // ROS_INFO("lock released");
+      int new_length = *(int *) share_addr;
+      std::cout<< "Length ="<< length <<" New length = "<< new_length << std::endl;
+      if (new_length != length) {
+        succ = true;
+        std::cout<<"Im here."<<std::endl;
+      } // Write has succeeded
 
-      // wait command processed
-      bool succ = false;
-      while (!succ && ros::ok())
+      if (succ)
       {
-          // wait for client to modify this value
-          ros::Duration(0.005);
-          acquire_semaphore();
-          int new_length = *(int *) share_addr;
-          std::cout<< "Length ="<< length <<" New length = "<< new_length << std::endl;
-          if (new_length != length) {
-            succ = true;
-            std::cout<<"Im here."<<std::endl;
-          } // Write has succeeded
+          naviswarm::Actions actions;
+          ros::serialization::IStream stream((share_addr + 4), new_length);
+          ros::serialization::Serializer<naviswarm::Actions>::read(stream, actions); // Reads actions from shared memory
+          release_semaphore();
 
-          if (succ)
-          {
-              naviswarm::Actions actions;
-              ros::serialization::IStream stream((share_addr + 4), new_length);
-              ros::serialization::Serializer<naviswarm::Actions>::read(stream, actions); // Reads actions from shared memory
-              release_semaphore();
-
-              if (actions.data.size() != num_robots){
-                  ROS_INFO("actions_size != robots_size, actions_size is %d", static_cast<int>(actions.data.size()));
-                  ROS_BREAK();
-              }
-              //for(size_t r = 0; r < this->robotmodels_.size(); ++r)
-              for (int j = 0 ; j < actions.data.size(); ++j){
-                  // this->positionmodels[j]->SetSpeed(actions.data[j].vx, 0., actions.data[j].vz);
-                  // Add cmd_vel publisher
-                  last_states.actionObsBatch[j].ac_pprev = last_states.actionObsBatch[j].ac_prev;
-                  last_states.actionObsBatch[j].ac_prev = actions.data[j];
-              }
-
-              executed_actions = actions;
-              break;
+          if (actions.data.size() != num_robots){
+              ROS_INFO("actions_size != robots_size, actions_size is %d", static_cast<int>(actions.data.size()));
+              ROS_BREAK();
           }
-          else
-          {
-              release_semaphore();
+          //for(size_t r = 0; r < this->robotmodels_.size(); ++r)
+          for (int j = 0 ; j < actions.data.size(); ++j){
+              // this->positionmodels[j]->SetSpeed(actions.data[j].vx, 0., actions.data[j].vz);
+              setvelocities(j, actions.data[j]);
+              last_states.actionObsBatch[j].ac_pprev = last_states.actionObsBatch[j].ac_prev;
+              last_states.actionObsBatch[j].ac_prev = actions.data[j];
           }
+
+          executed_actions = actions;
+          break;
       }
+      else
+      {
+          release_semaphore();
+      }
+    }
 
-
+*/
   } // End of while ros::ok()
 } // End of function
 
 int main(int argc, char **argv){
   ros::init(argc, argv, "drl_gazeboros");
-  GazeboTrain train(2);
+  GazeboTrain train(5);
+  train.loop();
   return 0;
 }
