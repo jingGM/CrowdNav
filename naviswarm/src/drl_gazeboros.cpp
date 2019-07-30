@@ -399,7 +399,7 @@ int GazeboTrain::loop(){
     }
     path_length.resize(num_robots, 0.0); // Resize to size = no. of robots, init the new spaces to 0.0.
     time_elapsed.resize(num_robots, 0.0);
-/*
+
     share_id = shmget(KEY, SIZE, IPC_CREAT | IPC_EXCL | PERMISSION);
     ROS_INFO("share_id: %d", share_id);
     if (share_id == -1){
@@ -424,7 +424,7 @@ int GazeboTrain::loop(){
     }
 
     release_semaphore();
-*/
+
     for(int i = 0; i < num_robots; i++){
       current_robot = i;
 
@@ -513,7 +513,7 @@ int GazeboTrain::loop(){
           state.ImageObs.image_p1rev.data = state.ImageObs.image_now.data;
       }
 
-      state.DepthObs.image_now.data = depth_data.data;
+      /*state.DepthObs.image_now.data = depth_data.data;
       if (last_states.goalObsBatch.size() == 0) {
           //robotmodel->lasermodels[0]->GetSensors()[0].ranges;
           state.DepthObs.image_p1rev.data = depth_data.data;
@@ -526,7 +526,7 @@ int GazeboTrain::loop(){
           state.DepthObs.image_p3rev.data = state.DepthObs.image_p2rev.data;
           state.DepthObs.image_p2rev.data = state.DepthObs.image_p1rev.data;
           state.DepthObs.image_p1rev.data = state.DepthObs.image_now.data;
-      }
+      }*/
 
       //
       if (last_states.goalObsBatch.size() == 0) {
@@ -624,7 +624,7 @@ int GazeboTrain::loop(){
     last_states = current_states;
     // transition_collection.frame.push_back(current_transitions);
     // send the transition, copy the information into the shared memory
-/*    acquire_semaphore();
+    acquire_semaphore();
     uint32_t length = ros::serialization::serializationLength(current_transitions);
     // ROS_INFO("current state length is %d", length);
     boost::shared_array<uint8_t> buffer(new uint8_t[length]);
@@ -676,7 +676,7 @@ int GazeboTrain::loop(){
       }
     }
 
-*/
+
   } // End of while ros::ok()
 } // End of function
 
