@@ -37,6 +37,12 @@ class Agent(object):
         self.scan_filter = RunningAverageFilter(
             obs_shape[1], obstype="scan",
             demean=False, destd=False, update=False, delta=self.delta)
+        self.image_filter = RunningAverageFilter(
+            obs_shape[3], obstype="image",
+            demean=False, destd=False, update=False, delta=self.delta)
+        #self.depth_filter = RunningAverageFilter(
+        #    obs_shape[4], obstype="depth",
+        #    demean=False, destd=False, update=False, delta=self.delta)
         self.goal_filter = RunningAverageFilter(
             obs_shape[2], obstype="goal",
             demean=False, destd=False, update=False, delta=self.delta)
@@ -46,6 +52,8 @@ class Agent(object):
         self.reward_filter = RunningAverageFilter((), demean=False, clip=1)
 
     def obs_filter(self, obs):
+        image_filtered= self.camera_filter(obs.ImageObsBatch)
+        depth_filtered= self.camera_filter(obs.DepthObsBatch)
         scan_filtered = self.scan_filter(obs.scanObsBatch)
         goal_filtered = self.goal_filter(obs.goalObsBatch)
         vel_filtered = self.vel_filter(obs.velObsBatch)
@@ -59,7 +67,7 @@ class Agent(object):
         # print 'shape: ', np.shape(vel_filtered)
         # print 'vel: ', vel_filtered[0]
         # print 'after shape: ', np.shape(scan_filtered)
-        return [scan_filtered, goal_filtered, vel_filtered]
+        return [ scan_filtered, goal_filtered, vel_filtered,image_filtered,depth_filtered]
 
 
 class Policy(object):

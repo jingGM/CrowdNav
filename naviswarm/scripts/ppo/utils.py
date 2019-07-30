@@ -153,6 +153,23 @@ class RunningAverageFilter(object):
                              x[i].scan_prev.ranges,
                              x[i].scan_now.ranges),
                             axis=1)
+                elif self.obstype == "camera":
+                    if self.delta:
+                        data = np.stack(
+                            (np.array(x[i].image_now.data) - np.array(x[i].image_p4rev.data),
+                             np.array(x[i].image_now.data) - np.array(x[i].image_p3rev.data),
+                             np.array(x[i].image_now.data) - np.array(x[i].image_p2rev.data),
+                             np.array(x[i].image_now.data) - np.array(x[i].image_p1rev.data),
+                             np.array(x[i].scan_now.data)),
+                            axis=1)
+                    else:
+                        data = np.stack(
+                            (x[i].image_p4rev.ranges,
+                             x[i].image_p3rev.ranges,
+                             x[i].image_p2rev.ranges,
+                             x[i].image_p1rev.ranges,
+                             x[i].scan_now.ranges),
+                            axis=1)
                 elif self.obstype == "goal":
                     data = [x[i].goal_now.goal_dist, x[i].goal_now.goal_theta]
                 elif self.obstype == "action":

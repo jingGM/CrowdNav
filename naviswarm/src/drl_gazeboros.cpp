@@ -513,7 +513,7 @@ int GazeboTrain::loop(){
           state.ImageObs.image_p1rev.data = state.ImageObs.image_now.data;
       }
 
-      /*state.DepthObs.image_now.data = depth_data.data;
+      state.DepthObs.image_now.data = depth_data.data;
       if (last_states.goalObsBatch.size() == 0) {
           //robotmodel->lasermodels[0]->GetSensors()[0].ranges;
           state.DepthObs.image_p1rev.data = depth_data.data;
@@ -526,7 +526,7 @@ int GazeboTrain::loop(){
           state.DepthObs.image_p3rev.data = state.DepthObs.image_p2rev.data;
           state.DepthObs.image_p2rev.data = state.DepthObs.image_p1rev.data;
           state.DepthObs.image_p1rev.data = state.DepthObs.image_now.data;
-      }*/
+      }
 
       //
       if (last_states.goalObsBatch.size() == 0) {
