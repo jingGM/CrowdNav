@@ -209,8 +209,7 @@ class MultiRobotDRL(object):
         return paths_batch
 
     def _print_statistics(self, stats):
-        print(
-            "*********** Iteration {} ************".format(stats["Iteration"]))
+        print("*********** Iteration {} ************".format(stats["Iteration"]))
         print(tabulate(
             filter(lambda (k, v): np.asarray(v).size == 1, stats.items()),
             tablefmt="grid"))

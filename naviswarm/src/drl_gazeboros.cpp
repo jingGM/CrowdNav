@@ -175,7 +175,7 @@ class GazeboTrain {
     ros::ServiceServer reset_srv_;
 
     // Service to reset simulation with a set new initial poses and goals for each robot.
-    ros::ServiceServer update_srv;
+    ros::ServiceServer update_srv=nh.advertiseService("update_goals", &GazeboTrain::cb_update_srv, this);
 
     // for semaphore operation
     void acquire_semaphore();
@@ -227,7 +227,6 @@ class GazeboTrain {
 // Function definitions
 // Constructor for the class
 GazeboTrain::GazeboTrain(int n){
-  update_srv = nh.advertiseService("update_goals", &GazeboTrain::cb_update_srv, this);
   collision_status.resize(n, false);
   num_robots = n;
   loop(); // infinite loop to continuously subscribe to scan, odom, and groundtruth.

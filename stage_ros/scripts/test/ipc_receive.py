@@ -1,2 +1,0 @@
-import StringIO
-import sysv_ipc

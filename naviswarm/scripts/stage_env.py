@@ -30,8 +30,8 @@ import numpy as np
 import rospy
 import sysv_ipc
 from geometry_msgs.msg import Point, Pose
-from crowdmove_train.msg import Action, Actions, States, Transitions
-from crowdmove_train.srv import UpdateModel, UpdateModelRequest
+from naviswarm.msg import Action, Actions, States, Transitions
+from naviswarm.srv import UpdateModel, UpdateModelRequest
 from gazebo_msgs.msg import ModelState
 from gazebo_msgs.srv import SetModelState
 from std_srvs.srv import Empty
