@@ -13,6 +13,7 @@
     <arg name="world_name" value="$(arg world_file)" />
   </include>
 
+  <node pkg="naviswarm" type="drl_gazeboros" name="drl_gazeboros"/>
 
   <arg name="ns0"        default="turtlebot0"/>
   <include file="$(find naviswarm)/launch/include/turtlebot_base.launch">

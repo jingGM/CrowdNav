@@ -682,7 +682,7 @@ int GazeboTrain::loop(){
 
 int main(int argc, char **argv){
   ros::init(argc, argv, "drl_gazeboros");
-  GazeboTrain train(5);
+  GazeboTrain train(2);
   train.loop();
   return 0;
 }

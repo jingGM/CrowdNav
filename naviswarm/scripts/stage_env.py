@@ -54,7 +54,7 @@ class StageEnv(object):
     Wrapped Stage simulator using gym's API.
     """
     # Constructor
-    def __init__(self, num_agents=10, num_obstacles=5,
+    def __init__(self, num_agents=2, num_obstacles=0,
                  agent_radius=0.12, env_size=4.0,
                  max_vx=1.0, key=42, options=2):
         self.num_agents = num_agents
@@ -109,8 +109,8 @@ class StageEnv(object):
         # Actions are [lin_velocity, ang_velocity]
         self.agent_actions = [[0., 0.] for _ in range(self.num_agents)]
         # a list of agent's color (for the markers)
-        self.agent_colors = self._select_colors()
-        self.option_colors = self._select_option_colors(options)
+        #self.agent_colors = self._select_colors()
+        #self.option_colors = self._select_option_colors(options)
 
         self.start_time = 0.
 
