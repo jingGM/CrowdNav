@@ -297,13 +297,15 @@ void GazeboTrain::sync_Callback(const sensor_msgs::ImageConstPtr& image,
 }
 
 void GazeboTrain::image_Callback(const sensor_msgs::ImageConstPtr& image){
-  substatus[0] =1;
-  img_data.data    = image->data;
-  img_header   = image->header;
-  //std::cout<<img_header.stamp<<std::endl;
+	//ROS_INFO("running image callback");
+	substatus[0] =1;
+	img_data.data    = image->data;
+	img_header   = image->header;
+	//std::cout<<img_header.stamp<<std::endl;
 }
 
 void GazeboTrain::scan_Callback(const sensor_msgs::LaserScanConstPtr& scan){
+  ROS_INFO("running scan callback");
   substatus[1] =1;
   scan_data.ranges = scan->ranges;
   scan_header  = scan->header;
@@ -318,30 +320,33 @@ void GazeboTrain::scan_Callback(const sensor_msgs::LaserScanConstPtr& scan){
 }
 
 void GazeboTrain::velocity_Callback(const nav_msgs::OdometryConstPtr& odom){
-  substatus[2] =1;
-  odom_data.vx = odom->twist.twist.linear.x;
-    odom_data.vz = odom->twist.twist.angular.z;
-    odom_header  = odom->header;
+	//ROS_INFO("running velocity callback");
+	substatus[2] =1;
+	odom_data.vx = odom->twist.twist.linear.x;
+	odom_data.vz = odom->twist.twist.angular.z;
+	odom_header  = odom->header;
 }
 
 // Bumper CallBack
 void GazeboTrain::bumper_Callback(const kobuki_msgs::BumperEventConstPtr& bumper_msg, int i) {
-  substatus[3] =1;
-  // ROS_INFO("bumper hit. value = [%d] for robot %d", bumper_msg->bumper, i);
-  if (bumper_msg->bumper == 1)
-    collision_status[i] = true;
+	//ROS_INFO("running bumper callback");
+	substatus[3] =1;
+	// ROS_INFO("bumper hit. value = [%d] for robot %d", bumper_msg->bumper, i);
+	if (bumper_msg->bumper == 1)
+		collision_status[i] = true;
 }
 
 
 // Ground Truth callback
 void GazeboTrain::gt_Callback(const gazebo_msgs::ModelStates gt){
-    substatus[4] =1;
-  // ROS_INFO("Inside GT CallBack and current_robot is %d", current_robot);
-  for (int i = 0; i < gt.name.size(); i++){
-    if(gt.name[i].substr(0,2) == "tb" && gt.name[i].compare(2, 1, std::to_string(current_robot)) == 0) {
-      gpose = gt.pose[i];
-    }
-  }
+	//ROS_INFO("running frame_trans callback");
+	substatus[4] =1;
+	// ROS_INFO("Inside GT CallBack and current_robot is %d", current_robot);
+	for (int i = 0; i < gt.name.size(); i++){
+		if(gt.name[i].substr(0,2) == "tb" && gt.name[i].compare(2, 1, std::to_string(current_robot)) == 0) {
+		  gpose = gt.pose[i];
+		}
+	}
 }
 
 // Update Goal service CallBack
@@ -350,8 +355,7 @@ bool GazeboTrain::cb_update_srv(naviswarm::UpdateModelRequest& request, naviswar
     ROS_INFO("Updatting Gazebo!");
 
     std::cout << "Request goal size: " << request.points.size() << std::endl;
-    // std::cout << "position models size: " << this->positionmodels.size() << std::endl;
-    //
+
     if (request.points.size() != num_robots) {
         ROS_WARN("Robot Number and number of goals don't match!");
         response.success = false;
@@ -618,7 +622,8 @@ int GazeboTrain::loop(){
       current_states.velObsBatch.push_back(state.velObs);
       current_states.ImageObsBatch.push_back(state.ImageObs);
       current_states.DepthObsBatch.push_back(state.DepthObs);
-      std::cout<<"==="<<std::endl;
+
+      ROS_INFO("======");
     } // end of for loop
 
     last_states = current_states;
