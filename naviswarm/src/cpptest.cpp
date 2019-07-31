@@ -140,7 +140,7 @@ class GazeboTrain {
 		std_msgs::Header scan_header;
 		std_msgs::Header odom_header;
 
-		int substatus[5] = {0,0,0,0};//check if get messages
+		int substatus[5] = {0,0,0,0,0};//check if get messages
 
 	public:
 	    // Function declarations
@@ -190,11 +190,14 @@ class GazeboTrain {
 				groundtruth_sub = nh.subscribe<gazebo_msgs::ModelStates>("/gazebo/model_states", 1, &GazeboTrain::gt_Callback, this);
 				bumper_sub 		= nh.subscribe<kobuki_msgs::BumperEvent>(name_space + "/mobile_base/events/bumper", 1, boost::bind(&GazeboTrain::bumper_Callback, this, _1, i));
 
-				int checkstatus[5] = {1,1,1,1,1};
+				int checkstatus[5] = {0,0,0,0,0};
+				for(int i=0;i<5;i++){checkstatus[i]=1;}
+				checkstatus[3] = 0;
 				while(substatus!=checkstatus){
 					ros::spinOnce();
 				}
 				for(int i=0;i<5;i++){substatus[i]=0;}
+				ROS_INFO("out of while");
 			}
 	    }
 
@@ -268,7 +271,7 @@ void GazeboTrain::velocity_Callback(const nav_msgs::OdometryConstPtr& odom){
 
 // Bumper CallBack
 void GazeboTrain::bumper_Callback(const kobuki_msgs::BumperEventConstPtr& bumper_msg, int i) {
-	substatus[3] =1;
+	substatus[3] =0;
   // ROS_INFO("bumper hit. value = [%d] for robot %d", bumper_msg->bumper, i);
   if (bumper_msg->bumper == 1)
     collision_status[i] = true;

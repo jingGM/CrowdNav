@@ -125,7 +125,7 @@ class GazeboTrain {
     std_msgs::Header scan_header;
     std_msgs::Header odom_header;
 
-    int substatus[5] = {0,0,0,0};//check if get messages
+    int substatus[4] = {0,0,0,0};//check if get messages
 
     // Defining vec3 = {x, y, theta}
     typedef struct {
@@ -305,7 +305,7 @@ void GazeboTrain::image_Callback(const sensor_msgs::ImageConstPtr& image){
 }
 
 void GazeboTrain::scan_Callback(const sensor_msgs::LaserScanConstPtr& scan){
-  ROS_INFO("running scan callback");
+  //ROS_INFO("running scan callback");
   substatus[1] =1;
   scan_data.ranges = scan->ranges;
   scan_header  = scan->header;
@@ -330,7 +330,6 @@ void GazeboTrain::velocity_Callback(const nav_msgs::OdometryConstPtr& odom){
 // Bumper CallBack
 void GazeboTrain::bumper_Callback(const kobuki_msgs::BumperEventConstPtr& bumper_msg, int i) {
 	//ROS_INFO("running bumper callback");
-	substatus[3] =1;
 	// ROS_INFO("bumper hit. value = [%d] for robot %d", bumper_msg->bumper, i);
 	if (bumper_msg->bumper == 1)
 		collision_status[i] = true;
@@ -340,10 +339,10 @@ void GazeboTrain::bumper_Callback(const kobuki_msgs::BumperEventConstPtr& bumper
 // Ground Truth callback
 void GazeboTrain::gt_Callback(const gazebo_msgs::ModelStates gt){
 	//ROS_INFO("running frame_trans callback");
-	substatus[4] =1;
+	substatus[3] =1;
 	// ROS_INFO("Inside GT CallBack and current_robot is %d", current_robot);
 	for (int i = 0; i < gt.name.size(); i++){
-		if(gt.name[i].substr(0,2) == "tb" && gt.name[i].compare(2, 1, std::to_string(current_robot)) == 0) {
+		if(gt.name[i].substr(0,2) == "turtlebot" && gt.name[i].compare(2, 1, std::to_string(current_robot)) == 0) {
 		  gpose = gt.pose[i];
 		}
 	}
@@ -450,13 +449,15 @@ int GazeboTrain::loop(){
       groundtruth_sub = nh.subscribe<gazebo_msgs::ModelStates>("/gazebo/model_states", 1, &GazeboTrain::gt_Callback, this);
       bumper_sub    = nh.subscribe<kobuki_msgs::BumperEvent>(name_space + "/mobile_base/events/bumper", 1, boost::bind(&GazeboTrain::bumper_Callback, this, _1, i));
 
-      int checkstatus[5] = {1,1,1,1,1};
-      while(substatus!=checkstatus){
-        ros::spinOnce();
-      }
-      for(int i=0;i<5;i++){substatus[i]=0;}
-
-
+		  /*int checkstatus[4] = {1,1,1,1};
+      bool condition=(substatus[0]!=checkstatus[0])||(substatus[1]!=checkstatus[1])||(substatus[3]!=checkstatus[3])||(substatus[2]!=checkstatus[2]);
+		  while(condition){
+			 ros::spinOnce();
+       condition=(substatus[0]!=checkstatus[0])||(substatus[1]!=checkstatus[1])||(substatus[3]!=checkstatus[3])||(substatus[2]!=checkstatus[2]);
+		  }
+		  for(int i=0;i<4;i++){substatus[i]=0;}
+      */
+      
       // NOTE: Block to write the subscribed data into Shared memory
       naviswarm::Transition current_transition;
       // Initially the robot is at ground truth (x, y, theta)
