@@ -384,6 +384,7 @@ bool GazeboTrain::cb_update_srv(naviswarm::UpdateModelRequest& request, naviswar
 // Infinite loop function
 int GazeboTrain::loop(){
   while(ros::ok()){
+
     // This loop is equivalent to the for loop inside
     //StageNode::WorldCallback in drl_stageros.cpp
     naviswarm::States current_states;

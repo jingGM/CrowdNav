@@ -52,8 +52,8 @@ class Agent(object):
         self.reward_filter = RunningAverageFilter((), demean=False, clip=1)
 
     def obs_filter(self, obs):
-        image_filtered= self.camera_filter(obs.ImageObsBatch)
-        depth_filtered= self.camera_filter(obs.DepthObsBatch)
+        image_filtered= self.image_filter(obs.ImageObsBatch)
+        depth_filtered= self.image_filter(obs.DepthObsBatch)
         scan_filtered = self.scan_filter(obs.scanObsBatch)
         goal_filtered = self.goal_filter(obs.goalObsBatch)
         vel_filtered = self.vel_filter(obs.velObsBatch)

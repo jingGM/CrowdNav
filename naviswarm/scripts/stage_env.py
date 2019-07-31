@@ -109,8 +109,8 @@ class StageEnv(object):
         # Actions are [lin_velocity, ang_velocity]
         self.agent_actions = [[0., 0.] for _ in range(self.num_agents)]
         # a list of agent's color (for the markers)
-        #self.agent_colors = self._select_colors()
-        #self.option_colors = self._select_option_colors(options)
+        self.agent_colors = self._select_colors()
+        self.option_colors = self._select_option_colors(options)
 
         self.start_time = 0.
 

@@ -158,9 +158,11 @@ class GazeboTrain {
 	    
 
 	    void runvelocity(){
-	    	naviswarm::Action action;
-	    	action.vx = 1;
-	    	setvelocities( 0, action);
+	    	naviswarm::Actions velocity;
+		  	naviswarm::Action v1;
+		  	v1.vx = 5;
+		  	velocity.data.push_back(v1);
+		  	setvelocities(0,velocity.data[0]);
 	    }
 
 
@@ -289,6 +291,8 @@ int main(int argc, char **argv){
   GazeboTrain train(2);
 
   //train.runvelocity();
-  train.subscribedata();
+  
+  train.runvelocity();
+  //train.subscribedata();
   return 0;
 }
