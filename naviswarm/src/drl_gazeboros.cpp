@@ -427,10 +427,10 @@ int GazeboTrain::train(){
     time_elapsed.resize(num_robots, 0.0);
 
     share_id = shmget(KEY, SIZE, IPC_CREAT | IPC_EXCL | PERMISSION);
-    ROS_INFO("share_id: %d", share_id);
+    //ROS_INFO("share_id: %d", share_id);
     if (share_id == -1){
         share_id = 0;
-        ROS_FATAL("Shared memory allocate failed, Please run: python stage_env.py");
+        //ROS_FATAL("Shared memory allocate failed, Please run: python stage_env.py");
         return 1;
     }
 
@@ -691,7 +691,7 @@ int GazeboTrain::train(){
               ROS_INFO("actions_size != robots_size, actions_size is %d", static_cast<int>(actions.data.size()));
               ROS_BREAK();
           }
-          //for(size_t r = 0; r < this->robotmodels_.size(); ++r)
+          
           for (int j = 0 ; j < actions.data.size(); ++j){
               // this->positionmodels[j]->SetSpeed(actions.data[j].vx, 0., actions.data[j].vz);
               setvelocities(j, actions.data[j]);
@@ -699,7 +699,7 @@ int GazeboTrain::train(){
               last_states.actionObsBatch[j].ac_pprev = last_states.actionObsBatch[j].ac_prev;
               last_states.actionObsBatch[j].ac_prev = actions.data[j];
           }
-
+          ROS_INFO("setted data+++++++++++++++++++++");
           executed_actions = actions;
           break;
       }

@@ -216,7 +216,7 @@ class StageEnv(object):
 
     # Function to read transitions, states, rewards data from shared memory and store it in local variables / class Datamembers
     def _read_data(self):
-        # print("entry: read data")
+        print("entry: read data")
         succ = False
         while not succ:
             # print("before sleep")
@@ -237,7 +237,8 @@ class StageEnv(object):
             states = States()
             rewards = []
             terminals = []
-
+            print(succ)
+            print("_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+")
             if succ:
                 data = self.memory.read(offset=4, byte_count=length)
                 # rospy.logwarn('data length: {0}'.format(len(data)))
@@ -253,9 +254,10 @@ class StageEnv(object):
                     self.agent_poses[i] = t.pose  # x, y, a
                     rewards.append(t.reward)
                     terminals.append(t.terminal)
-            #print(states.scanObsBatch[0].scan_now.ranges)
-            #print("==============================")
+                print(len(states.scanObsBatch[0].scan_now.ranges))
+            
             self.semaphore.release()
+        print("==============================")
         # print(states.scanObsBatch[0].scan_now.ranges)
         return states, rewards, terminals, {}
 
