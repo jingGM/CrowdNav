@@ -1,6 +1,6 @@
  #include <math.h>
  #include <stdio.h>    /* printf */
-#include <math.h>       /* isnan, sqrt */
+#include <cmath>       /* isnan, sqrt */
  #include <stdlib.h>
  #include <string>
 
@@ -115,8 +115,7 @@ class GazeboTrain {
 
     geometry_msgs::Pose gpose;
     naviswarm::Velocity odom_data;
-    //odom_data.vz = 0;
-    //odom_data.vx = 0;
+
     
     naviswarm::Scan         scan_data;
     naviswarm::CameraImage  depth_data;
@@ -190,6 +189,7 @@ class GazeboTrain {
     int current_robot;
     std::vector<vec2> current_goal;
     naviswarm::States last_states;
+    
     naviswarm::Actions executed_actions;
     std::vector<double> path_length;
     std::vector<double> time_elapsed;
@@ -233,6 +233,11 @@ class GazeboTrain {
 GazeboTrain::GazeboTrain(int n){
   collision_status.resize(n, false);
   num_robots = n;
+  /*for (int i=0;i<num_robots;i++){
+      last_states.actionObsBatch[i].ac_prev.vx = 0;
+      last_states.actionObsBatch[i].ac_prev.vz = 0;
+    }
+    ROS_INFO("++++++++++++++");*/
 }
 
 void GazeboTrain::acquire_semaphore()
@@ -331,11 +336,16 @@ void GazeboTrain::scan_Callback(const sensor_msgs::LaserScanConstPtr& scan){
 
 void GazeboTrain::velocity_Callback(const nav_msgs::OdometryConstPtr& odom){
 	//ROS_INFO("running velocity callback");
+  substatus[2]=1;
 	odom_data.vx = odom->twist.twist.linear.x;
 	odom_data.vz = odom->twist.twist.angular.z;
 	odom_header  = odom->header;
   
-  //if (isnan(twist.twist.angular.z) && isnan(twist.twist.linear.x)){substatus[2]=1;}
+  if (std::isnan(odom->twist.twist.angular.z) && std::isnan(odom->twist.twist.linear.x)){
+    odom_data.vx = 0;
+    odom_data.vz = 0;
+  }
+
 }
 
 // Bumper CallBack
@@ -458,11 +468,11 @@ int GazeboTrain::train(){
 
       image_sub   = nh.subscribe<sensor_msgs::Image>(name_space + "/camera/image_raw", 1, &GazeboTrain::image_Callback, this); //"/camera/depth/image_raw"
       scan_sub    = nh.subscribe<sensor_msgs::LaserScan>(name_space + "/scan", 1, &GazeboTrain::scan_Callback, this);
-      //velocity_sub  = nh.subscribe<nav_msgs::Odometry>(name_space + "/odom", 1, &GazeboTrain::velocity_Callback, this);
+      velocity_sub  = nh.subscribe<nav_msgs::Odometry>(name_space + "/odom", 1, &GazeboTrain::velocity_Callback, this);
       groundtruth_sub = nh.subscribe<gazebo_msgs::ModelStates>("/gazebo/model_states", 1, &GazeboTrain::gt_Callback, this);
       bumper_sub    = nh.subscribe<kobuki_msgs::BumperEvent>(name_space + "/mobile_base/events/bumper", 1, boost::bind(&GazeboTrain::bumper_Callback, this, _1, i));
 
-		  int checkstatus[4] = {1,1,0,1};
+		  int checkstatus[4] = {1,1,1,1};
       bool condition=(substatus[0]!=checkstatus[0])||(substatus[1]!=checkstatus[1])||(substatus[3]!=checkstatus[3])||(substatus[2]!=checkstatus[2]);
 		  while(condition){
        condition=(substatus[0]!=checkstatus[0])||(substatus[1]!=checkstatus[1])||(substatus[3]!=checkstatus[3])||(substatus[2]!=checkstatus[2]);
@@ -490,14 +500,13 @@ int GazeboTrain::train(){
       // std::cout<< state.goalObs.goal_now.goal_theta << std::endl;
 
       // v is subscribed from odom in our case.
-      //state.velObs.vel_now.vx = odom_data.vx;
-      //state.velObs.vel_now.vz = odom_data.vz;
+      state.velObs.vel_now.vx = odom_data.vx;
+      state.velObs.vel_now.vz = odom_data.vz;
 
-      state.velObs.vel_now.vx = last_states.actionObsBatch[current_robot].ac_prev.vx;
-      state.velObs.vel_now.vz = last_states.actionObsBatch[current_robot].ac_prev.vz;
-
+      //state.velObs.vel_now.vx = last_states.actionObsBatch[current_robot].ac_prev.vx;
+      //state.velObs.vel_now.vz = last_states.actionObsBatch[current_robot].ac_prev.vz;
+      ROS_INFO("++++++++state+++++++");
       std::cout<<state.velObs.vel_now<<std::endl;
-      ROS_INFO("++++++++++++++++++++++++state++++++++++++++++++++++");
 
       if (last_states.goalObsBatch.size() == 0) {
           state.goalObs.goal_pprev = state.goalObs.goal_now; //pprev is previous to previous goal. (We take 3 instances of observations.)

@@ -253,8 +253,8 @@ class StageEnv(object):
                     self.agent_poses[i] = t.pose  # x, y, a
                     rewards.append(t.reward)
                     terminals.append(t.terminal)
-            print(states.scanObsBatch[0].scan_now.ranges)
-            print("==============================")
+            #print(states.scanObsBatch[0].scan_now.ranges)
+            #print("==============================")
             self.semaphore.release()
         # print(states.scanObsBatch[0].scan_now.ranges)
         return states, rewards, terminals, {}
