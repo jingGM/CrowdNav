@@ -81,8 +81,7 @@ class Policy(object):
         self.test_var = args.test_var
         self.max_vx = args.max_vx
 
-        self.model, self.obs, self.means, self.log_vars, \
-            self.sampled_act, self.test_act = self._policy_net()
+        self.model, self.obs, self.means, self.log_vars,self.sampled_act, self.test_act = self._policy_net()
 
         self.sess.run(tf.global_variables_initializer())
 
@@ -134,8 +133,7 @@ class Policy(object):
         test_act = action_mean + \
             self.test_var * tf.random_normal(shape=(2,))
 
-        return [net, act_net, linear, angular], [scan, goal, vel], \
-            action_mean, log_vars, sampled_act, test_act
+        return [net, act_net, linear, angular], [scan, goal, vel],action_mean, log_vars, sampled_act, test_act
 
     def act(self, obs, terminated, batch=True):
         if not batch:
@@ -185,8 +183,7 @@ class Value(object):
         self.obs_shape = obs_shape
 
         self.model, self.obs, self.value = self._value_net()
-        self.ret_ph = tf.placeholder(
-            tf.float32, shape=[None, ], name='return_ph')
+        self.ret_ph = tf.placeholder(tf.float32, shape=[None, ], name='return_ph')
         self.loss = tf.reduce_mean(tf.square(self.value - self.ret_ph))
         self.optimizer = tf.train.AdamOptimizer(1e-3).minimize(self.loss)
 

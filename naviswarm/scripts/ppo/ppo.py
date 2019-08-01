@@ -54,8 +54,7 @@ class PPO(object):
         self.means = agent.policy.means
         self.log_vars = agent.policy.log_vars
 
-        self.obs_scan_value, self.obs_goal_value, self.obs_vel_value = \
-            agent.value.obs
+        self.obs_scan_value, self.obs_goal_value, self.obs_vel_value =agent.value.obs
         self.baseline = agent.value
         self.value = agent.value.value
 
@@ -106,11 +105,9 @@ class PPO(object):
         # compute kl
         with tf.variable_scope('kl'):
             self.kl = 0.5 * tf.reduce_mean(
-                tf.reduce_sum(
-                    tf.exp(self.old_log_vars_ph - self.log_vars)) +
-                tf.reduce_sum(
-                    tf.square(self.means - self.old_means_ph) / tf.exp(self.log_vars),
-                    axis=1) - self.act_dim + tf.reduce_sum(self.log_vars) -
+                tf.reduce_sum(tf.exp(self.old_log_vars_ph - self.log_vars)) +
+                tf.reduce_sum(tf.square(self.means - self.old_means_ph) / tf.exp(self.log_vars),axis=1) - 
+                self.act_dim + tf.reduce_sum(self.log_vars) -
                 tf.reduce_sum(self.old_log_vars_ph))
         # compute entropy
         with tf.variable_scope('entropy'):
@@ -152,24 +149,21 @@ class PPO(object):
     def update(self, paths):
         self.time_step += 1
 
-        acts = np.concatenate([path["action"] for path in paths])
-        obs_scan = np.concatenate([path["obs_scan"] for path in paths])
-        obs_goal = np.concatenate([path["obs_goal"] for path in paths])
+        acts    = np.concatenate([path["action"] for path in paths])
+        obs_scan= np.concatenate([path["obs_scan"] for path in paths])
+        obs_goal= np.concatenate([path["obs_goal"] for path in paths])
         obs_vel = np.concatenate([path["obs_vel"] for path in paths])
 
-        baseline_value = self.baseline.predict(
-            [obs_scan, obs_goal, obs_vel])
+        baseline_value = self.baseline.predict([obs_scan, obs_goal, obs_vel])
 
         last_path_size = 0
         for _, path in enumerate(paths):
             np.array(path["reward"])
             path["return"] = discount(path["reward"], self.args.gamma)
-            b = path["baseline"] = baseline_value[
-                last_path_size:last_path_size + path["done_id"]]
+            b = path["baseline"] = baseline_value[last_path_size:last_path_size + path["done_id"]]
             b1 = np.append(b, 0 if path["terminated"] else b[-1])
             deltas = path["reward"] + self.args.gamma * b1[1:] - b1[:-1]
-            path["advantage"] = discount(
-                deltas, self.args.gamma * self.args.lamda)
+            path["advantage"] = discount(deltas, self.args.gamma * self.args.lamda)
             last_path_size = path["done_id"]
 
         rets = np.concatenate([path["return"] for path in paths])
@@ -236,12 +230,12 @@ class PPO(object):
             if ep > 20:
                 succ_agent[i] = 1
 
-        stats["SuccessNum"] = succ_agent.sum()
-        stats["SuccessRate"] = succ_agent.sum() / succ_agent.shape[0]
-        stats["EpRewardsMean"] = epRewards.mean()
-        stats["EpRewardsMax"] = epRewards.max()
-        stats["EpRewardsMin"] = epRewards.min()
-        stats["EpPathLengthsMean"] = (epPathLengths * succ_agent).sum() / succ_agent.sum()
+        stats["SuccessNum"]       = succ_agent.sum()
+        stats["SuccessRate"]      = succ_agent.sum() / succ_agent.shape[0]
+        stats["EpRewardsMean"]    = epRewards.mean()
+        stats["EpRewardsMax"]     = epRewards.max()
+        stats["EpRewardsMin"]     = epRewards.min()
+        stats["EpPathLengthsMean"]= (epPathLengths * succ_agent).sum() / succ_agent.sum()
         stats["EpPathLengthsMax"] = (epPathLengths * succ_agent).max()
         stats["EpPathLengthsMin"] = (epPathLengths * succ_agent).min()
 
@@ -259,8 +253,7 @@ class PPO(object):
             self.lr_ph: self.actor_lr * self.lr_multiplier
         }
 
-        old_means_np, old_log_vars_np = self.session.run(
-            [self.means, self.log_vars], feed_dict)
+        old_means_np, old_log_vars_np = self.session.run([self.means, self.log_vars], feed_dict)
 
         feed_dict[self.old_log_vars_ph] = old_log_vars_np
         feed_dict[self.old_means_ph] = old_means_np
@@ -289,13 +282,10 @@ class PPO(object):
             obs_scan_train, obs_goal_train, obs_vel_train, ret_train = \
                 obs_scan, obs_goal, obs_vel, rets
         else:
-            obs_scan_train = np.concatenate(
-                [obs_scan, self.replay_buffer_obs_scan])
-            obs_goal_train = np.concatenate(
-                [obs_goal, self.replay_buffer_obs_goal])
-            obs_vel_train = np.concatenate(
-                [obs_vel, self.replay_buffer_obs_vel])
-            ret_train = np.concatenate([rets, self.replay_buffer_ret])
+            obs_scan_train  = np.concatenate([obs_scan, self.replay_buffer_obs_scan])
+            obs_goal_train  = np.concatenate([obs_goal, self.replay_buffer_obs_goal])
+            obs_vel_train   = np.concatenate([obs_vel, self.replay_buffer_obs_vel])
+            ret_train       = np.concatenate([rets, self.replay_buffer_ret])
 
         self.replay_buffer_obs_scan = obs_scan
         self.replay_buffer_obs_goal = obs_goal
