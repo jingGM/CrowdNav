@@ -136,6 +136,9 @@ class MultiRobotDRL(object):
             # receive the obs_of_agents sent by stage
             # check status of the agent: reached_goal, collision, over_run
             # if running (not done): act(obs)
+
+            #print(obs_agents.scanObsBatch)
+            #print("============scan length=============================")
             obs_agents = self.agent.obs_filter(obs_agents)
 
             scan_input = obs_agents[0]
@@ -143,6 +146,7 @@ class MultiRobotDRL(object):
             vel_input = obs_agents[2]
             image_input = obs_agents[3]
             depth_input = obs_agents[4]
+
 
             paths["obs_scan"].append(scan_input)
             paths["obs_goal"].append(goal_input)

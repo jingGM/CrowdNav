@@ -447,13 +447,12 @@ int GazeboTrain::train(){
       groundtruth_sub = nh.subscribe<gazebo_msgs::ModelStates>("/gazebo/model_states", 1, &GazeboTrain::gt_Callback, this);
       bumper_sub    = nh.subscribe<kobuki_msgs::BumperEvent>(name_space + "/mobile_base/events/bumper", 1, boost::bind(&GazeboTrain::bumper_Callback, this, _1, i));
 
-		  /*int checkstatus[4] = {1,1,1,1};
+		  int checkstatus[4] = {1,1,1,1};
       bool condition=(substatus[0]!=checkstatus[0])||(substatus[1]!=checkstatus[1])||(substatus[3]!=checkstatus[3])||(substatus[2]!=checkstatus[2]);
 		  while(condition){
-			 ros::spinOnce();
        condition=(substatus[0]!=checkstatus[0])||(substatus[1]!=checkstatus[1])||(substatus[3]!=checkstatus[3])||(substatus[2]!=checkstatus[2]);
 		  }
-		  for(int i=0;i<4;i++){substatus[i]=0;}*/
+		  for(int i=0;i<4;i++){substatus[i]=0;}
 
       // NOTE: Block to write the subscribed data into Shared memory
       naviswarm::Transition current_transition;

@@ -155,9 +155,6 @@ def callbackunsync(data,args):
 
 
 
-
-
-
 from sensor_msgs.msg import CompressedImage
 def testcompressed():
     #data = CameraImage()
@@ -181,7 +178,7 @@ def callbackfortest(data):
 
 
 if __name__ == '__main__':
-    rospy.init_node('test', anonymous=True)
+    rospy.init_node('ser', anonymous=True)
 
     #RobotNumber=5
 
@@ -189,5 +186,4 @@ if __name__ == '__main__':
     #listener(RobotNumber,data)
     #testcompressed()
 
-    while(True):
-        print(rosservice.get_service_node("update_goals"))
+
