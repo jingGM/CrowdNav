@@ -232,14 +232,17 @@ class StageEnv(object):
             if self.received_data_size == length:
                 succ = True
 
+            transitions = Transitions()
+            
+            states = States()
+            rewards = []
+            terminals = []
+
             if succ:
                 data = self.memory.read(offset=4, byte_count=length)
                 # rospy.logwarn('data length: {0}'.format(len(data)))
-                transitions = Transitions()
                 transitions = transitions.deserialize(str=data)
-                states = States()
-                rewards = []
-                terminals = []
+                
                 for i, t in enumerate(transitions.data):
                     states.scanObsBatch.append(t.state.scanObs)
                     states.goalObsBatch.append(t.state.goalObs)

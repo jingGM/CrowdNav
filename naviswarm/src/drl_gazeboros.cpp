@@ -478,6 +478,7 @@ int GazeboTrain::train(){
       state.velObs.vel_now.vx = odom_data.vx;
       state.velObs.vel_now.vz = odom_data.vz;
 
+      std::cout<<state.scanObs.scan_now<<std::endl;
       if (last_states.goalObsBatch.size() == 0) {
           state.goalObs.goal_pprev = state.goalObs.goal_now; //pprev is previous to previous goal. (We take 3 instances of observations.)
           state.goalObs.goal_prev = state.goalObs.goal_now;
