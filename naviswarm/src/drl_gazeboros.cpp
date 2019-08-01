@@ -221,7 +221,7 @@ class GazeboTrain {
     bool cb_update_srv(naviswarm::UpdateModelRequest& request, naviswarm::UpdateModelResponse& response);
     void velocity_Callback(const nav_msgs::OdometryConstPtr& odom);
    
-    int loop();
+    int train();
 };
 
 // Function definitions
@@ -229,7 +229,6 @@ class GazeboTrain {
 GazeboTrain::GazeboTrain(int n){
   collision_status.resize(n, false);
   num_robots = n;
-  loop(); // infinite loop to continuously subscribe to scan, odom, and groundtruth.
 }
 
 void GazeboTrain::acquire_semaphore()
@@ -380,14 +379,13 @@ bool GazeboTrain::cb_update_srv(naviswarm::UpdateModelRequest& request, naviswar
 
         response.success = true;
     }
+
     return true;
 }
 
 
 // Infinite loop function
-int GazeboTrain::loop(){
-  while(ros::ok()){
-
+int GazeboTrain::train(){
     // This loop is equivalent to the for loop inside
     //StageNode::WorldCallback in drl_stageros.cpp
     naviswarm::States current_states;
@@ -455,9 +453,8 @@ int GazeboTrain::loop(){
 			 ros::spinOnce();
        condition=(substatus[0]!=checkstatus[0])||(substatus[1]!=checkstatus[1])||(substatus[3]!=checkstatus[3])||(substatus[2]!=checkstatus[2]);
 		  }
-		  for(int i=0;i<4;i++){substatus[i]=0;}
-      */
-      
+		  for(int i=0;i<4;i++){substatus[i]=0;}*/
+
       // NOTE: Block to write the subscribed data into Shared memory
       naviswarm::Transition current_transition;
       // Initially the robot is at ground truth (x, y, theta)
@@ -639,7 +636,7 @@ int GazeboTrain::loop(){
     memcpy(share_addr, &length, 4);
     memcpy(share_addr+4, buffer.get(), length);
     release_semaphore();
-    // ROS_INFO("lock released");
+    ROS_INFO("lock released");
 
     // wait command processed
     bool succ = false;
@@ -648,7 +645,7 @@ int GazeboTrain::loop(){
       ros::Duration(0.005);
       acquire_semaphore();
       int new_length = *(int *) share_addr;
-      std::cout<< "Length ="<< length <<" New length = "<< new_length << std::endl;
+      //std::cout<< "Length ="<< length <<" New length = "<< new_length << std::endl;
       if (new_length != length) {
         succ = true;
         std::cout<<"Im here."<<std::endl;
@@ -660,7 +657,7 @@ int GazeboTrain::loop(){
           ros::serialization::IStream stream((share_addr + 4), new_length);
           ros::serialization::Serializer<naviswarm::Actions>::read(stream, actions); // Reads actions from shared memory
           release_semaphore();
-
+          ROS_INFO("ready to get data");
           if (actions.data.size() != num_robots){
               ROS_INFO("actions_size != robots_size, actions_size is %d", static_cast<int>(actions.data.size()));
               ROS_BREAK();
@@ -681,14 +678,18 @@ int GazeboTrain::loop(){
           release_semaphore();
       }
     }
+}
 
-
-  } // End of while ros::ok()
-} // End of function
 
 int main(int argc, char **argv){
   ros::init(argc, argv, "drl_gazeboros");
-  GazeboTrain train(2);
-  train.loop();
-  return 0;
+  GazeboTrain gazeboc(2);
+
+  boost::thread t = boost::thread(boost::bind(&ros::spin));
+
+  while(ros::ok() ){ //TODO: add method to check if gazebo is running
+    gazeboc.train();
+  }
+  t.join();
+  exit(0);
 }

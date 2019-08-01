@@ -224,6 +224,7 @@ class MultiRobotDRL(object):
             paths = self._get_paths(seed_iter)
             if args.train:
                 stats = self.alg.update(paths)
+                print("in training==============================")
             else:
                 stats, succ_agent = self.alg.test(paths)
                 stats["MeanDistance"] = (self.env.perfect_distance * succ_agent).sum() / succ_agent.sum()

@@ -217,15 +217,10 @@ class Value(object):
             net, n_units=128, act=tf.nn.relu, name='cnn_output_value')
         cnn_output = net.outputs
 
-        value_net = tl.layers.InputLayer(
-            tf.concat([goal, vel, cnn_output], axis=1),
-            name='goal_input_value')
-        value_net = tl.layers.DenseLayer(
-            value_net, n_units=64, act=tf.nn.tanh, name='value1')
-        value_net = tl.layers.DenseLayer(
-            value_net, n_units=64, act=tf.nn.tanh, name='value2')
-        value_net = tl.layers.DenseLayer(
-            value_net, n_units=1, name='value')
+        value_net = tl.layers.InputLayer(tf.concat([goal, vel, cnn_output], axis=1),name='goal_input_value')
+        value_net = tl.layers.DenseLayer(value_net, n_units=64, act=tf.nn.tanh, name='value1')
+        value_net = tl.layers.DenseLayer(value_net, n_units=64, act=tf.nn.tanh, name='value2')
+        value_net = tl.layers.DenseLayer(value_net, n_units=1, name='value')
         value = value_net.outputs
 
         return [net, value_net], [scan, goal, vel], value

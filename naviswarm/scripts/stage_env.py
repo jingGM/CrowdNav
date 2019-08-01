@@ -76,12 +76,10 @@ class StageEnv(object):
         self.scan_space = spaces.Box(low=0., high=4., shape=(512, ))
         self.image_space = spaces.Box(low=0., high=4., shape=(640,480,3))   #TODO: need to make sure the actual size
         self.depth_space = spaces.Box(low=0., high=4., shape=(640,480))
-        self.goal_space = spaces.Box(
-            low=np.array([0., -np.pi]), high=np.array([np.inf, np.pi]))
+        self.goal_space = spaces.Box(low=np.array([0., -np.pi]), high=np.array([np.inf, np.pi]))
 
         # rospy.wait_for_service("/update_positions")new initial poses and goal poses.
-        self.update_model_srv = rospy.ServiceProxy(
-            "/update_goals", UpdateModel)
+        self.update_model_srv = rospy.ServiceProxy("/update_goals", UpdateModel)
         # self.update_stage_srv.wait_for_service()
 
         self.scene_points = []
@@ -357,7 +355,6 @@ class StageEnv(object):
             state_msg.pose.orientation.w = np.sin(s[2] / 2)
             state_msg.reference_frame = 'ground_plane'
             rospy.wait_for_service('/gazebo/set_model_state')
-
             try:
                 reset_robots = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)
                 reset_robots(state_msg)
@@ -376,9 +373,12 @@ class StageEnv(object):
             goal.y = g[1]
             update_goal_request.points.append(goal)
 
-        # print("starts: ", self.starts)
-        # print("goals: ", self.goals)
-        resp = self.update_model_srv(update_goal_request) # Call the service
+        rospy.wait_for_service('/update_goals')
+        try:
+            resp = self.update_model_srv(update_goal_request)
+        except rospy.ServiceException, e:
+            print "Service call failed: %s"%e
+
         time.sleep(2.5)
         return resp.success
 
