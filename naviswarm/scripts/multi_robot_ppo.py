@@ -143,10 +143,8 @@ class MultiRobotDRL(object):
 
             scan_input = obs_agents[0]
             goal_input = obs_agents[1]
-            vel_input = obs_agents[2]
-            image_input = obs_agents[3]
-            depth_input = obs_agents[4]
-
+            vel_input  = obs_agents[2]
+            image_input= obs_agents[3]
 
             paths["obs_scan"].append(scan_input)
             paths["obs_goal"].append(goal_input)
@@ -157,7 +155,9 @@ class MultiRobotDRL(object):
             print(goal_input)
             print("============goal=============================")
             print(vel_input)
-            print("============velocity=============================")
+            print("============velocity=========================")
+            print(terminateds)
+            print("============terminats========================")
 
             if args.train:
                 action_agents = self.agent.policy.act(
@@ -168,7 +168,7 @@ class MultiRobotDRL(object):
             paths["action"].append(action_agents)
 
             print(action_agents)
-            print("============agent actions=============================")
+            print("============agent actions====================")
             obs_agents, reward_agents, done_agents, _ = env.step(action_agents)
 
             if step == 0:
@@ -268,7 +268,9 @@ if __name__ == "__main__":
         args.num_agents, args.num_obstacles,
         args.agent_radius, args.env_size, args.max_vx)
 
-    obs_shape = [3, env.scan_space.shape[0], env.goal_space.shape[0],env.image_space.shape[0],env.depth_space.shape[0]]
+    #print(env.image_space.shape)
+    #print("+++++++++++++++++++++++++++++++++++++")
+    obs_shape = [3, env.scan_space.shape[0], env.goal_space.shape[0],5,env.image_space.shape[0]]
     ac_shape = env.action_space.shape[0]
 
     agent = Agent(args, session, obs_shape, ac_shape)

@@ -153,22 +153,31 @@ class RunningAverageFilter(object):
                              x[i].scan_prev.ranges,
                              x[i].scan_now.ranges),
                             axis=1)
-                elif self.obstype == "camera":
+                elif self.obstype == "image":
                     if self.delta:
                         data = np.stack(
                             (np.array(x[i].image_now.data) - np.array(x[i].image_p4rev.data),
                              np.array(x[i].image_now.data) - np.array(x[i].image_p3rev.data),
                              np.array(x[i].image_now.data) - np.array(x[i].image_p2rev.data),
                              np.array(x[i].image_now.data) - np.array(x[i].image_p1rev.data),
-                             np.array(x[i].scan_now.data)),
+                             np.array(x[i].image_now.data)),
                             axis=1)
                     else:
+                        k=np.array(x[i].image_now.data)
+                        print(x[i].image_now.data)
+                        print(k.shape)
+                        print(len(x[i].image_now.data))
+                        print(len(x[i].image_p1rev.data))
+                        print(len(x[i].image_p2rev.data))
+                        print(len(x[i].image_p3rev.data))
+                        print(len(x[i].image_p4rev.data))
+                        print("==============image size===================")
                         data = np.stack(
-                            (x[i].image_p4rev.ranges,
-                             x[i].image_p3rev.ranges,
-                             x[i].image_p2rev.ranges,
-                             x[i].image_p1rev.ranges,
-                             x[i].scan_now.ranges),
+                            (x[i].image_p4rev.data,
+                             x[i].image_p3rev.data,
+                             x[i].image_p2rev.data,
+                             x[i].image_p1rev.data,
+                             x[i].image_now.data),
                             axis=1)
                 elif self.obstype == "goal":
                     data = [x[i].goal_now.goal_dist, x[i].goal_now.goal_theta]

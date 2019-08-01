@@ -71,11 +71,10 @@ class StageEnv(object):
         self.received_data_size = 0
 
         # self._seed()
-        self.action_space = spaces.Box(
-            low=np.array([0., -1.0]), high=np.array([1., 1.]))
+        self.action_space = spaces.Box(low=np.array([0., -1.0]), high=np.array([1., 1.]))
         self.scan_space = spaces.Box(low=0., high=4., shape=(512, ))
-        self.image_space = spaces.Box(low=0., high=4., shape=(640,480,3))   #TODO: need to make sure the actual size
-        self.depth_space = spaces.Box(low=0., high=4., shape=(640,480))
+        image_size = 640*480*3    #    depth_size = 640*480
+        self.image_space = spaces.Box(low=0., high=4., shape=(image_size,))   
         self.goal_space = spaces.Box(low=np.array([0., -np.pi]), high=np.array([np.inf, np.pi]))
 
         # rospy.wait_for_service("/update_positions")new initial poses and goal poses.
@@ -218,6 +217,10 @@ class StageEnv(object):
     def _read_data(self):
         print("entry: read data")
         succ = False
+        states = States()
+        rewards = []
+        terminals = []
+
         while not succ:
             # print("before sleep")
             time.sleep(0.005)
@@ -226,22 +229,19 @@ class StageEnv(object):
             size = self.memory.read(byte_count=4)
             length, = struct.unpack("i", size)
             # rospy.logwarn('python received data size: {}'.format(length))
+            print(length)
+            print(self.received_data_size)
+            print("==================size====================")
 
             if self.received_data_size == 0:
                 self.received_data_size = length
             if self.received_data_size == length:
                 succ = True
 
-            transitions = Transitions()
-            
-            states = States()
-            rewards = []
-            terminals = []
-            print(succ)
-            print("_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+")
             if succ:
                 data = self.memory.read(offset=4, byte_count=length)
                 # rospy.logwarn('data length: {0}'.format(len(data)))
+                transitions = Transitions()
                 transitions = transitions.deserialize(str=data)
                 
                 for i, t in enumerate(transitions.data):
@@ -249,16 +249,14 @@ class StageEnv(object):
                     states.goalObsBatch.append(t.state.goalObs)
                     states.actionObsBatch.append(t.state.actionObs)
                     states.velObsBatch.append(t.state.velObs)
-                    states.ImageObsBatch.append(t.state.ImageObs)
-                    states.DepthObsBatch.append(t.state.DepthObs)
+                    #states.ImageObsBatch.append(t.state.ImageObs)
+                    #states.DepthObsBatch.append(t.state.DepthObs)
                     self.agent_poses[i] = t.pose  # x, y, a
                     rewards.append(t.reward)
                     terminals.append(t.terminal)
-                print(len(states.scanObsBatch[0].scan_now.ranges))
             
             self.semaphore.release()
-        print("==============================")
-        # print(states.scanObsBatch[0].scan_now.ranges)
+        #print(states.scanObsBatch[0].scan_now.ranges)
         return states, rewards, terminals, {}
 
     def reset(self):

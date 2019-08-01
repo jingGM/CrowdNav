@@ -116,14 +116,9 @@ class GazeboTrain {
     geometry_msgs::Pose gpose;
     naviswarm::Velocity odom_data;
 
-    
     naviswarm::Scan         scan_data;
-    naviswarm::CameraImage  depth_data;
     naviswarm::CameraImage  img_data;
-    //cv::Mat img_data; // stores image frames published in /camera/rgb/image_raw/compressed converted to Mat format.
-    //cv::Mat depth_data;
 
-    std_msgs::Header depth_header;
     std_msgs::Header img_header;
     std_msgs::Header scan_header;
     std_msgs::Header odom_header;
@@ -212,6 +207,7 @@ class GazeboTrain {
           }
         }
       }
+
   public:
     // Function declarations
     GazeboTrain(int num_robots);
@@ -224,19 +220,16 @@ class GazeboTrain {
     void bumper_Callback(const kobuki_msgs::BumperEventConstPtr& bumper_msg, int i);
     bool cb_update_srv(naviswarm::UpdateModelRequest& request, naviswarm::UpdateModelResponse& response);
     void velocity_Callback(const nav_msgs::OdometryConstPtr& odom);
+    int create_sharedmemory();
    
     int train();
 };
 
-// Function definitions
 // Constructor for the class
 GazeboTrain::GazeboTrain(int n){
   collision_status.resize(n, false);
   num_robots = n;
-  /*for (int i=0;i<num_robots;i++){
-      last_states.actionObsBatch[i].ac_prev.vx = 0;
-      last_states.actionObsBatch[i].ac_prev.vz = 0;
-    }
+  /*
     ROS_INFO("++++++++++++++");*/
 }
 
@@ -291,17 +284,6 @@ void GazeboTrain::sync_Callback(const sensor_msgs::ImageConstPtr& image,
             collision_status[robotindex] = true;  // true indicates presence of obstacle
         }
     }
-
-    /*cv_bridge::CvImagePtr cvPtr;
-  try {
-  cvPtr = cv_bridge::toCvCopy(img_msg, sensor_msgs::image_encodings::BGR8);
-  // ROS_INFO("Inside image callback");
-  } catch (cv_bridge::Exception& e) {
-  ROS_ERROR("cv_bridge exception: %s", e.what());
-  return;
-  }
-  img_data = cvPtr->image;
-  */
 }
 
 void GazeboTrain::image_Callback(const sensor_msgs::ImageConstPtr& image){
@@ -309,11 +291,6 @@ void GazeboTrain::image_Callback(const sensor_msgs::ImageConstPtr& image){
 	
 	img_data.data    = image->data;
 	img_header   = image->header;
-	//std::cout<<img_header.stamp<<std::endl;
-  //std::cout<<img_data.data.size()<<std::endl;
-  //bool condi = img_data.data.size()>0;
-  //std::cout<<condi<<std::endl;
-  //ROS_INFO("-------------image---------------------");
 
   if (img_data.data.size()>0){substatus[0] =1;}
 
@@ -361,9 +338,8 @@ void GazeboTrain::bumper_Callback(const kobuki_msgs::BumperEventConstPtr& bumper
 void GazeboTrain::gt_Callback(const gazebo_msgs::ModelStates gt){
 	//ROS_INFO("running frame_trans callback");
 
-
+  std::string current_robot_name ="turtlebot"+std::to_string(current_robot);
 	for (int i = 0; i < gt.name.size(); i++){
-    std::string current_robot_name ="turtlebot"+std::to_string(current_robot);
 		if(gt.name[i]== current_robot_name) {
 		  gpose = gt.pose[i];
 		}
@@ -408,15 +384,9 @@ bool GazeboTrain::cb_update_srv(naviswarm::UpdateModelRequest& request, naviswar
     return true;
 }
 
+int GazeboTrain::create_sharedmemory(){
 
-// Infinite loop function
-int GazeboTrain::train(){
-    // This loop is equivalent to the for loop inside
-    //StageNode::WorldCallback in drl_stageros.cpp
-    naviswarm::States current_states;
-    naviswarm::Transitions current_transitions;
-
-    for (int j = 0; j < num_robots; ++j)
+  for (int j = 0; j < num_robots; ++j)
     {
         vec2 temp_goal;
         temp_goal.x = 0.;
@@ -426,7 +396,13 @@ int GazeboTrain::train(){
     path_length.resize(num_robots, 0.0); // Resize to size = no. of robots, init the new spaces to 0.0.
     time_elapsed.resize(num_robots, 0.0);
 
-    share_id = shmget(KEY, SIZE, IPC_CREAT | IPC_EXCL | PERMISSION);
+  /*for (int i=0;i<num_robots;i++){
+      last_states.actionObsBatch[i].ac_prev.vx = 0;
+      last_states.actionObsBatch[i].ac_prev.vz = 0;
+    }*/
+
+
+  share_id = shmget(KEY, SIZE, IPC_CREAT | IPC_EXCL | PERMISSION);
     //ROS_INFO("share_id: %d", share_id);
     if (share_id == -1){
         share_id = 0;
@@ -450,6 +426,14 @@ int GazeboTrain::train(){
     }
 
     release_semaphore();
+    return 0;
+}
+// Infinite loop function
+int GazeboTrain::train(){
+    // This loop is equivalent to the for loop inside
+    //StageNode::WorldCallback in drl_stageros.cpp
+    naviswarm::States current_states;
+    naviswarm::Transitions current_transitions;
 
     for(int i = 0; i < num_robots; i++){
       current_robot = i;
@@ -474,9 +458,7 @@ int GazeboTrain::train(){
 
 		  int checkstatus[4] = {1,1,1,1};
       bool condition=(substatus[0]!=checkstatus[0])||(substatus[1]!=checkstatus[1])||(substatus[3]!=checkstatus[3])||(substatus[2]!=checkstatus[2]);
-		  while(condition){
-       condition=(substatus[0]!=checkstatus[0])||(substatus[1]!=checkstatus[1])||(substatus[3]!=checkstatus[3])||(substatus[2]!=checkstatus[2]);
-		  }
+		  while(condition){condition=(substatus[0]!=checkstatus[0])||(substatus[1]!=checkstatus[1])||(substatus[3]!=checkstatus[3])||(substatus[2]!=checkstatus[2]);}
 		  for(int ind=0;ind<4;ind++){substatus[ind]=0;}
 
       // NOTE: Block to write the subscribed data into Shared memory
@@ -544,7 +526,7 @@ int GazeboTrain::train(){
           state.ImageObs.image_p1rev.data = state.ImageObs.image_now.data;
       }
 
-      state.DepthObs.image_now.data = depth_data.data;
+      /*state.DepthObs.image_now.data = depth_data.data;
       if (last_states.goalObsBatch.size() == 0) {
           //robotmodel->lasermodels[0]->GetSensors()[0].ranges;
           state.DepthObs.image_p1rev.data = depth_data.data;
@@ -557,7 +539,7 @@ int GazeboTrain::train(){
           state.DepthObs.image_p3rev.data = state.DepthObs.image_p2rev.data;
           state.DepthObs.image_p2rev.data = state.DepthObs.image_p1rev.data;
           state.DepthObs.image_p1rev.data = state.DepthObs.image_now.data;
-      }
+      }*/
 
       //
       if (last_states.goalObsBatch.size() == 0) {
@@ -648,14 +630,15 @@ int GazeboTrain::train(){
       current_states.actionObsBatch.push_back(state.actionObs);
       current_states.velObsBatch.push_back(state.velObs);
       current_states.ImageObsBatch.push_back(state.ImageObs);
-      current_states.DepthObsBatch.push_back(state.DepthObs);
+      //current_states.DepthObsBatch.push_back(state.DepthObs);
 
-      ROS_INFO("======");
     } // end of for loop
 
     last_states = current_states;
     // transition_collection.frame.push_back(current_transitions);
     // send the transition, copy the information into the shared memory
+
+    ROS_INFO("lock memory");
     acquire_semaphore();
     uint32_t length = ros::serialization::serializationLength(current_transitions);
     // ROS_INFO("current state length is %d", length);
@@ -671,6 +654,7 @@ int GazeboTrain::train(){
     bool succ = false;
     while (!succ && ros::ok()){
       // wait for client to modify this value
+      ROS_INFO("locked for actions");
       ros::Duration(0.005);
       acquire_semaphore();
       int new_length = *(int *) share_addr;
@@ -686,20 +670,20 @@ int GazeboTrain::train(){
           ros::serialization::IStream stream((share_addr + 4), new_length);
           ros::serialization::Serializer<naviswarm::Actions>::read(stream, actions); // Reads actions from shared memory
           release_semaphore();
-          ROS_INFO("ready to get data");
+          ROS_INFO("got data and released memory");
           if (actions.data.size() != num_robots){
               ROS_INFO("actions_size != robots_size, actions_size is %d", static_cast<int>(actions.data.size()));
               ROS_BREAK();
           }
           
           for (int j = 0 ; j < actions.data.size(); ++j){
-              // this->positionmodels[j]->SetSpeed(actions.data[j].vx, 0., actions.data[j].vz);
+              std::cout<<actions.data[j]<<std::endl;
+              ROS_INFO("============action=================");
               setvelocities(j, actions.data[j]);
 
               last_states.actionObsBatch[j].ac_pprev = last_states.actionObsBatch[j].ac_prev;
               last_states.actionObsBatch[j].ac_prev = actions.data[j];
           }
-          ROS_INFO("setted data+++++++++++++++++++++");
           executed_actions = actions;
           break;
       }
@@ -714,6 +698,9 @@ int GazeboTrain::train(){
 int main(int argc, char **argv){
   ros::init(argc, argv, "drl_gazeboros");
   GazeboTrain gazeboc(2);
+
+  if(gazeboc.create_sharedmemory() != 0)
+        exit(-1);
 
   boost::thread t = boost::thread(boost::bind(&ros::spin));
 
