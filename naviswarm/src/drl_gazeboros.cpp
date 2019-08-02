@@ -525,10 +525,10 @@ int GazeboTrain::train(){
           state.ImageObs.image_p4rev.data = img_data.data;
       }
       else {
-          state.ImageObs.image_p4rev.data = state.ImageObs.image_p3rev.data;
-          state.ImageObs.image_p3rev.data = state.ImageObs.image_p2rev.data;
-          state.ImageObs.image_p2rev.data = state.ImageObs.image_p1rev.data;
-          state.ImageObs.image_p1rev.data = state.ImageObs.image_now.data;
+          state.ImageObs.image_p4rev.data = last_states.ImageObsBatch[current_robot].image_p3rev.data;
+          state.ImageObs.image_p3rev.data = last_states.ImageObsBatch[current_robot].image_p2rev.data;
+          state.ImageObs.image_p2rev.data = last_states.ImageObsBatch[current_robot].image_p1rev.data;
+          state.ImageObs.image_p1rev.data = last_states.ImageObsBatch[current_robot].image_now.data;
       }
 
       /*state.DepthObs.image_now.data = depth_data.data;
@@ -659,7 +659,9 @@ int GazeboTrain::train(){
     int infodatasiz9 = current_transitions.data[0].state.ImageObs.image_p4rev.data.size();
     int infodatasiz0 = current_transitions.data[1].state.ImageObs.image_p4rev.data.size();
     std::cout<<infodatasiz1<<'|'<<infodatasiz2<<'|'<<infodatasiz3<<'|'<<infodatasiz4<<'|'<<infodatasiz5<<'|'<<infodatasiz6<<'|'<<infodatasiz7<<'|'<<infodatasiz8<<'|'<<infodatasiz9<<'|'<<infodatasiz0<<std::endl;
-    //std::cout<<state.goalObs.goal_now<<std::endl;
+    std::cout<<current_transitions.data[0].state.goalObs.goal_now.goal_dist<<'|'<<current_transitions.data[0].state.goalObs.goal_now.goal_theta<<'/'<<current_transitions.data[0].state.goalObs.goal_prev.goal_dist<<'|'<<current_transitions.data[0].state.goalObs.goal_prev.goal_theta<<'/'<<current_transitions.data[0].state.goalObs.goal_pprev.goal_dist<<'|'<<current_transitions.data[0].state.goalObs.goal_pprev.goal_theta<<std::endl;
+    std::cout<<current_transitions.data[1].state.goalObs.goal_now.goal_dist<<'|'<<current_transitions.data[1].state.goalObs.goal_now.goal_theta<<'/'<<current_transitions.data[1].state.goalObs.goal_prev.goal_dist<<'|'<<current_transitions.data[1].state.goalObs.goal_prev.goal_theta<<'/'<<current_transitions.data[1].state.goalObs.goal_pprev.goal_dist<<'|'<<current_transitions.data[1].state.goalObs.goal_pprev.goal_theta<<std::endl;
+    std::cout<<current_transitions.data[0].state.actionObs.ac_prev.vx<<'|'<<current_transitions.data[0].state.actionObs.ac_prev.vz<<'|'<<current_transitions.data[0].state.actionObs.ac_pprev.vx<<'|'<<current_transitions.data[0].state.actionObs.ac_pprev.vz<<'/'<<current_transitions.data[1].state.actionObs.ac_prev.vx<<'|'<<current_transitions.data[1].state.actionObs.ac_prev.vz<<'|'<<current_transitions.data[1].state.actionObs.ac_pprev.vx<<'|'<<current_transitions.data[1].state.actionObs.ac_pprev.vz<<std::endl;
 
     //ROS_INFO("lock memory");
     acquire_semaphore();
