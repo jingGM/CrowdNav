@@ -267,7 +267,7 @@ void GazeboTrain::sync_Callback(const sensor_msgs::ImageConstPtr& image,
   int robotindex = current_robot;
   substatus[0] = 1;
 
-  img_data.data    = image->data;
+  img_data.data    = *image;
   scan_data.ranges = scan->ranges;
 
   img_header   = image->header;
@@ -291,10 +291,10 @@ void GazeboTrain::sync_Callback(const sensor_msgs::ImageConstPtr& image,
 void GazeboTrain::image_Callback(const sensor_msgs::ImageConstPtr& image){
 	//ROS_INFO("running image callback");
 	
-	img_data.data    = image->data;
+	img_data.data= *image;
 	img_header   = image->header;
 
-  if (img_data.data.size()>0){substatus[0] =1;}
+  if (img_data.data.data.size()>0){substatus[0] =1;}
 
 }
 

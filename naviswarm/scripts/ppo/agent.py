@@ -74,9 +74,7 @@ class Policy(object):
         self.sess.run(tf.global_variables_initializer())
 
     def _policy_net(self):
-        scan = tf.placeholder(
-            tf.float32, [None, self.obs_shape[1], self.obs_shape[0]],
-            'scan_ph')
+        scan = tf.placeholder(tf.float32, [None, self.obs_shape[1], self.obs_shape[0]],'scan_ph')
         goal = tf.placeholder(tf.float32, [None, 2], 'goal_ph')
         vel = tf.placeholder(tf.float32, [None, 2], 'vel_ph')
 

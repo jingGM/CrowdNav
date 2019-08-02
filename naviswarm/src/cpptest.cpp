@@ -158,7 +158,7 @@ class GazeboTrain {
 	    bool cb_update_srv(naviswarm::UpdateModelRequest& request, naviswarm::UpdateModelResponse& response);
 	    void velocity_Callback(const nav_msgs::OdometryConstPtr& odom);
 
-	    void GazeboTrain::camera_Callback(const sensor_msgs::ImageConstPtr& img_msg) {
+	    void camera_Callback(const sensor_msgs::ImageConstPtr& img_msg) {
 		  cv_bridge::CvImagePtr cvPtr;
 		  try {
 		    cvPtr = cv_bridge::toCvCopy(img_msg, sensor_msgs::image_encodings::BGR8);
@@ -172,7 +172,7 @@ class GazeboTrain {
 		  //ROS_INFO("=================================================");
 		}
 	    
-	    void GazeboTrain::subscribecamera(){
+	    void subscribecamera(){
 	    	image_sub		= nh.subscribe<sensor_msgs::Image>("turtlebot0/camera/image_raw", 1, &GazeboTrain::camera_Callback, this);
 	    	ros::spin();
 	    }
@@ -229,7 +229,7 @@ void GazeboTrain::sync_Callback(const sensor_msgs::ImageConstPtr& image,
 	int robotindex = current_robot;
 	substatus[0] = 1;
 
-	img_data.data 	 = image->data;
+	img_data.data 	 = *image;
 	scan_data.ranges = scan->ranges;
 
 	img_header   = image->header;
@@ -263,7 +263,7 @@ void GazeboTrain::sync_Callback(const sensor_msgs::ImageConstPtr& image,
 
 void GazeboTrain::image_Callback(const sensor_msgs::ImageConstPtr& image){
 	substatus[0] =1;
-	img_data.data 	 = image->data;
+	img_data.data 	 = *image;
 	img_header   = image->header;
 	std::cout<<img_header.stamp<<std::endl;
 }

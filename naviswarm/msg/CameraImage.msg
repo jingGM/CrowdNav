@@ -1,1 +1,1 @@
-uint8[] data
+sensor_msgs/Image data

@@ -188,6 +188,7 @@ def callbackfortest(data):
     except CvBridgeError as e:
       print(e)
 
+    a = uint8()
     a = np.array(cv_image)
     print(a.shape)
     #print(data.data)
