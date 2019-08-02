@@ -13,6 +13,8 @@
  #include <sstream>
 
  #include <ros/ros.h>
+ #include <std_msgs/Header.h>
+ #include <std_msgs/Float32.h>
  #include <gazebo_msgs/ModelStates.h>
  #include <boost/thread/mutex.hpp>
  #include <boost/thread/thread.hpp>
@@ -396,6 +398,8 @@ int GazeboTrain::create_sharedmemory(){
     path_length.resize(num_robots, 0.0); // Resize to size = no. of robots, init the new spaces to 0.0.
     time_elapsed.resize(num_robots, 0.0);
 
+  reward_pub = nh.advertise<naviswarm::Reward>("/reward", 1000);
+
   /*for (int i=0;i<num_robots;i++){
       last_states.actionObsBatch[i].ac_prev.vx = 0;
       last_states.actionObsBatch[i].ac_prev.vz = 0;
@@ -487,16 +491,17 @@ int GazeboTrain::train(){
 
       //state.velObs.vel_now.vx = last_states.actionObsBatch[current_robot].ac_prev.vx;
       //state.velObs.vel_now.vz = last_states.actionObsBatch[current_robot].ac_prev.vz;
-      ROS_INFO("++++++++state+++++++");
-      std::cout<<state.velObs.vel_now<<std::endl;
+      
+      //std::cout<<last_states.goalObsBatch.size()<<std::endl;
+      //ROS_INFO("+++++++++++++++++++size+++++++++++++++++++");
 
       if (last_states.goalObsBatch.size() == 0) {
           state.goalObs.goal_pprev = state.goalObs.goal_now; //pprev is previous to previous goal. (We take 3 instances of observations.)
           state.goalObs.goal_prev = state.goalObs.goal_now;
       }
       else {
-          state.goalObs.goal_pprev = last_states.goalObsBatch[i].goal_prev;
-          state.goalObs.goal_prev = last_states.goalObsBatch[i].goal_now;
+          state.goalObs.goal_pprev = last_states.goalObsBatch[current_robot].goal_prev;
+          state.goalObs.goal_prev = last_states.goalObsBatch[current_robot].goal_now;
       }
 
       // TODO: Need to confirm if this is same as what was given in drl_stageros.
@@ -507,8 +512,8 @@ int GazeboTrain::train(){
           state.scanObs.scan_prev = state.scanObs.scan_now;
       }
       else {
-          state.scanObs.scan_pprev = last_states.scanObsBatch[i].scan_prev;
-          state.scanObs.scan_prev = last_states.scanObsBatch[i].scan_now;
+          state.scanObs.scan_pprev = last_states.scanObsBatch[current_robot].scan_prev;
+          state.scanObs.scan_prev = last_states.scanObsBatch[current_robot].scan_now;
       }
 
       state.ImageObs.image_now.data = img_data.data;
@@ -550,8 +555,8 @@ int GazeboTrain::train(){
       }
       else {
           // should set last_states.data[r].acobs.ac_prev = actions.data[i] (this is ac_now)
-          state.actionObs.ac_pprev = last_states.actionObsBatch[i].ac_pprev;
-          state.actionObs.ac_prev = last_states.actionObsBatch[i].ac_prev;
+          state.actionObs.ac_pprev = last_states.actionObsBatch[current_robot].ac_pprev;
+          state.actionObs.ac_prev = last_states.actionObsBatch[current_robot].ac_prev;
       }
 
       // initial obs/state/transition
@@ -570,8 +575,6 @@ int GazeboTrain::train(){
           reward.reward_approaching_goal = 0.;
 
           current_transition.state = state;
-          //current_transition.next_state = msg;
-          //current_transition.action = executed_actions.data[r];
 
           if (state.goalObs.goal_now.goal_dist < 0.2) {  // arrived the goal
               current_transition.terminal = true;
@@ -595,7 +598,7 @@ int GazeboTrain::train(){
                   double penalty_for_bigvz = 0.0;
                   if (std::abs(executed_actions.data[i].vz) > 0.7) // executed actions = actions (set later)
                   {
-                      penalty_for_bigvz = -0.05*std::abs(executed_actions.data[i].vz);
+                      penalty_for_bigvz = -0.05*std::abs(executed_actions.data[current_robot].vz);
                   }
 
                   double penalty_for_deviation = 0.0;
@@ -635,10 +638,30 @@ int GazeboTrain::train(){
     } // end of for loop
 
     last_states = current_states;
-    // transition_collection.frame.push_back(current_transitions);
-    // send the transition, copy the information into the shared memory
+    
+    ROS_INFO("++++++++state+++++++");
+    std::cout<<current_transitions.data[0].state.velObs.vel_now.vx<<current_transitions.data[0].state.velObs.vel_now.vz<<current_transitions.data[1].state.velObs.vel_now.vx<<current_transitions.data[1].state.velObs.vel_now.vz<<std::endl;
+    int infodatasize1 = current_transitions.data[0].state.scanObs.scan_now.ranges.size();
+    int infodatasize2 = current_transitions.data[1].state.scanObs.scan_now.ranges.size();
+    int infodatasize3 = current_transitions.data[0].state.scanObs.scan_pprev.ranges.size();
+    int infodatasize4 = current_transitions.data[1].state.scanObs.scan_pprev.ranges.size();
+    int infodatasize5 = current_transitions.data[0].state.scanObs.scan_prev.ranges.size();
+    int infodatasize6 = current_transitions.data[1].state.scanObs.scan_prev.ranges.size();
+    std::cout<<infodatasize1<<'|'<<infodatasize2<<'|'<<infodatasize3<<'|'<<infodatasize4<<'|'<<infodatasize5<<'|'<<infodatasize6<<std::endl;
+    int infodatasiz1 = current_transitions.data[0].state.ImageObs.image_now.data.size();
+    int infodatasiz2 = current_transitions.data[1].state.ImageObs.image_now.data.size();
+    int infodatasiz3 = current_transitions.data[0].state.ImageObs.image_p1rev.data.size();
+    int infodatasiz4 = current_transitions.data[1].state.ImageObs.image_p1rev.data.size();
+    int infodatasiz5 = current_transitions.data[0].state.ImageObs.image_p2rev.data.size();
+    int infodatasiz6 = current_transitions.data[1].state.ImageObs.image_p2rev.data.size();
+    int infodatasiz7 = current_transitions.data[0].state.ImageObs.image_p3rev.data.size();
+    int infodatasiz8 = current_transitions.data[1].state.ImageObs.image_p3rev.data.size();
+    int infodatasiz9 = current_transitions.data[0].state.ImageObs.image_p4rev.data.size();
+    int infodatasiz0 = current_transitions.data[1].state.ImageObs.image_p4rev.data.size();
+    std::cout<<infodatasiz1<<'|'<<infodatasiz2<<'|'<<infodatasiz3<<'|'<<infodatasiz4<<'|'<<infodatasiz5<<'|'<<infodatasiz6<<'|'<<infodatasiz7<<'|'<<infodatasiz8<<'|'<<infodatasiz9<<'|'<<infodatasiz0<<std::endl;
+    //std::cout<<state.goalObs.goal_now<<std::endl;
 
-    ROS_INFO("lock memory");
+    //ROS_INFO("lock memory");
     acquire_semaphore();
     uint32_t length = ros::serialization::serializationLength(current_transitions);
     // ROS_INFO("current state length is %d", length);
@@ -648,13 +671,14 @@ int GazeboTrain::train(){
     memcpy(share_addr, &length, 4);
     memcpy(share_addr+4, buffer.get(), length);
     release_semaphore();
-    ROS_INFO("lock released");
+    std::cout<<length<<std::endl;
+    //ROS_INFO("lock released");
 
     // wait command processed
     bool succ = false;
     while (!succ && ros::ok()){
       // wait for client to modify this value
-      ROS_INFO("locked for actions");
+      //ROS_INFO("locked for actions");
       ros::Duration(0.005);
       acquire_semaphore();
       int new_length = *(int *) share_addr;
@@ -677,8 +701,8 @@ int GazeboTrain::train(){
           }
           
           for (int j = 0 ; j < actions.data.size(); ++j){
-              std::cout<<actions.data[j]<<std::endl;
-              ROS_INFO("============action=================");
+              //std::cout<<actions.data[j]<<std::endl;
+              //ROS_INFO("============action=================");
               setvelocities(j, actions.data[j]);
 
               last_states.actionObsBatch[j].ac_pprev = last_states.actionObsBatch[j].ac_prev;
