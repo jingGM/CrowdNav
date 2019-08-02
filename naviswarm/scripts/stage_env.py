@@ -229,9 +229,9 @@ class StageEnv(object):
             size = self.memory.read(byte_count=4)
             length, = struct.unpack("i", size)
             # rospy.logwarn('python received data size: {}'.format(length))
-            print(length)
-            print(self.received_data_size)
-            print("==================size====================")
+            #print(length)
+            #print(self.received_data_size)
+            #print("==================size====================")
 
             if self.received_data_size == 0:
                 self.received_data_size = length

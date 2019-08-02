@@ -150,14 +150,14 @@ class MultiRobotDRL(object):
             paths["obs_goal"].append(goal_input)
             paths["obs_vel"].append(vel_input)
 
-            print(scan_input)
-            print("============scan=============================")
-            print(goal_input)
-            print("============goal=============================")
-            print(vel_input)
-            print("============velocity=========================")
-            print(terminateds)
-            print("============terminats========================")
+            #print(scan_input)
+            #print("============scan=============================")
+            #print(goal_input)
+            #print("============goal=============================")
+            #print(vel_input)
+            #print("============velocity=========================")
+            #print(terminateds)
+            #print("============terminats========================")
 
             if args.train:
                 action_agents = self.agent.policy.act(

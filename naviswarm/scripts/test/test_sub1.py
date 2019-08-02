@@ -7,7 +7,7 @@ Created on Sat Jul 20 19:47:07 2019
 """
 
 import rospy
-from std_msgs.msg import String
+from std_msgs.msg import String, uint8
 
 import message_filters
 
@@ -20,6 +20,8 @@ from kobuki_msgs.msg import BumperEvent, CliffEvent
 from gazebo_msgs.msg import ContactState
 
 import rosservice
+import csv
+import numpy as np
 
 
 class EnvData(object):
@@ -158,33 +160,51 @@ def callbackunsync(data,args):
 
 
 
-from sensor_msgs.msg import CompressedImage
+from cv_bridge import CvBridge, CvBridgeError
+
 def testcompressed():
     #data = CameraImage()
     #print(type(data.data))
     #data.data+='1'
     #data.data.append(1)
-    rospy.Subscriber("/turtlebot1/scan", LaserScan, callbackfortest, queue_size=1)
+    rospy.Subscriber("/turtlebot0/camera/image_raw", Image, callbackfortest, queue_size=1)
     
     rospy.spin()
     #print(data)
-
+    '''
     callbackstatus = False
     while(not callbackstatus):
         if (rosservice.get_service_node("update_goals")!=none):
             callbackstatus=True
             value = [geometry_msgs.Point()]
-            
+    '''  
 
 
 def callbackfortest(data):
-    print("--------------------------------")
+    image = data.data
+    bridge = CvBridge()
+    try:
+      cv_image = bridge.imgmsg_to_cv2(data, "bgr8")
+    except CvBridgeError as e:
+      print(e)
+
+    a = np.array(cv_image)
+    print(a.shape)
+    #print(data.data)
+
+    #print("--------------------------------")
     #print(image.cams)
     #image.cams.append(data.data)
-    print(len(data.ranges))
-
-
-
+    #print(len(data.ranges))
+    #print(data.header)
+    '''
+    with open('sales.csv', 'w') as csv_file:
+        print("writing")
+        csv_writer = csv.writer(csv_file, delimiter=',')
+        csv_writer.writerow(data.data)
+    
+    
+    '''
 if __name__ == '__main__':
     rospy.init_node('test', anonymous=True)
 
@@ -192,7 +212,4 @@ if __name__ == '__main__':
 
     #data = EnvData(RobotNumber)
     #listener(RobotNumber,data)
-    #testcompressed()
-
-    while(True):
-        print()
+    testcompressed()

@@ -136,6 +136,8 @@ class GazeboTrain {
 	    naviswarm::Velocity 	odom_data;
 	    naviswarm::Scan 		scan_data;
 
+	    cv::Mat cam_data;
+
 		std_msgs::Header img_header;
 		std_msgs::Header scan_header;
 		std_msgs::Header odom_header;
@@ -155,7 +157,25 @@ class GazeboTrain {
 	    void bumper_Callback(const kobuki_msgs::BumperEventConstPtr& bumper_msg, int i);
 	    bool cb_update_srv(naviswarm::UpdateModelRequest& request, naviswarm::UpdateModelResponse& response);
 	    void velocity_Callback(const nav_msgs::OdometryConstPtr& odom);
+
+	    void GazeboTrain::camera_Callback(const sensor_msgs::ImageConstPtr& img_msg) {
+		  cv_bridge::CvImagePtr cvPtr;
+		  try {
+		    cvPtr = cv_bridge::toCvCopy(img_msg, sensor_msgs::image_encodings::BGR8);
+		  } catch (cv_bridge::Exception& e) {
+		    ROS_ERROR("cv_bridge exception: %s", e.what());
+		    return;
+		  }
+		  cam_data = cvPtr->image;
+		  //img_data=cam_data
+		  //std::cout<<image_data<<std::endl;
+		  //ROS_INFO("=================================================");
+		}
 	    
+	    void GazeboTrain::subscribecamera(){
+	    	image_sub		= nh.subscribe<sensor_msgs::Image>("turtlebot0/camera/image_raw", 1, &GazeboTrain::camera_Callback, this);
+	    	ros::spin();
+	    }
 
 	    void runvelocity(){
 	    	naviswarm::Actions velocity;

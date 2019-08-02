@@ -85,41 +85,27 @@ class Policy(object):
         net = tl.layers.MeanPool1d(net, filter_size=3, strides=2, name='min_pooling2')
         net = tl.layers.MeanPool1d(net, filter_size=3, strides=2, name='min_pooling3')
 
-        net = tl.layers.Conv1dLayer(
-            net, act=tf.nn.relu, shape=[5, self.obs_shape[0], 8], stride=2,
-            name='cnn1')
-        net = tl.layers.Conv1dLayer(
-            net, act=tf.nn.relu, shape=[3, 8, 16], stride=2,
-            name='cnn2')
+        net = tl.layers.Conv1dLayer(net, act=tf.nn.relu, shape=[5, self.obs_shape[0], 8], stride=2,name='cnn1')
+        net = tl.layers.Conv1dLayer(net, act=tf.nn.relu, shape=[3, 8, 16], stride=2,name='cnn2')
         net = tl.layers.FlattenLayer(net, name='fl')
-        net = tl.layers.DenseLayer(
-            net, n_units=128, act=tf.nn.relu, name='cnn_output')
+        net = tl.layers.DenseLayer(net, n_units=128, act=tf.nn.relu, name='cnn_output')
         cnn_output = net.outputs
 
-        act_net = tl.layers.InputLayer(
-            tf.concat([goal, vel, cnn_output], axis=1), name='goal_input')
-        act_net = tl.layers.DenseLayer(
-            act_net, n_units=64, act=tf.nn.tanh, name='act1')
-        act_net = tl.layers.DenseLayer(
-            act_net, n_units=64, act=tf.nn.tanh, name='act2')
-        linear = tl.layers.DenseLayer(
-            act_net, n_units=1, act=tf.nn.sigmoid, name='linear')
-        angular = tl.layers.DenseLayer(
-            act_net, n_units=1, act=tf.nn.tanh, name='angular')
+        act_net = tl.layers.InputLayer(tf.concat([goal, vel, cnn_output], axis=1), name='goal_input')
+        act_net = tl.layers.DenseLayer(act_net, n_units=64, act=tf.nn.tanh, name='act1')
+        act_net = tl.layers.DenseLayer(act_net, n_units=64, act=tf.nn.tanh, name='act2')
+        linear = tl.layers.DenseLayer(act_net, n_units=1, act=tf.nn.sigmoid, name='linear')
+        angular = tl.layers.DenseLayer(act_net, n_units=1, act=tf.nn.tanh, name='angular')
         with tf.variable_scope('means'):
             action_mean = tf.concat([linear.outputs, angular.outputs], axis=1)
 
         logvar_speed = (10 * 128) // 48
-        log_vars = tf.get_variable(
-            'logvars', (logvar_speed, 2), tf.float32,
-            tf.constant_initializer(0.0))
+        log_vars = tf.get_variable('logvars', (logvar_speed, 2), tf.float32,tf.constant_initializer(0.0))
         log_vars = tf.reduce_sum(log_vars, axis=0)
 
-        sampled_act = action_mean + \
-            tf.exp(log_vars / 2.0) * tf.random_normal(shape=(2,))
+        sampled_act = action_mean + tf.exp(log_vars / 2.0) * tf.random_normal(shape=(2,))
 
-        test_act = action_mean + \
-            self.test_var * tf.random_normal(shape=(2,))
+        test_act = action_mean + self.test_var * tf.random_normal(shape=(2,))
 
         return [net, act_net, linear, angular], [scan, goal, vel],action_mean, log_vars, sampled_act, test_act
 
@@ -178,28 +164,19 @@ class Value(object):
         self.sess.run(tf.global_variables_initializer())
 
     def _value_net(self):
-        scan = tf.placeholder(
-            tf.float32, [None, self.obs_shape[1], self.obs_shape[0]],
-            'scan_value_ph')
+        scan = tf.placeholder(tf.float32, [None, self.obs_shape[1], self.obs_shape[0]],'scan_value_ph')
         goal = tf.placeholder(tf.float32, [None, 2], 'goal_value_ph')
         vel = tf.placeholder(tf.float32, [None, 2], 'vel_value_ph')
 
-        net = tl.layers.InputLayer(
-            scan, name='scan_input_value')
+        net = tl.layers.InputLayer(scan, name='scan_input_value')
         net = tl.layers.MeanPool1d(net, filter_size=3, strides=2, name='min_pooling1_value')
         net = tl.layers.MeanPool1d(net, filter_size=3, strides=2, name='min_pooling2_value')
         net = tl.layers.MeanPool1d(net, filter_size=3, strides=2, name='min_pooling3_value')
 
-        net = tl.layers.Conv1dLayer(
-            net, act=tf.nn.relu, shape=[5, self.obs_shape[0], 8], stride=2,
-            name='cnn1_value')
-        net = tl.layers.Conv1dLayer(
-            net, act=tf.nn.relu, shape=[3, 8, 16], stride=2,
-            name='cnn2_value')
-        net = tl.layers.FlattenLayer(
-            net, name='fl_value')
-        net = tl.layers.DenseLayer(
-            net, n_units=128, act=tf.nn.relu, name='cnn_output_value')
+        net = tl.layers.Conv1dLayer(net, act=tf.nn.relu, shape=[5, self.obs_shape[0], 8], stride=2,name='cnn1_value')
+        net = tl.layers.Conv1dLayer(net, act=tf.nn.relu, shape=[3, 8, 16], stride=2,name='cnn2_value')
+        net = tl.layers.FlattenLayer(net, name='fl_value')
+        net = tl.layers.DenseLayer(net, n_units=128, act=tf.nn.relu, name='cnn_output_value')
         cnn_output = net.outputs
 
         value_net = tl.layers.InputLayer(tf.concat([goal, vel, cnn_output], axis=1),name='goal_input_value')
