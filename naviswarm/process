@@ -1,0 +1,23 @@
+Changing velocities:
+	//velocity_sub  = nh.subscribe<nav_msgs::Odometry>(name_space + "/odom", 1, &GazeboTrain::velocity_Callback, this);
+
+
+	int checkstatus[4] = {1,1,0,1};
+
+
+	// v is subscribed from odom in our case.
+	//state.velObs.vel_now.vx = odom_data.vx;
+	//state.velObs.vel_now.vz = odom_data.vz;
+	state.velObs.vel_now.vx = last_states.actionObsBatch[current_robot].ac_prev.vx;
+	state.velObs.vel_now.vz = last_states.actionObsBatch[current_robot].ac_prev.vz;
+
+
+	for (int i=0;i<num_robots;i++){
+	    std::string name_space = "/turtlebot" + std::to_string(i);
+	    naviswarm::ActionObs actionobs_data;
+	    actionobs_data.ac_prev.vx = 0; 
+	    actionobs_data.ac_prev.vz = 0; 
+	    actionobs_data.ac_pprev.vx = 0; 
+	    actionobs_data.ac_pprev.vz = 0; 
+	    last_states.actionObsBatch.push_back(actionobs_data);
+	  }

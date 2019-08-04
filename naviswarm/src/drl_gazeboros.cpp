@@ -49,6 +49,7 @@
  #include <naviswarm/Velocities.h>
  #include <naviswarm/Action.h>
  #include <naviswarm/Actions.h>
+ #include <naviswarm/ActionObs.h>
  #include <naviswarm/Goal.h>
  #include <naviswarm/Scan.h>
  #include <naviswarm/State.h>
@@ -399,11 +400,17 @@ int GazeboTrain::create_sharedmemory(){
     time_elapsed.resize(num_robots, 0.0);
 
   reward_pub = nh.advertise<naviswarm::Reward>("/reward", 1000);
-
-  /*for (int i=0;i<num_robots;i++){
-      last_states.actionObsBatch[i].ac_prev.vx = 0;
-      last_states.actionObsBatch[i].ac_prev.vz = 0;
-    }*/
+  
+  
+  for (int i=0;i<num_robots;i++){
+    std::string name_space = "/turtlebot" + std::to_string(i);
+    naviswarm::ActionObs actionobs_data;
+    actionobs_data.ac_prev.vx = 0; 
+    actionobs_data.ac_prev.vz = 0; 
+    actionobs_data.ac_pprev.vx = 0; 
+    actionobs_data.ac_pprev.vz = 0; 
+    last_states.actionObsBatch.push_back(actionobs_data);
+  }
 
 
   share_id = shmget(KEY, SIZE, IPC_CREAT | IPC_EXCL | PERMISSION);
@@ -439,6 +446,7 @@ int GazeboTrain::train(){
     naviswarm::States current_states;
     naviswarm::Transitions current_transitions;
 
+    //ROS_INFO("in training");
     for(int i = 0; i < num_robots; i++){
       current_robot = i;
 
@@ -456,11 +464,11 @@ int GazeboTrain::train(){
 
       image_sub   = nh.subscribe<sensor_msgs::Image>(name_space + "/camera/image_raw", 1, &GazeboTrain::image_Callback, this); //"/camera/depth/image_raw"
       scan_sub    = nh.subscribe<sensor_msgs::LaserScan>(name_space + "/scan", 1, &GazeboTrain::scan_Callback, this);
-      velocity_sub  = nh.subscribe<nav_msgs::Odometry>(name_space + "/odom", 1, &GazeboTrain::velocity_Callback, this);
+      //velocity_sub  = nh.subscribe<nav_msgs::Odometry>(name_space + "/odom", 1, &GazeboTrain::velocity_Callback, this);
       groundtruth_sub = nh.subscribe<gazebo_msgs::ModelStates>("/gazebo/model_states", 1, &GazeboTrain::gt_Callback, this);
       bumper_sub    = nh.subscribe<kobuki_msgs::BumperEvent>(name_space + "/mobile_base/events/bumper", 1, boost::bind(&GazeboTrain::bumper_Callback, this, _1, i));
 
-		  int checkstatus[4] = {1,1,1,1};
+		  int checkstatus[4] = {1,1,0,1};
       bool condition=(substatus[0]!=checkstatus[0])||(substatus[1]!=checkstatus[1])||(substatus[3]!=checkstatus[3])||(substatus[2]!=checkstatus[2]);
 		  while(condition){condition=(substatus[0]!=checkstatus[0])||(substatus[1]!=checkstatus[1])||(substatus[3]!=checkstatus[3])||(substatus[2]!=checkstatus[2]);}
 		  for(int ind=0;ind<4;ind++){substatus[ind]=0;}
@@ -486,14 +494,15 @@ int GazeboTrain::train(){
       // std::cout<< state.goalObs.goal_now.goal_theta << std::endl;
 
       // v is subscribed from odom in our case.
-      state.velObs.vel_now.vx = odom_data.vx;
-      state.velObs.vel_now.vz = odom_data.vz;
-
-      //state.velObs.vel_now.vx = last_states.actionObsBatch[current_robot].ac_prev.vx;
-      //state.velObs.vel_now.vz = last_states.actionObsBatch[current_robot].ac_prev.vz;
+      //state.velObs.vel_now.vx = odom_data.vx;
+      //state.velObs.vel_now.vz = odom_data.vz;
+      //std::cout<<last_states.actionObsBatch[current_robot].ac_prev<<std::endl;
+      state.velObs.vel_now.vx = last_states.actionObsBatch[current_robot].ac_prev.vx;
+      state.velObs.vel_now.vz = last_states.actionObsBatch[current_robot].ac_prev.vz;
       
       //std::cout<<last_states.goalObsBatch.size()<<std::endl;
-      
+      ROS_INFO("+++ velocity +++");
+      std::cout<<state.velObs.vel_now<<std::endl;
 
       if (last_states.goalObsBatch.size() == 0) {
           state.goalObs.goal_pprev = state.goalObs.goal_now; //pprev is previous to previous goal. (We take 3 instances of observations.)
@@ -653,7 +662,7 @@ int GazeboTrain::train(){
       //std::cout<< "Length ="<< length <<" New length = "<< new_length << std::endl;
       if (new_length != length) {
         succ = true;
-        ROS_INFO("wait shared data")
+        ROS_INFO("wait shared data");
       } // Write has succeeded
 
       if (succ)
@@ -669,8 +678,8 @@ int GazeboTrain::train(){
           }
           
           for (int j = 0 ; j < actions.data.size(); ++j){
-              //std::cout<<actions.data[j]<<std::endl;
-              //ROS_INFO("============action=================");
+              std::cout<<actions.data[j]<<std::endl;
+              ROS_INFO("============action=================");
               setvelocities(j, actions.data[j]);
               last_states.actionObsBatch[j].ac_pprev = last_states.actionObsBatch[j].ac_prev;
               last_states.actionObsBatch[j].ac_prev = actions.data[j];
