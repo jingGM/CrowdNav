@@ -368,7 +368,7 @@ bool GazeboTrain::cb_update_srv(naviswarm::UpdateModelRequest& request, naviswar
             goal.x = request.points[r].x;
             goal.y = request.points[r].y;
             current_goal[r] = goal;
-            ROS_INFO("Goal_%d: %.3f, %.3f", int(r), goal.x, goal.y);
+            //ROS_INFO("Goal_%d: %.3f, %.3f", int(r), goal.x, goal.y);
         }
 
         // WARNING: IT MAY NOT FREE THE MEMORY SPACE
@@ -493,7 +493,7 @@ int GazeboTrain::train(){
       //state.velObs.vel_now.vz = last_states.actionObsBatch[current_robot].ac_prev.vz;
       
       //std::cout<<last_states.goalObsBatch.size()<<std::endl;
-      //ROS_INFO("+++++++++++++++++++size+++++++++++++++++++");
+      
 
       if (last_states.goalObsBatch.size() == 0) {
           state.goalObs.goal_pprev = state.goalObs.goal_now; //pprev is previous to previous goal. (We take 3 instances of observations.)
@@ -506,45 +506,9 @@ int GazeboTrain::train(){
 
       // TODO: Need to confirm if this is same as what was given in drl_stageros.
       state.scanObs.scan_now.ranges = scan_data.ranges;
-      if (last_states.goalObsBatch.size() == 0) {
-          //robotmodel->lasermodels[0]->GetSensors()[0].ranges;
-          state.scanObs.scan_pprev = state.scanObs.scan_now;
-          state.scanObs.scan_prev = state.scanObs.scan_now;
-      }
-      else {
-          state.scanObs.scan_pprev = last_states.scanObsBatch[current_robot].scan_prev;
-          state.scanObs.scan_prev = last_states.scanObsBatch[current_robot].scan_now;
-      }
 
       state.ImageObs.image_now.data = img_data.data;
-      if (last_states.goalObsBatch.size() == 0) {
-          //robotmodel->lasermodels[0]->GetSensors()[0].ranges;
-          state.ImageObs.image_p1rev.data = img_data.data;
-          state.ImageObs.image_p2rev.data = img_data.data;
-          state.ImageObs.image_p3rev.data = img_data.data;
-          state.ImageObs.image_p4rev.data = img_data.data;
-      }
-      else {
-          state.ImageObs.image_p4rev.data = last_states.ImageObsBatch[current_robot].image_p3rev.data;
-          state.ImageObs.image_p3rev.data = last_states.ImageObsBatch[current_robot].image_p2rev.data;
-          state.ImageObs.image_p2rev.data = last_states.ImageObsBatch[current_robot].image_p1rev.data;
-          state.ImageObs.image_p1rev.data = last_states.ImageObsBatch[current_robot].image_now.data;
-      }
 
-      /*state.DepthObs.image_now.data = depth_data.data;
-      if (last_states.goalObsBatch.size() == 0) {
-          //robotmodel->lasermodels[0]->GetSensors()[0].ranges;
-          state.DepthObs.image_p1rev.data = depth_data.data;
-          state.DepthObs.image_p2rev.data = depth_data.data;
-          state.DepthObs.image_p3rev.data = depth_data.data;
-          state.DepthObs.image_p4rev.data = depth_data.data;
-      }
-      else {
-          state.DepthObs.image_p4rev.data = state.DepthObs.image_p3rev.data;
-          state.DepthObs.image_p3rev.data = state.DepthObs.image_p2rev.data;
-          state.DepthObs.image_p2rev.data = state.DepthObs.image_p1rev.data;
-          state.DepthObs.image_p1rev.data = state.DepthObs.image_now.data;
-      }*/
 
       //
       if (last_states.goalObsBatch.size() == 0) {
@@ -638,7 +602,7 @@ int GazeboTrain::train(){
     } // end of for loop
 
     last_states = current_states;
-    
+    /*
     ROS_INFO("++++++++state+++++++");
     std::cout<<current_transitions.data[0].state.velObs.vel_now.vx<<current_transitions.data[0].state.velObs.vel_now.vz<<current_transitions.data[1].state.velObs.vel_now.vx<<current_transitions.data[1].state.velObs.vel_now.vz<<std::endl;
     int infodatasize1 = current_transitions.data[0].state.scanObs.scan_now.ranges.size();
@@ -662,7 +626,9 @@ int GazeboTrain::train(){
     std::cout<<current_transitions.data[0].state.goalObs.goal_now.goal_dist<<'|'<<current_transitions.data[0].state.goalObs.goal_now.goal_theta<<'/'<<current_transitions.data[0].state.goalObs.goal_prev.goal_dist<<'|'<<current_transitions.data[0].state.goalObs.goal_prev.goal_theta<<'/'<<current_transitions.data[0].state.goalObs.goal_pprev.goal_dist<<'|'<<current_transitions.data[0].state.goalObs.goal_pprev.goal_theta<<std::endl;
     std::cout<<current_transitions.data[1].state.goalObs.goal_now.goal_dist<<'|'<<current_transitions.data[1].state.goalObs.goal_now.goal_theta<<'/'<<current_transitions.data[1].state.goalObs.goal_prev.goal_dist<<'|'<<current_transitions.data[1].state.goalObs.goal_prev.goal_theta<<'/'<<current_transitions.data[1].state.goalObs.goal_pprev.goal_dist<<'|'<<current_transitions.data[1].state.goalObs.goal_pprev.goal_theta<<std::endl;
     std::cout<<current_transitions.data[0].state.actionObs.ac_prev.vx<<'|'<<current_transitions.data[0].state.actionObs.ac_prev.vz<<'|'<<current_transitions.data[0].state.actionObs.ac_pprev.vx<<'|'<<current_transitions.data[0].state.actionObs.ac_pprev.vz<<'/'<<current_transitions.data[1].state.actionObs.ac_prev.vx<<'|'<<current_transitions.data[1].state.actionObs.ac_prev.vz<<'|'<<current_transitions.data[1].state.actionObs.ac_pprev.vx<<'|'<<current_transitions.data[1].state.actionObs.ac_pprev.vz<<std::endl;
-
+    */
+    ROS_INFO("+++time stamp+++");
+    std::cout<<current_transitions.data[0].state.ImageObs.image_now.data.header.stamp<<std::endl;
     //ROS_INFO("lock memory");
     acquire_semaphore();
     uint32_t length = ros::serialization::serializationLength(current_transitions);
@@ -681,13 +647,13 @@ int GazeboTrain::train(){
     while (!succ && ros::ok()){
       // wait for client to modify this value
       //ROS_INFO("locked for actions");
-      ros::Duration(0.005);
+      ros::Duration(0.01);
       acquire_semaphore();
       int new_length = *(int *) share_addr;
       //std::cout<< "Length ="<< length <<" New length = "<< new_length << std::endl;
       if (new_length != length) {
         succ = true;
-        std::cout<<"Im here."<<std::endl;
+        ROS_INFO("wait shared data")
       } // Write has succeeded
 
       if (succ)
@@ -696,17 +662,16 @@ int GazeboTrain::train(){
           ros::serialization::IStream stream((share_addr + 4), new_length);
           ros::serialization::Serializer<naviswarm::Actions>::read(stream, actions); // Reads actions from shared memory
           release_semaphore();
-          ROS_INFO("got data and released memory");
+          //ROS_INFO("got data and released memory");
           if (actions.data.size() != num_robots){
               ROS_INFO("actions_size != robots_size, actions_size is %d", static_cast<int>(actions.data.size()));
               ROS_BREAK();
           }
           
           for (int j = 0 ; j < actions.data.size(); ++j){
-              std::cout<<actions.data[j]<<std::endl;
-              ROS_INFO("============action=================");
+              //std::cout<<actions.data[j]<<std::endl;
+              //ROS_INFO("============action=================");
               setvelocities(j, actions.data[j]);
-
               last_states.actionObsBatch[j].ac_pprev = last_states.actionObsBatch[j].ac_prev;
               last_states.actionObsBatch[j].ac_prev = actions.data[j];
           }

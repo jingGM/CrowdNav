@@ -136,95 +136,221 @@ class RunningAverageFilter(object):
 
         self.rs = RunningStat(shape)
 
-    def __call__(self, x):
+    def __call__(self, x,datastore=[]):
         # x is scanObsBatch, len(x) == num_agents
         if len(x) > 1:
             filtered_x = []
-            for i in range(len(x)):  # for each agent
+            if len(datastore):
+                for i in range(len(x)):  # for each agent
+                    if self.obstype == "scan":
+                        
+                        tempdata = datastore[i]
+                        tempdata_changed = np.swapaxes(tempdata, 0, 1)
+                        tempdata_changed[2] = tempdata_changed[1]
+                        tempdata_changed[1] = tempdata_changed[0]
+                        tempdata_changed[0] = np.array(x[i].scan_now.ranges)
+                        tempdata_back = np.swapaxes(tempdata_changed, 0, 1)
+                        datastore[i] = tempdata_back
+
+                        if self.delta:
+                            data = np.stack(
+                                (tempdata_changed[0] - tempdata_changed[2],
+                                 tempdata_changed[0] - tempdata_changed[1],
+                                 tempdata_changed[0]), axis=1)
+                        else:
+                            data = datastore[i]
+                        '''
+                        print(data.shape)
+                        print(data[0][0])
+                        print(data[0][1])
+                        print(data[0][2])
+                        print('==========scan shape======================')
+                        '''
+                    elif self.obstype == "image":
+                        bridge = CvBridge()
+                        try:
+                          image_now = bridge.imgmsg_to_cv2(x[i].image_now.data, "bgr8")
+                        except CvBridgeError as e:
+                          print(e)
+
+                        datastore[i][4] = datastore[i][3]
+                        datastore[i][3] = datastore[i][2]
+                        datastore[i][2] = datastore[i][1]
+                        datastore[i][1] = datastore[i][0]
+                        datastore[i][0] = np.array(image_now)
+                        
+                        if self.delta:
+                            data = np.stack(
+                                (datastore[i][0] - datastore[i][4],
+                                 datastore[i][0] - datastore[i][3],
+                                 datastore[i][0] - datastore[i][2],
+                                 datastore[i][0] - datastore[i][1],
+                                 datastore[i][0]), axis=0)
+                        else:
+                            data = datastore[i]
+                            '''
+                            print(data.shape)
+                            print(data[0][0])
+                            print(data[1][0])
+                            print(data[2][0])
+                            print(data[3][0])
+                            print(data[4][0])
+                            print('==========image shape======================')
+                            '''
+                    elif self.obstype == "goal":
+                        data = [x[i].goal_now.goal_dist, x[i].goal_now.goal_theta]
+                    elif self.obstype == "action":
+                        data = [
+                            [x[i].ac_pprev.vx, x[i].ac_pprev.vz],
+                            [x[i].ac_prev.vx, x[i].ac_prev.vz]]
+                    elif self.obstype == "vel":
+                        data = [x[i].vel_now.vx, x[i].vel_now.vz]
+                    else:
+                        data = x
+                    data = np.array(data)
+
+                    # print("data shape before filter: {}".format(data.shape))
+                    if self.update:
+                        self.rs.add(data[-1])
+                    if self.demean:
+                        data -= self.rs.mean
+                    if self.destd:
+                        data /= (self.rs.std + 1e-8)
+                    if self.clip is not None:
+                        data = np.clip(data, -self.clip, self.clip)
+
+                    filtered_x.append(data)
+                
+            else:
+                for i in range(len(x)):  # for each agent
+                    if self.obstype == "scan":
+                        scantemp = np.stack((np.array(x[i].scan_now.ranges),np.array(x[i].scan_now.ranges),np.array(x[i].scan_now.ranges)),axis=1)
+                        datastore.append(scantemp)
+
+                        data = datastore[i]
+                        #print(data.shape)
+                        #print('==========scan shape======================')
+
+                    elif self.obstype == "image":
+                        bridge = CvBridge()
+                        try:
+                          image_now = bridge.imgmsg_to_cv2(x[i].image_now.data, "bgr8")
+                        except CvBridgeError as e:
+                          print(e)
+
+                        imagetemp = np.stack((np.array(image_now),np.array(image_now),np.array(image_now),np.array(image_now),np.array(image_now)),axis=0)
+                        datastore.append(imagetemp)
+
+                        data = datastore[i]
+                        '''
+                        print(data.shape)
+                        print(data[0][0])
+                        print(data[1][0])
+                        print(data[2][0])
+                        print(data[3][0])
+                        print(data[4][0])
+                        print('==========image shape======================')
+                        '''    
+                    elif self.obstype == "goal":
+                        data = [x[i].goal_now.goal_dist, x[i].goal_now.goal_theta]
+                    elif self.obstype == "action":
+                        data = [
+                            [x[i].ac_pprev.vx, x[i].ac_pprev.vz],
+                            [x[i].ac_prev.vx, x[i].ac_prev.vz]]
+                    elif self.obstype == "vel":
+                        data = [x[i].vel_now.vx, x[i].vel_now.vz]
+                    else:
+                        data = x
+                    data = np.array(data)
+
+                    # print("data shape before filter: {}".format(data.shape))
+                    if self.update:
+                        self.rs.add(data[-1])
+                    if self.demean:
+                        data -= self.rs.mean
+                    if self.destd:
+                        data /= (self.rs.std + 1e-8)
+                    if self.clip is not None:
+                        data = np.clip(data, -self.clip, self.clip)
+
+                    filtered_x.append(data)
+                
+            return np.array(filtered_x),datastore
+        else:
+            if len(datastore): 
                 if self.obstype == "scan":
+                    tempdata = datastore
+                    tempdata_changed = np.swapaxes(tempdata, 0, 1)
+                    tempdata_changed[2] = tempdata_changed[1]
+                    tempdata_changed[1] = tempdata_changed[0]
+                    tempdata_changed[0] = np.array(x.scan_now.ranges)
+                    tempdata_back = np.swapaxes(tempdata_changed, 0, 1)
+                    datastore = tempdata_back
+
                     if self.delta:
                         data = np.stack(
-                            (np.array(x[i].scan_now.ranges) - np.array(x[i].scan_pprev.ranges),
-                             np.array(x[i].scan_now.ranges) - np.array(x[i].scan_prev.ranges),
-                             np.array(x[i].scan_now.ranges)),
-                            axis=1)
+                            (tempdata_changed[0] - tempdata_changed[2],
+                             tempdata_changed[0] - tempdata_changed[1],
+                             tempdata_changed[0]), axis=1)
                     else:
-                        data = np.stack(
-                            (x[i].scan_pprev.ranges,
-                             x[i].scan_prev.ranges,
-                             x[i].scan_now.ranges),
-                            axis=1)
-                        print(data.shape)
-                        print('==========scan shape======================')
+                        data = datastore
+                    print(data.shape)
+                    print('==========scan shape======================')
+
                 elif self.obstype == "image":
                     bridge = CvBridge()
                     try:
-                      image_now = bridge.imgmsg_to_cv2(x[i].image_now.data, "bgr8")
-                    except CvBridgeError as e:
-                      print(e)
-                    try:
-                      image_p1rev = bridge.imgmsg_to_cv2(x[i].image_p1rev.data, "bgr8")
-                    except CvBridgeError as e:
-                      print(e)
-                    try:
-                      image_p2rev = bridge.imgmsg_to_cv2(x[i].image_p2rev.data, "bgr8")
-                    except CvBridgeError as e:
-                      print(e)
-                    try:
-                      image_p3rev = bridge.imgmsg_to_cv2(x[i].image_p3rev.data, "bgr8")
-                    except CvBridgeError as e:
-                      print(e)
-                    try:
-                      image_p4rev = bridge.imgmsg_to_cv2(x[i].image_p4rev.data, "bgr8")
+                      image_now = bridge.imgmsg_to_cv2(x.image_now.data, "bgr8")
                     except CvBridgeError as e:
                       print(e)
 
+                    datastore[4] = datastore[3]
+                    datastore[3] = datastore[2]
+                    datastore[2] = datastore[1]
+                    datastore[1] = datastore[0]
+                    datastore[0] = np.array(image_now)
+                    
                     if self.delta:
                         data = np.stack(
-                            (np.array(image_now) - np.array(image_p4rev),
-                             np.array(image_now) - np.array(image_p3rev),
-                             np.array(image_now) - np.array(image_p2rev),
-                             np.array(image_now) - np.array(image_p1rev),
-                             np.array(image_now)),
-                            axis=1)
+                            (datastore[0] - datastore[4],
+                             datastore[0] - datastore[3],
+                             datastore[0] - datastore[2],
+                             datastore[0] - datastore[1],
+                             datastore[0]), axis=0)
                     else:
-                        data = np.stack((np.array(image_now),np.array(image_p1rev),np.array(image_p2rev),
-                                         np.array(image_p3rev),np.array(image_p4rev)),axis=0)
+                        data = datastore
                         print(data.shape)
                         print('==========image shape======================')
-                        
-                elif self.obstype == "goal":
-                    data = [x[i].goal_now.goal_dist, x[i].goal_now.goal_theta]
-                elif self.obstype == "action":
-                    data = [
-                        [x[i].ac_pprev.vx, x[i].ac_pprev.vz],
-                        [x[i].ac_prev.vx, x[i].ac_prev.vz]]
-                elif self.obstype == "vel":
-                    data = [x[i].vel_now.vx, x[i].vel_now.vz]
                 else:
-                    data = x
-                data = np.array(data)
+                    data = np.array(x)
+            else:
+                if self.obstype == "scan":
+                    datastore = np.stack((np.array(x.scan_now.ranges),np.array(x.scan_now.ranges),np.array(x.scan_now.ranges)),axis=1)
 
-                # print("data shape before filter: {}".format(data.shape))
-                if self.update:
-                    self.rs.add(data[-1])
-                if self.demean:
-                    data -= self.rs.mean
-                if self.destd:
-                    data /= (self.rs.std + 1e-8)
-                if self.clip is not None:
-                    data = np.clip(data, -self.clip, self.clip)
+                    data = datastore
+                    print(data.shape)
+                    print('==========scan shape======================')
 
-                filtered_x.append(data)
-            return np.array(filtered_x)
-        else:
-            x = np.array(x)
+                elif self.obstype == "image":
+                    bridge = CvBridge()
+                    try:
+                      image_now = bridge.imgmsg_to_cv2(x.image_now.data, "bgr8")
+                    except CvBridgeError as e:
+                      print(e)
+
+                    datastore = np.stack((np.array(image_now),np.array(image_now),np.array(image_now),np.array(image_now),np.array(image_now)),axis=0)
+
+                    data = datastore
+                    print(data.shape)
+                    print('==========image shape======================')
+                else:
+                    data = np.array(x)
             if self.update:
-                self.rs.add(x)
+                self.rs.add(data)
             if self.demean:
-                x -= self.rs.mean
+                data -= self.rs.mean
             if self.destd:
-                x /= (self.rs.std + 1e-8)
+                data /= (self.rs.std + 1e-8)
             if self.clip is not None:
-                x = np.clip(x, -self.clip, self.clip)
-            return x
+                data = np.clip(data, -self.clip, self.clip)
+            return data,datastore

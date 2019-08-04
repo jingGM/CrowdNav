@@ -251,7 +251,9 @@ class Scenarios(object):
                     for s in self.starts:
                         if np.hypot(sx - s[0], sy - s[1]) < self.agent_size*4+0.15:
                             succ = False
-
+            #print([sx, sy, sa])
+            #print([-sx, -sy, sa])
+            #print('----------')
             self.starts.append([sx, sy, sa])
             self.goals.append([-sx, -sy, sa])
 
