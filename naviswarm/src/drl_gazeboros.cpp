@@ -407,10 +407,10 @@ int GazeboTrain::create_sharedmemory(){
 
 
   share_id = shmget(KEY, SIZE, IPC_CREAT | IPC_EXCL | PERMISSION);
-    //ROS_INFO("share_id: %d", share_id);
+    ROS_INFO("share_id: %d", share_id);
     if (share_id == -1){
         share_id = 0;
-        //ROS_FATAL("Shared memory allocate failed, Please run: python stage_env.py");
+        ROS_FATAL("Shared memory allocate failed, Please run: python stage_env.py");
         return 1;
     }
 
@@ -638,7 +638,7 @@ int GazeboTrain::train(){
     } // end of for loop
 
     last_states = current_states;
-    /*
+    
     ROS_INFO("++++++++state+++++++");
     std::cout<<current_transitions.data[0].state.velObs.vel_now.vx<<current_transitions.data[0].state.velObs.vel_now.vz<<current_transitions.data[1].state.velObs.vel_now.vx<<current_transitions.data[1].state.velObs.vel_now.vz<<std::endl;
     int infodatasize1 = current_transitions.data[0].state.scanObs.scan_now.ranges.size();
@@ -648,21 +648,21 @@ int GazeboTrain::train(){
     int infodatasize5 = current_transitions.data[0].state.scanObs.scan_prev.ranges.size();
     int infodatasize6 = current_transitions.data[1].state.scanObs.scan_prev.ranges.size();
     std::cout<<infodatasize1<<'|'<<infodatasize2<<'|'<<infodatasize3<<'|'<<infodatasize4<<'|'<<infodatasize5<<'|'<<infodatasize6<<std::endl;
-    int infodatasiz1 = current_transitions.data[0].state.ImageObs.image_now.data.size();
-    int infodatasiz2 = current_transitions.data[1].state.ImageObs.image_now.data.size();
-    int infodatasiz3 = current_transitions.data[0].state.ImageObs.image_p1rev.data.size();
-    int infodatasiz4 = current_transitions.data[1].state.ImageObs.image_p1rev.data.size();
-    int infodatasiz5 = current_transitions.data[0].state.ImageObs.image_p2rev.data.size();
-    int infodatasiz6 = current_transitions.data[1].state.ImageObs.image_p2rev.data.size();
-    int infodatasiz7 = current_transitions.data[0].state.ImageObs.image_p3rev.data.size();
-    int infodatasiz8 = current_transitions.data[1].state.ImageObs.image_p3rev.data.size();
-    int infodatasiz9 = current_transitions.data[0].state.ImageObs.image_p4rev.data.size();
-    int infodatasiz0 = current_transitions.data[1].state.ImageObs.image_p4rev.data.size();
+    int infodatasiz1 = current_transitions.data[0].state.ImageObs.image_now.data.data.size();
+    int infodatasiz2 = current_transitions.data[1].state.ImageObs.image_now.data.data.size();
+    int infodatasiz3 = current_transitions.data[0].state.ImageObs.image_p1rev.data.data.size();
+    int infodatasiz4 = current_transitions.data[1].state.ImageObs.image_p1rev.data.data.size();
+    int infodatasiz5 = current_transitions.data[0].state.ImageObs.image_p2rev.data.data.size();
+    int infodatasiz6 = current_transitions.data[1].state.ImageObs.image_p2rev.data.data.size();
+    int infodatasiz7 = current_transitions.data[0].state.ImageObs.image_p3rev.data.data.size();
+    int infodatasiz8 = current_transitions.data[1].state.ImageObs.image_p3rev.data.data.size();
+    int infodatasiz9 = current_transitions.data[0].state.ImageObs.image_p4rev.data.data.size();
+    int infodatasiz0 = current_transitions.data[1].state.ImageObs.image_p4rev.data.data.size();
     std::cout<<infodatasiz1<<'|'<<infodatasiz2<<'|'<<infodatasiz3<<'|'<<infodatasiz4<<'|'<<infodatasiz5<<'|'<<infodatasiz6<<'|'<<infodatasiz7<<'|'<<infodatasiz8<<'|'<<infodatasiz9<<'|'<<infodatasiz0<<std::endl;
     std::cout<<current_transitions.data[0].state.goalObs.goal_now.goal_dist<<'|'<<current_transitions.data[0].state.goalObs.goal_now.goal_theta<<'/'<<current_transitions.data[0].state.goalObs.goal_prev.goal_dist<<'|'<<current_transitions.data[0].state.goalObs.goal_prev.goal_theta<<'/'<<current_transitions.data[0].state.goalObs.goal_pprev.goal_dist<<'|'<<current_transitions.data[0].state.goalObs.goal_pprev.goal_theta<<std::endl;
     std::cout<<current_transitions.data[1].state.goalObs.goal_now.goal_dist<<'|'<<current_transitions.data[1].state.goalObs.goal_now.goal_theta<<'/'<<current_transitions.data[1].state.goalObs.goal_prev.goal_dist<<'|'<<current_transitions.data[1].state.goalObs.goal_prev.goal_theta<<'/'<<current_transitions.data[1].state.goalObs.goal_pprev.goal_dist<<'|'<<current_transitions.data[1].state.goalObs.goal_pprev.goal_theta<<std::endl;
     std::cout<<current_transitions.data[0].state.actionObs.ac_prev.vx<<'|'<<current_transitions.data[0].state.actionObs.ac_prev.vz<<'|'<<current_transitions.data[0].state.actionObs.ac_pprev.vx<<'|'<<current_transitions.data[0].state.actionObs.ac_pprev.vz<<'/'<<current_transitions.data[1].state.actionObs.ac_prev.vx<<'|'<<current_transitions.data[1].state.actionObs.ac_prev.vz<<'|'<<current_transitions.data[1].state.actionObs.ac_pprev.vx<<'|'<<current_transitions.data[1].state.actionObs.ac_pprev.vz<<std::endl;
-*/
+
     //ROS_INFO("lock memory");
     acquire_semaphore();
     uint32_t length = ros::serialization::serializationLength(current_transitions);
@@ -703,8 +703,8 @@ int GazeboTrain::train(){
           }
           
           for (int j = 0 ; j < actions.data.size(); ++j){
-              //std::cout<<actions.data[j]<<std::endl;
-              //ROS_INFO("============action=================");
+              std::cout<<actions.data[j]<<std::endl;
+              ROS_INFO("============action=================");
               setvelocities(j, actions.data[j]);
 
               last_states.actionObsBatch[j].ac_pprev = last_states.actionObsBatch[j].ac_prev;

@@ -49,12 +49,12 @@ class PPO(object):
         self.critic_epochs = args.critic_epochs
         self.critic_lr = args.critic_lr
 
-        self.obs_scan, self.obs_goal, self.obs_vel = agent.policy.obs
+        self.obs_scan, self.obs_goal, self.obs_vel, self.obs_image = agent.policy.obs
         self.actor = agent.policy
         self.means = agent.policy.means
         self.log_vars = agent.policy.log_vars
 
-        self.obs_scan_value, self.obs_goal_value, self.obs_vel_value =agent.value.obs
+        self.obs_scan_value, self.obs_goal_value, self.obs_vel_value, self.obs_image_value =agent.value.obs
         self.baseline = agent.value
         self.value = agent.value.value
 
@@ -149,12 +149,13 @@ class PPO(object):
     def update(self, paths):
         self.time_step += 1
 
-        acts    = np.concatenate([path["action"] for path in paths])
-        obs_scan= np.concatenate([path["obs_scan"] for path in paths])
-        obs_goal= np.concatenate([path["obs_goal"] for path in paths])
-        obs_vel = np.concatenate([path["obs_vel"] for path in paths])
+        acts     = np.concatenate([path["action"] for path in paths])
+        obs_scan = np.concatenate([path["obs_scan"] for path in paths])
+        obs_goal = np.concatenate([path["obs_goal"] for path in paths])
+        obs_vel  = np.concatenate([path["obs_vel"] for path in paths])
+        obs_image= np.concatenate([path["obs_image"] for path in paths])
 
-        baseline_value = self.baseline.predict([obs_scan, obs_goal, obs_vel])
+        baseline_value = self.baseline.predict([obs_scan, obs_goal, obs_vel,obs_image])
 
         last_path_size = 0
         for _, path in enumerate(paths):
@@ -171,8 +172,8 @@ class PPO(object):
         advs = (advs - advs.mean()) / (advs.std() + 1e-6)
 
         if self.time_step > 1: # train acotr after trained critic
-            kl = self.actor_update(obs_scan, obs_goal, obs_vel, acts, advs)
-        self.critic_update(obs_scan, obs_goal, obs_vel, rets)
+            kl = self.actor_update(obs_scan,obs_image, obs_goal, obs_vel, acts, advs)
+        self.critic_update(obs_scan,obs_image, obs_goal, obs_vel, rets)
 
         stats = OrderedDict()
 
@@ -194,7 +195,9 @@ class PPO(object):
                 self.obs_scan: obs_scan,
                 self.obs_goal: obs_goal,
                 self.obs_vel: obs_vel,
+                self.obs_image: obs_image,
                 self.obs_scan_value: obs_scan,
+                self.obs_image_value: obs_image,
                 self.obs_goal_value: obs_goal,
                 self.obs_vel_value: obs_vel,
                 self.act_ph: acts,
@@ -241,9 +244,10 @@ class PPO(object):
 
         return stats, succ_agent
 
-    def actor_update(self, obs_scan, obs_goal, obs_vel, acts, advs):
+    def actor_update(self, obs_scan,obs_image, obs_goal, obs_vel, acts, advs):
         feed_dict = {
             self.obs_scan: obs_scan,
+            self.obs_image:obs_image,
             self.obs_goal: obs_goal,
             self.obs_vel: obs_vel,
             self.act_ph: acts,
@@ -275,33 +279,35 @@ class PPO(object):
 
         return kl
 
-    def critic_update(self, obs_scan, obs_goal, obs_vel, rets):
+    def critic_update(self, obs_scan,obs_image, obs_goal, obs_vel, rets):
         num_batches = max(obs_scan.shape[0] // 256, 1)
         batch_size = obs_scan.shape[0] // num_batches
         if self.replay_buffer_obs_scan is None:
-            obs_scan_train, obs_goal_train, obs_vel_train, ret_train = \
-                obs_scan, obs_goal, obs_vel, rets
+            obs_scan_train, obs_goal_train, obs_vel_train,obs_image_train, ret_train = obs_scan, obs_goal, obs_vel,obs_image, rets
         else:
             obs_scan_train  = np.concatenate([obs_scan, self.replay_buffer_obs_scan])
             obs_goal_train  = np.concatenate([obs_goal, self.replay_buffer_obs_goal])
             obs_vel_train   = np.concatenate([obs_vel, self.replay_buffer_obs_vel])
+            obs_image_train = np.concatenate([obs_image, self.replay_buffer_obs_image])
             ret_train       = np.concatenate([rets, self.replay_buffer_ret])
 
         self.replay_buffer_obs_scan = obs_scan
         self.replay_buffer_obs_goal = obs_goal
-        self.replay_buffer_obs_vel = obs_vel
-        self.replay_buffer_ret = rets
+        self.replay_buffer_obs_vel  = obs_vel
+        self.replay_buffer_obs_image= obs_image
+        self.replay_buffer_ret      = rets
 
         for e in range(self.critic_epochs):
-            obs_scan_train, obs_goal_train, obs_vel_train, ret_train = shuffle(
-                obs_scan_train, obs_goal_train, obs_vel_train, ret_train)
+            obs_scan_train, obs_goal_train, obs_vel_train,obs_image_train, ret_train = shuffle(
+                obs_scan_train, obs_goal_train, obs_vel_train,obs_image_train, ret_train)
             for j in range(num_batches):
                 start = j * batch_size
                 end = (j + 1) * batch_size
                 obs_scan_set = obs_scan_train[start:end, :, :]
                 obs_goal_set = obs_goal_train[start:end, :]
                 obs_vel_set = obs_vel_train[start:end, :]
+                obs_image_set = obs_image_train[start:end, :]
                 ret_set = ret_train[start:end]
 
                 self.baseline.update(
-                    [obs_scan_set, obs_goal_set, obs_vel_set], ret_set)
+                    [obs_scan_set, obs_goal_set, obs_vel_set,obs_image_set], ret_set)

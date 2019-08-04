@@ -7,7 +7,7 @@ Created on Sat Jul 20 19:47:07 2019
 """
 
 import rospy
-from std_msgs.msg import String, uint8
+from std_msgs.msg import String
 
 import message_filters
 
@@ -188,7 +188,6 @@ def callbackfortest(data):
     except CvBridgeError as e:
       print(e)
 
-    a = uint8()
     a = np.array(cv_image)
     print(a.shape)
     #print(data.data)

@@ -16,6 +16,7 @@
 import numpy as np
 import scipy.signal
 import tensorflow as tf
+from cv_bridge import CvBridge, CvBridgeError
 
 
 def gauss_log_prob(mean, logstd, x):
@@ -153,32 +154,45 @@ class RunningAverageFilter(object):
                              x[i].scan_prev.ranges,
                              x[i].scan_now.ranges),
                             axis=1)
+                        print(data.shape)
+                        print('==========scan shape======================')
                 elif self.obstype == "image":
+                    bridge = CvBridge()
+                    try:
+                      image_now = bridge.imgmsg_to_cv2(x[i].image_now.data, "bgr8")
+                    except CvBridgeError as e:
+                      print(e)
+                    try:
+                      image_p1rev = bridge.imgmsg_to_cv2(x[i].image_p1rev.data, "bgr8")
+                    except CvBridgeError as e:
+                      print(e)
+                    try:
+                      image_p2rev = bridge.imgmsg_to_cv2(x[i].image_p2rev.data, "bgr8")
+                    except CvBridgeError as e:
+                      print(e)
+                    try:
+                      image_p3rev = bridge.imgmsg_to_cv2(x[i].image_p3rev.data, "bgr8")
+                    except CvBridgeError as e:
+                      print(e)
+                    try:
+                      image_p4rev = bridge.imgmsg_to_cv2(x[i].image_p4rev.data, "bgr8")
+                    except CvBridgeError as e:
+                      print(e)
+
                     if self.delta:
                         data = np.stack(
-                            (np.array(x[i].image_now.data) - np.array(x[i].image_p4rev.data),
-                             np.array(x[i].image_now.data) - np.array(x[i].image_p3rev.data),
-                             np.array(x[i].image_now.data) - np.array(x[i].image_p2rev.data),
-                             np.array(x[i].image_now.data) - np.array(x[i].image_p1rev.data),
-                             np.array(x[i].image_now.data)),
+                            (np.array(image_now) - np.array(image_p4rev),
+                             np.array(image_now) - np.array(image_p3rev),
+                             np.array(image_now) - np.array(image_p2rev),
+                             np.array(image_now) - np.array(image_p1rev),
+                             np.array(image_now)),
                             axis=1)
                     else:
-                        k=np.array(x[i].image_now.data)
-                        print(x[i].image_now.data)
-                        print(k.shape)
-                        print(len(x[i].image_now.data))
-                        print(len(x[i].image_p1rev.data))
-                        print(len(x[i].image_p2rev.data))
-                        print(len(x[i].image_p3rev.data))
-                        print(len(x[i].image_p4rev.data))
-                        print("==============image size===================")
-                        data = np.stack(
-                            (x[i].image_p4rev.data,
-                             x[i].image_p3rev.data,
-                             x[i].image_p2rev.data,
-                             x[i].image_p1rev.data,
-                             x[i].image_now.data),
-                            axis=1)
+                        data = np.stack((np.array(image_now),np.array(image_p1rev),np.array(image_p2rev),
+                                         np.array(image_p3rev),np.array(image_p4rev)),axis=0)
+                        print(data.shape)
+                        print('==========image shape======================')
+                        
                 elif self.obstype == "goal":
                     data = [x[i].goal_now.goal_dist, x[i].goal_now.goal_theta]
                 elif self.obstype == "action":

@@ -148,7 +148,8 @@ class MultiRobotDRL(object):
 
             paths["obs_scan"].append(scan_input)
             paths["obs_goal"].append(goal_input)
-            paths["obs_vel"].append(vel_input)
+            paths["obs_vel" ].append(vel_input)
+            paths["obs_image"].append(image_input)
 
             #print(scan_input)
             #print("============scan=============================")
@@ -160,11 +161,9 @@ class MultiRobotDRL(object):
             #print("============terminats========================")
 
             if args.train:
-                action_agents = self.agent.policy.act(
-                    [scan_input, goal_input, vel_input], terminateds)
+                action_agents = self.agent.policy.act([scan_input, goal_input, vel_input, image_input], terminateds)
             else:
-                action_agents = self.agent.policy.act_test(
-                    [scan_input, goal_input, vel_input], terminateds)
+                action_agents = self.agent.policy.act_test([scan_input, goal_input, vel_input,image_input], terminateds)
             paths["action"].append(action_agents)
 
             print(action_agents)
@@ -270,7 +269,7 @@ if __name__ == "__main__":
 
     #print(env.image_space.shape)
     #print("+++++++++++++++++++++++++++++++++++++")
-    obs_shape = [3, env.scan_space.shape[0], env.goal_space.shape[0],5,env.image_space.shape[0]]
+    obs_shape = [3, env.scan_space.shape[0], env.goal_space.shape[0],5,env.image_space.shape[0],env.image_space.shape[1],env.image_space.shape[2]]
     ac_shape = env.action_space.shape[0]
 
     agent = Agent(args, session, obs_shape, ac_shape)

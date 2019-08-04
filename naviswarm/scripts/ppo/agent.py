@@ -29,13 +29,12 @@ class Agent(object):
         if not os.path.exists("./ppo/model"):
             os.makedirs("./ppo/model")
 
-        self.policy = Policy(
-            session, obs_shape, ac_shape, args)
+        self.policy = Policy(session, obs_shape, ac_shape, args)
         self.value = Value(session, obs_shape)
         self.delta = False
 
         self.scan_filter  = RunningAverageFilter(obs_shape[1], obstype="scan",  demean=False, destd=False, update=False, delta=self.delta)
-        self.image_filter = RunningAverageFilter(obs_shape[4], obstype="image", demean=False, destd=False, update=False, delta=self.delta)
+        self.image_filter = RunningAverageFilter([obs_shape[3],obs_shape[4],obs_shape[5],obs_shape[6]], obstype="image", demean=False, destd=False, update=False, delta=self.delta)
         self.goal_filter  = RunningAverageFilter(obs_shape[2], obstype="goal",  demean=False, destd=False, update=False, delta=self.delta)
         self.vel_filter   = RunningAverageFilter(ac_shape,     obstype="vel",   demean=False, destd=False, update=False, delta=self.delta)
         self.reward_filter= RunningAverageFilter((), demean=False, clip=1)
@@ -55,7 +54,7 @@ class Agent(object):
         # print 'shape: ', np.shape(vel_filtered)
         # print 'vel: ', vel_filtered[0]
         # print 'after shape: ', np.shape(scan_filtered)
-        return [ scan_filtered, goal_filtered, vel_filtered,image_filtered]
+        return [ scan_filtered, goal_filtered, vel_filtered, image_filtered]
 
 
 class Policy(object):
@@ -76,23 +75,43 @@ class Policy(object):
     def _policy_net(self):
         scan = tf.placeholder(tf.float32, [None, self.obs_shape[1], self.obs_shape[0]],'scan_ph')
         goal = tf.placeholder(tf.float32, [None, 2], 'goal_ph')
-        vel = tf.placeholder(tf.float32, [None, 2], 'vel_ph')
+        vel  = tf.placeholder(tf.float32, [None, 2], 'vel_ph')
+        image= tf.placeholder(tf.float32, [None, self.obs_shape[3],self.obs_shape[4],self.obs_shape[5],self.obs_shape[6]], 'image_ph')
 
         net = tl.layers.InputLayer(scan, name='scan_input')
         net = tl.layers.MeanPool1d(net, filter_size=3, strides=2, name='min_pooling1')
         net = tl.layers.MeanPool1d(net, filter_size=3, strides=2, name='min_pooling2')
         net = tl.layers.MeanPool1d(net, filter_size=3, strides=2, name='min_pooling3')
-
         net = tl.layers.Conv1dLayer(net, act=tf.nn.relu, shape=[5, self.obs_shape[0], 8], stride=2,name='cnn1')
         net = tl.layers.Conv1dLayer(net, act=tf.nn.relu, shape=[3, 8, 16], stride=2,name='cnn2')
         net = tl.layers.FlattenLayer(net, name='fl')
-        net = tl.layers.DenseLayer(net, n_units=128, act=tf.nn.relu, name='cnn_output')
-        cnn_output = net.outputs
+        net = tl.layers.DenseLayer(net, n_units=128, act=tf.nn.relu, name='scan_output')
+        scan_output = net.outputs
 
-        act_net = tl.layers.InputLayer(tf.concat([goal, vel, cnn_output], axis=1), name='goal_input')
+
+        def keras_block(imagenetx):
+            imagenet = tf.keras.layers.ConvLSTM2D(filters=16,kernel_size=[7,7],strides=[2,2],padding='same',activation=tf.nn.relu,return_sequences=True)(imagenetx)
+            imagenet = tf.keras.layers.BatchNormalization()(imagenet)
+            imagenet = tf.keras.layers.ConvLSTM2D(filters=32,kernel_size=[5,5],strides=[2,2],padding='same',activation=tf.nn.relu,return_sequences=True)(imagenet)
+            imagenet = tf.keras.layers.BatchNormalization()(imagenet)
+            imagenet = tf.keras.layers.ConvLSTM2D(filters=64,kernel_size=[3,3],strides=[2,2],padding='same',activation=tf.nn.relu,return_sequences=True)(imagenet)
+            imagenet = tf.keras.layers.BatchNormalization()(imagenet)
+            imagenet = tf.keras.layers.ConvLSTM2D(filters=64,kernel_size=[3,3],strides=[1,1],padding='same',activation=tf.nn.relu,return_sequences=True)(imagenet)
+            imagenet = tf.keras.layers.BatchNormalization()(imagenet)
+            imagenet = tf.keras.layers.Conv3D(filters=1, kernel_size=(3, 3, 3),activation=tf.nn.relu,padding='same')(imagenet)
+            return imagenet
+
+        imagenet = tl.layers.InputLayer(image, name='image_input')
+        imagenet = tl.layers.LambdaLayer(imagenet, fn=keras_block, name='kerasImage')
+        imagenet = tl.layers.FlattenLayer(imagenet, name='imagefl')
+        imagenet = tl.layers.DenseLayer(imagenet, n_units=960, act=tf.nn.relu, name='image_output')
+        image_output = imagenet.outputs
+        #print(image_output.shape)
+
+        act_net = tl.layers.InputLayer(tf.concat([goal, vel, scan_output, image_output], axis=1), name='goal_input')
         act_net = tl.layers.DenseLayer(act_net, n_units=64, act=tf.nn.tanh, name='act1')
         act_net = tl.layers.DenseLayer(act_net, n_units=64, act=tf.nn.tanh, name='act2')
-        linear = tl.layers.DenseLayer(act_net, n_units=1, act=tf.nn.sigmoid, name='linear')
+        linear  = tl.layers.DenseLayer(act_net, n_units=1, act=tf.nn.sigmoid, name='linear')
         angular = tl.layers.DenseLayer(act_net, n_units=1, act=tf.nn.tanh, name='angular')
         with tf.variable_scope('means'):
             action_mean = tf.concat([linear.outputs, angular.outputs], axis=1)
@@ -105,7 +124,7 @@ class Policy(object):
 
         test_act = action_mean + self.test_var * tf.random_normal(shape=(2,))
 
-        return [net, act_net, linear, angular], [scan, goal, vel],action_mean, log_vars, sampled_act, test_act
+        return [net, act_net,imagenet, linear, angular], [scan, goal, vel, image],action_mean, log_vars, sampled_act, test_act
 
     def act(self, obs, terminated, batch=True):
         if not batch:
@@ -114,7 +133,8 @@ class Policy(object):
         actions = self.sess.run(self.sampled_act, feed_dict={
                 self.obs[0]: obs[0],
                 self.obs[1]: obs[1],
-                self.obs[2]: obs[2]
+                self.obs[2]: obs[2],
+                self.obs[3]: obs[3]
             })
 
         for i, t in enumerate(terminated):
@@ -127,7 +147,8 @@ class Policy(object):
         actions = self.sess.run(self.test_act, feed_dict={
                 self.obs[0]: obs[0],
                 self.obs[1]: obs[1],
-                self.obs[2]: obs[2]
+                self.obs[2]: obs[2],
+                self.obs[3]: obs[3]
             })
 
         for i, t in enumerate(terminated):
@@ -155,7 +176,7 @@ class Value(object):
         self.obs_shape = obs_shape
 
         self.model, self.obs, self.value = self._value_net()
-        self.ret_ph = tf.placeholder(tf.float32, shape=[None, ], name='return_ph')
+        self.ret_ph = tf.placeholder(tf.float32, shape=[self.obs_shape[7], ], name='return_ph')
         self.loss = tf.reduce_mean(tf.square(self.value - self.ret_ph))
         self.optimizer = tf.train.AdamOptimizer(1e-3).minimize(self.loss)
 
@@ -164,7 +185,8 @@ class Value(object):
     def _value_net(self):
         scan = tf.placeholder(tf.float32, [None, self.obs_shape[1], self.obs_shape[0]],'scan_value_ph')
         goal = tf.placeholder(tf.float32, [None, 2], 'goal_value_ph')
-        vel = tf.placeholder(tf.float32, [None, 2], 'vel_value_ph')
+        vel  = tf.placeholder(tf.float32, [None, 2], 'vel_ph')
+        image= tf.placeholder(tf.float32, [None, self.obs_shape[3],self.obs_shape[4],self.obs_shape[5],self.obs_shape[6]], 'image_ph')
 
         net = tl.layers.InputLayer(scan, name='scan_input_value')
         net = tl.layers.MeanPool1d(net, filter_size=3, strides=2, name='min_pooling1_value')
@@ -177,19 +199,38 @@ class Value(object):
         net = tl.layers.DenseLayer(net, n_units=128, act=tf.nn.relu, name='cnn_output_value')
         cnn_output = net.outputs
 
-        value_net = tl.layers.InputLayer(tf.concat([goal, vel, cnn_output], axis=1),name='goal_input_value')
+        def keras_block(imagenetx):
+            imagenet = tf.keras.layers.ConvLSTM2D(filters=16,kernel_size=[7,7],strides=[2,2],padding='same',activation=tf.nn.relu,return_sequences=True)(imagenetx)
+            imagenet = tf.keras.layers.BatchNormalization()(imagenet)
+            imagenet = tf.keras.layers.ConvLSTM2D(filters=32,kernel_size=[5,5],strides=[2,2],padding='same',activation=tf.nn.relu,return_sequences=True)(imagenet)
+            imagenet = tf.keras.layers.BatchNormalization()(imagenet)
+            imagenet = tf.keras.layers.ConvLSTM2D(filters=64,kernel_size=[3,3],strides=[2,2],padding='same',activation=tf.nn.relu,return_sequences=True)(imagenet)
+            imagenet = tf.keras.layers.BatchNormalization()(imagenet)
+            imagenet = tf.keras.layers.ConvLSTM2D(filters=64,kernel_size=[3,3],strides=[1,1],padding='same',activation=tf.nn.relu,return_sequences=True)(imagenet)
+            imagenet = tf.keras.layers.BatchNormalization()(imagenet)
+            imagenet = tf.keras.layers.Conv3D(filters=1, kernel_size=(3, 3, 3),activation=tf.nn.relu,padding='same')(imagenet)
+            return imagenet
+
+        imagevnet = tl.layers.InputLayer(image, name='image_input_value')
+        imagevnet = tl.layers.LambdaLayer(imagevnet, fn=keras_block, name='kerasImage_value')
+        imagevnet = tl.layers.FlattenLayer(imagevnet, name='imagefl_value')
+        imagevnet = tl.layers.DenseLayer(imagevnet, n_units=960, act=tf.nn.relu, name='image_output_value')
+        image_voutput = imagevnet.outputs
+
+        value_net = tl.layers.InputLayer(tf.concat([goal, vel, cnn_output,image_voutput], axis=1),name='goal_input_value')
         value_net = tl.layers.DenseLayer(value_net, n_units=64, act=tf.nn.tanh, name='value1')
         value_net = tl.layers.DenseLayer(value_net, n_units=64, act=tf.nn.tanh, name='value2')
         value_net = tl.layers.DenseLayer(value_net, n_units=1, name='value')
         value = value_net.outputs
 
-        return [net, value_net], [scan, goal, vel], value
+        return [net, value_net,imagevnet], [scan, goal, vel, image], value
 
     def update(self, obs, returns):
         feed_dict = {
             self.obs[0]: obs[0],
             self.obs[1]: obs[1],
             self.obs[2]: obs[2],
+            self.obs[3]: obs[3],
             self.ret_ph: returns}
 
         self.sess.run(self.optimizer, feed_dict)
@@ -200,7 +241,8 @@ class Value(object):
             feed_dict={
                 self.obs[0]: obs[0],
                 self.obs[1]: obs[1],
-                self.obs[2]: obs[2]})
+                self.obs[2]: obs[2],
+            	self.obs[3]: obs[3]})
         return value
 
     def save_network(self, model_name):

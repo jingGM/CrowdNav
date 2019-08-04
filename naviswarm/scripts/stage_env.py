@@ -73,8 +73,8 @@ class StageEnv(object):
         # self._seed()
         self.action_space = spaces.Box(low=np.array([0., -1.0]), high=np.array([1., 1.]))
         self.scan_space = spaces.Box(low=0., high=4., shape=(512, ))
-        image_size = 640*480*3    #    depth_size = 640*480
-        self.image_space = spaces.Box(low=0., high=4., shape=(image_size,))   
+        #image_size = 480*640*3        depth_size = 480*640
+        self.image_space = spaces.Box(low=0., high=4., shape=(480,640,3,))   
         self.goal_space = spaces.Box(low=np.array([0., -np.pi]), high=np.array([np.inf, np.pi]))
 
         # rospy.wait_for_service("/update_positions")new initial poses and goal poses.
@@ -249,7 +249,7 @@ class StageEnv(object):
                     states.goalObsBatch.append(t.state.goalObs)
                     states.actionObsBatch.append(t.state.actionObs)
                     states.velObsBatch.append(t.state.velObs)
-                    #states.ImageObsBatch.append(t.state.ImageObs)
+                    states.ImageObsBatch.append(t.state.ImageObs)
                     #states.DepthObsBatch.append(t.state.DepthObs)
                     self.agent_poses[i] = t.pose  # x, y, a
                     rewards.append(t.reward)
