@@ -39,17 +39,11 @@ class Agent(object):
         self.vel_filter   = RunningAverageFilter(ac_shape,     obstype="vel",   demean=False, destd=False, update=False, delta=self.delta)
         self.reward_filter= RunningAverageFilter((), demean=False, clip=1)
 
-        self.imagestore = []
-        self.scanstore = []
-
     def obs_filter(self, obs):
-
-        image_filtered,imagestore = self.image_filter(obs.ImageObsBatch,self.imagestore)
-        self.imagestore = imagestore
-        scan_filtered,scanstore   = self.scan_filter(obs.scanObsBatch,self.scanstore)
-        self.scanstore = scanstore
-        goal_filtered,_  = self.goal_filter(obs.goalObsBatch)
-        vel_filtered,_   = self.vel_filter(obs.velObsBatch)
+        image_filtered = self.image_filter(obs.ImageObsBatch)
+        scan_filtered  = self.scan_filter(obs.scanObsBatch)
+        goal_filtered  = self.goal_filter(obs.goalObsBatch)
+        vel_filtered   = self.vel_filter(obs.velObsBatch)
 
         if not self.delta:
             scan_filtered /= 4.0
@@ -94,7 +88,7 @@ class Policy(object):
         net = tl.layers.DenseLayer(net, n_units=128, act=tf.nn.relu, name='scan_output')
         scan_output = net.outputs
 
-        '''
+
         def keras_block(imagenetx):
             imagenet = tf.keras.layers.ConvLSTM2D(filters=16,kernel_size=[7,7],strides=[2,2],padding='same',activation=tf.nn.relu,return_sequences=True)(imagenetx)
             imagenet = tf.keras.layers.BatchNormalization()(imagenet)
@@ -113,11 +107,8 @@ class Policy(object):
         imagenet = tl.layers.DenseLayer(imagenet, n_units=960, act=tf.nn.relu, name='image_output')
         image_output = imagenet.outputs
         #print(image_output.shape)
-        '''
-        imagenet = tl.layers.InputLayer(image, name='image_input')
 
-
-        act_net = tl.layers.InputLayer(tf.concat([goal, vel, scan_output], axis=1), name='goal_input')
+        act_net = tl.layers.InputLayer(tf.concat([goal, vel, scan_output, image_output], axis=1), name='goal_input')
         act_net = tl.layers.DenseLayer(act_net, n_units=64, act=tf.nn.tanh, name='act1')
         act_net = tl.layers.DenseLayer(act_net, n_units=64, act=tf.nn.tanh, name='act2')
         linear  = tl.layers.DenseLayer(act_net, n_units=1, act=tf.nn.sigmoid, name='linear')
@@ -185,7 +176,7 @@ class Value(object):
         self.obs_shape = obs_shape
 
         self.model, self.obs, self.value = self._value_net()
-        self.ret_ph = tf.placeholder(tf.float32, shape=[None, ], name='return_ph')
+        self.ret_ph = tf.placeholder(tf.float32, shape=[self.obs_shape[7], ], name='return_ph')
         self.loss = tf.reduce_mean(tf.square(self.value - self.ret_ph))
         self.optimizer = tf.train.AdamOptimizer(1e-3).minimize(self.loss)
 
@@ -207,7 +198,7 @@ class Value(object):
         net = tl.layers.FlattenLayer(net, name='fl_value')
         net = tl.layers.DenseLayer(net, n_units=128, act=tf.nn.relu, name='cnn_output_value')
         cnn_output = net.outputs
-        '''
+
         def keras_block(imagenetx):
             imagenet = tf.keras.layers.ConvLSTM2D(filters=16,kernel_size=[7,7],strides=[2,2],padding='same',activation=tf.nn.relu,return_sequences=True)(imagenetx)
             imagenet = tf.keras.layers.BatchNormalization()(imagenet)
@@ -225,11 +216,8 @@ class Value(object):
         imagevnet = tl.layers.FlattenLayer(imagevnet, name='imagefl_value')
         imagevnet = tl.layers.DenseLayer(imagevnet, n_units=960, act=tf.nn.relu, name='image_output_value')
         image_voutput = imagevnet.outputs
-        '''
-        imagevnet = tl.layers.InputLayer(image, name='image_input_value')
 
-
-        value_net = tl.layers.InputLayer(tf.concat([goal, vel, cnn_output], axis=1),name='goal_input_value')
+        value_net = tl.layers.InputLayer(tf.concat([goal, vel, cnn_output,image_voutput], axis=1),name='goal_input_value')
         value_net = tl.layers.DenseLayer(value_net, n_units=64, act=tf.nn.tanh, name='value1')
         value_net = tl.layers.DenseLayer(value_net, n_units=64, act=tf.nn.tanh, name='value2')
         value_net = tl.layers.DenseLayer(value_net, n_units=1, name='value')
