@@ -1,0 +1,279 @@
+resolution 0.001 # set the resolution of the underlying raytrace model in meters
+interval_sim 100 # simulation timestep in milliseconds
+#interval_real 100
+threads 12
+
+window
+( 
+  size [ 800.000 600.000 ] 
+  scale 28.806 
+)
+
+define map model
+(
+  color "gray30"
+  boundary 0 
+  gui_nose 0
+  gui_grid 0
+  gui_move 0
+  gui_outline 1
+  obstacle_return 1
+  gripper_return 0
+  fiducial_return 0
+  laser_return 1
+)
+
+define diff_robot position
+(
+  size [0.24 0.24 0.3]
+  origin [0 0 0 0]
+  gui_nose 1
+  laser_return 1
+	
+  # This block approximates the circular shape of a robot
+  hokuyo( pose [0.12 0 -0.1 0] )
+  drive "diff"
+  bitmap "robot.png"
+)
+
+define hokuyo ranger
+(
+  sensor(
+    range [0.0 4.0]
+    fov 180
+    samples 512
+    size [ 0.05 0.05 0.1 ]
+    )
+  # generic model properties
+  color "black"
+)
+
+
+map
+(
+  name "medium"
+  size [50.0 50.0 0.5]
+  pose [0 0 0 0]
+  bitmap "empty.pgm"
+)
+
+diff_robot(pose [ 3.000000 0.000000 0.0 -180.000000 ] name "robot_0" color "VioletRed")
+diff_robot(pose [ 2.427051 1.763356 0.0 -144.000000 ] name "robot_1" color "tan")
+diff_robot(pose [ 0.927051 2.853170 0.0 -108.000000 ] name "robot_2" color "salmon")
+diff_robot(pose [ -0.927051 2.853170 0.0 -72.000000 ] name "robot_3" color "LightSeaGreen")
+diff_robot(pose [ -2.427051 1.763356 0.0 -36.000000 ] name "robot_4" color "HotPink")
+diff_robot(pose [ -3.000000 0.000000 0.0 -0.000000 ] name "robot_5" color "ForestGreen")
+diff_robot(pose [ -2.427051 -1.763356 0.0 36.000000 ] name "robot_6" color "orange")
+diff_robot(pose [ -0.927051 -2.853170 0.0 72.000000 ] name "robot_7" color "MediumSlateBlue")
+diff_robot(pose [ 0.927051 -2.853170 0.0 108.000000 ] name "robot_8" color "red")
+diff_robot(pose [ 2.427051 -1.763356 0.0 144.000000 ] name "robot_9" color "green")
+
+diff_robot(pose [ 3.000000 0.000000 0.0 -180.000000 ] name "robot_10" color "VioletRed")
+diff_robot(pose [ 2.427051 1.763356 0.0 -144.000000 ] name "robot_11" color "tan")
+diff_robot(pose [ 0.927051 2.853170 0.0 -108.000000 ] name "robot_12" color "salmon")
+diff_robot(pose [ -0.927051 2.853170 0.0 -72.000000 ] name "robot_13" color "LightSeaGreen")
+diff_robot(pose [ -2.427051 1.763356 0.0 -36.000000 ] name "robot_14" color "HotPink")
+diff_robot(pose [ -3.000000 0.000000 0.0 -0.000000 ] name "robot_15" color "ForestGreen")
+diff_robot(pose [ -2.427051 -1.763356 0.0 36.000000 ] name "robot_16" color "orange")
+diff_robot(pose [ -0.927051 -2.853170 0.0 72.000000 ] name "robot_17" color "MediumSlateBlue")
+diff_robot(pose [ 0.927051 -2.853170 0.0 108.000000 ] name "robot_18" color "red")
+diff_robot(pose [ 2.427051 -1.763356 0.0 144.000000 ] name "robot_19" color "green")
+
+diff_robot(pose [ 3.000000 0.000000 0.0 -180.000000 ] name "robot_20" color "VioletRed")
+diff_robot(pose [ 2.427051 1.763356 0.0 -144.000000 ] name "robot_21" color "tan")
+diff_robot(pose [ 0.927051 2.853170 0.0 -108.000000 ] name "robot_22" color "salmon")
+diff_robot(pose [ -0.927051 2.853170 0.0 -72.000000 ] name "robot_23" color "LightSeaGreen")
+diff_robot(pose [ -2.427051 1.763356 0.0 -36.000000 ] name "robot_24" color "HotPink")
+diff_robot(pose [ -3.000000 0.000000 0.0 -0.000000 ] name "robot_25" color "ForestGreen")
+diff_robot(pose [ -2.427051 -1.763356 0.0 36.000000 ] name "robot_26" color "orange")
+diff_robot(pose [ -0.927051 -2.853170 0.0 72.000000 ] name "robot_27" color "MediumSlateBlue")
+diff_robot(pose [ 0.927051 -2.853170 0.0 108.000000 ] name "robot_28" color "red")
+diff_robot(pose [ 2.427051 -1.763356 0.0 144.000000 ] name "robot_29" color "green")
+
+diff_robot(pose [ 3.000000 0.000000 0.0 -180.000000 ] name "robot_30" color "VioletRed")
+diff_robot(pose [ 2.427051 1.763356 0.0 -144.000000 ] name "robot_31" color "tan")
+diff_robot(pose [ 0.927051 2.853170 0.0 -108.000000 ] name "robot_32" color "salmon")
+diff_robot(pose [ -0.927051 2.853170 0.0 -72.000000 ] name "robot_33" color "LightSeaGreen")
+diff_robot(pose [ -2.427051 1.763356 0.0 -36.000000 ] name "robot_34" color "HotPink")
+diff_robot(pose [ -3.000000 0.000000 0.0 -0.000000 ] name "robot_35" color "ForestGreen")
+diff_robot(pose [ -2.427051 -1.763356 0.0 36.000000 ] name "robot_36" color "orange")
+diff_robot(pose [ -0.927051 -2.853170 0.0 72.000000 ] name "robot_37" color "MediumSlateBlue")
+diff_robot(pose [ 0.927051 -2.853170 0.0 108.000000 ] name "robot_38" color "red")
+diff_robot(pose [ 2.427051 -1.763356 0.0 144.000000 ] name "robot_39" color "green")
+
+diff_robot(pose [ 3.000000 0.000000 0.0 -180.000000 ] name "robot_40" color "VioletRed")
+diff_robot(pose [ 2.427051 1.763356 0.0 -144.000000 ] name "robot_41" color "tan")
+diff_robot(pose [ 0.927051 2.853170 0.0 -108.000000 ] name "robot_42" color "salmon")
+diff_robot(pose [ -0.927051 2.853170 0.0 -72.000000 ] name "robot_43" color "LightSeaGreen")
+diff_robot(pose [ -2.427051 1.763356 0.0 -36.000000 ] name "robot_44" color "HotPink")
+diff_robot(pose [ -3.000000 0.000000 0.0 -0.000000 ] name "robot_45" color "ForestGreen")
+diff_robot(pose [ -2.427051 -1.763356 0.0 36.000000 ] name "robot_46" color "orange")
+diff_robot(pose [ -0.927051 -2.853170 0.0 72.000000 ] name "robot_47" color "MediumSlateBlue")
+diff_robot(pose [ 0.927051 -2.853170 0.0 108.000000 ] name "robot_48" color "red")
+diff_robot(pose [ 2.427051 -1.763356 0.0 144.000000 ] name "robot_49" color "green")
+
+diff_robot(pose [ 3.000000 0.000000 0.0 -180.000000 ] name "robot_50" color "VioletRed")
+diff_robot(pose [ 2.427051 1.763356 0.0 -144.000000 ] name "robot_51" color "tan")
+diff_robot(pose [ 0.927051 2.853170 0.0 -108.000000 ] name "robot_52" color "salmon")
+diff_robot(pose [ -0.927051 2.853170 0.0 -72.000000 ] name "robot_53" color "LightSeaGreen")
+diff_robot(pose [ -2.427051 1.763356 0.0 -36.000000 ] name "robot_54" color "HotPink")
+diff_robot(pose [ -3.000000 0.000000 0.0 -0.000000 ] name "robot_55" color "ForestGreen")
+diff_robot(pose [ -2.427051 -1.763356 0.0 36.000000 ] name "robot_56" color "orange")
+diff_robot(pose [ -0.927051 -2.853170 0.0 72.000000 ] name "robot_57" color "MediumSlateBlue")
+diff_robot(pose [ 0.927051 -2.853170 0.0 108.000000 ] name "robot_58" color "red")
+diff_robot(pose [ 2.427051 -1.763356 0.0 144.000000 ] name "robot_59" color "green")
+
+diff_robot(pose [ 3.000000 0.000000 0.0 -180.000000 ] name "robot_60" color "VioletRed")
+diff_robot(pose [ 2.427051 1.763356 0.0 -144.000000 ] name "robot_61" color "tan")
+diff_robot(pose [ 0.927051 2.853170 0.0 -108.000000 ] name "robot_62" color "salmon")
+diff_robot(pose [ -0.927051 2.853170 0.0 -72.000000 ] name "robot_63" color "LightSeaGreen")
+diff_robot(pose [ -2.427051 1.763356 0.0 -36.000000 ] name "robot_64" color "HotPink")
+diff_robot(pose [ -3.000000 0.000000 0.0 -0.000000 ] name "robot_65" color "ForestGreen")
+diff_robot(pose [ -2.427051 -1.763356 0.0 36.000000 ] name "robot_66" color "orange")
+diff_robot(pose [ -0.927051 -2.853170 0.0 72.000000 ] name "robot_67" color "MediumSlateBlue")
+diff_robot(pose [ 0.927051 -2.853170 0.0 108.000000 ] name "robot_68" color "red")
+diff_robot(pose [ 2.427051 -1.763356 0.0 144.000000 ] name "robot_69" color "green")
+
+diff_robot(pose [ 3.000000 0.000000 0.0 -180.000000 ] name "robot_70" color "VioletRed")
+diff_robot(pose [ 2.427051 1.763356 0.0 -144.000000 ] name "robot_71" color "tan")
+diff_robot(pose [ 0.927051 2.853170 0.0 -108.000000 ] name "robot_72" color "salmon")
+diff_robot(pose [ -0.927051 2.853170 0.0 -72.000000 ] name "robot_73" color "LightSeaGreen")
+diff_robot(pose [ -2.427051 1.763356 0.0 -36.000000 ] name "robot_74" color "HotPink")
+diff_robot(pose [ -3.000000 0.000000 0.0 -0.000000 ] name "robot_75" color "ForestGreen")
+diff_robot(pose [ -2.427051 -1.763356 0.0 36.000000 ] name "robot_76" color "orange")
+diff_robot(pose [ -0.927051 -2.853170 0.0 72.000000 ] name "robot_77" color "MediumSlateBlue")
+diff_robot(pose [ 0.927051 -2.853170 0.0 108.000000 ] name "robot_78" color "red")
+diff_robot(pose [ 2.427051 -1.763356 0.0 144.000000 ] name "robot_79" color "green")
+
+diff_robot(pose [ 3.000000 0.000000 0.0 -180.000000 ] name "robot_80" color "VioletRed")
+diff_robot(pose [ 2.427051 1.763356 0.0 -144.000000 ] name "robot_81" color "tan")
+diff_robot(pose [ 0.927051 2.853170 0.0 -108.000000 ] name "robot_82" color "salmon")
+diff_robot(pose [ -0.927051 2.853170 0.0 -72.000000 ] name "robot_83" color "LightSeaGreen")
+diff_robot(pose [ -2.427051 1.763356 0.0 -36.000000 ] name "robot_84" color "HotPink")
+diff_robot(pose [ -3.000000 0.000000 0.0 -0.000000 ] name "robot_85" color "ForestGreen")
+diff_robot(pose [ -2.427051 -1.763356 0.0 36.000000 ] name "robot_86" color "orange")
+diff_robot(pose [ -0.927051 -2.853170 0.0 72.000000 ] name "robot_87" color "MediumSlateBlue")
+diff_robot(pose [ 0.927051 -2.853170 0.0 108.000000 ] name "robot_88" color "red")
+diff_robot(pose [ 2.427051 -1.763356 0.0 144.000000 ] name "robot_89" color "green")
+
+diff_robot(pose [ 3.000000 0.000000 0.0 -180.000000 ] name "robot_90" color "VioletRed")
+diff_robot(pose [ 2.427051 1.763356 0.0 -144.000000 ] name "robot_91" color "tan")
+diff_robot(pose [ 0.927051 2.853170 0.0 -108.000000 ] name "robot_92" color "salmon")
+diff_robot(pose [ -0.927051 2.853170 0.0 -72.000000 ] name "robot_93" color "LightSeaGreen")
+diff_robot(pose [ -2.427051 1.763356 0.0 -36.000000 ] name "robot_94" color "HotPink")
+diff_robot(pose [ -3.000000 0.000000 0.0 -0.000000 ] name "robot_95" color "ForestGreen")
+diff_robot(pose [ -2.427051 -1.763356 0.0 36.000000 ] name "robot_96" color "orange")
+diff_robot(pose [ -0.927051 -2.853170 0.0 72.000000 ] name "robot_97" color "MediumSlateBlue")
+diff_robot(pose [ 0.927051 -2.853170 0.0 108.000000 ] name "robot_98" color "red")
+diff_robot(pose [ 2.427051 -1.763356 0.0 144.000000 ] name "robot_99" color "green")
+
+diff_robot(pose [ 3.000000 0.000000 0.0 -180.000000 ] name "robot_0" color "VioletRed")
+diff_robot(pose [ 2.427051 1.763356 0.0 -144.000000 ] name "robot_1" color "tan")
+diff_robot(pose [ 0.927051 2.853170 0.0 -108.000000 ] name "robot_2" color "salmon")
+diff_robot(pose [ -0.927051 2.853170 0.0 -72.000000 ] name "robot_3" color "LightSeaGreen")
+diff_robot(pose [ -2.427051 1.763356 0.0 -36.000000 ] name "robot_4" color "HotPink")
+diff_robot(pose [ -3.000000 0.000000 0.0 -0.000000 ] name "robot_5" color "ForestGreen")
+diff_robot(pose [ -2.427051 -1.763356 0.0 36.000000 ] name "robot_6" color "orange")
+diff_robot(pose [ -0.927051 -2.853170 0.0 72.000000 ] name "robot_7" color "MediumSlateBlue")
+diff_robot(pose [ 0.927051 -2.853170 0.0 108.000000 ] name "robot_8" color "red")
+diff_robot(pose [ 2.427051 -1.763356 0.0 144.000000 ] name "robot_9" color "green")
+
+diff_robot(pose [ 3.000000 0.000000 0.0 -180.000000 ] name "robot_10" color "VioletRed")
+diff_robot(pose [ 2.427051 1.763356 0.0 -144.000000 ] name "robot_11" color "tan")
+diff_robot(pose [ 0.927051 2.853170 0.0 -108.000000 ] name "robot_12" color "salmon")
+diff_robot(pose [ -0.927051 2.853170 0.0 -72.000000 ] name "robot_13" color "LightSeaGreen")
+diff_robot(pose [ -2.427051 1.763356 0.0 -36.000000 ] name "robot_14" color "HotPink")
+diff_robot(pose [ -3.000000 0.000000 0.0 -0.000000 ] name "robot_15" color "ForestGreen")
+diff_robot(pose [ -2.427051 -1.763356 0.0 36.000000 ] name "robot_16" color "orange")
+diff_robot(pose [ -0.927051 -2.853170 0.0 72.000000 ] name "robot_17" color "MediumSlateBlue")
+diff_robot(pose [ 0.927051 -2.853170 0.0 108.000000 ] name "robot_18" color "red")
+diff_robot(pose [ 2.427051 -1.763356 0.0 144.000000 ] name "robot_19" color "green")
+
+diff_robot(pose [ 3.000000 0.000000 0.0 -180.000000 ] name "robot_20" color "VioletRed")
+diff_robot(pose [ 2.427051 1.763356 0.0 -144.000000 ] name "robot_21" color "tan")
+diff_robot(pose [ 0.927051 2.853170 0.0 -108.000000 ] name "robot_22" color "salmon")
+diff_robot(pose [ -0.927051 2.853170 0.0 -72.000000 ] name "robot_23" color "LightSeaGreen")
+diff_robot(pose [ -2.427051 1.763356 0.0 -36.000000 ] name "robot_24" color "HotPink")
+diff_robot(pose [ -3.000000 0.000000 0.0 -0.000000 ] name "robot_25" color "ForestGreen")
+diff_robot(pose [ -2.427051 -1.763356 0.0 36.000000 ] name "robot_26" color "orange")
+diff_robot(pose [ -0.927051 -2.853170 0.0 72.000000 ] name "robot_27" color "MediumSlateBlue")
+diff_robot(pose [ 0.927051 -2.853170 0.0 108.000000 ] name "robot_28" color "red")
+diff_robot(pose [ 2.427051 -1.763356 0.0 144.000000 ] name "robot_29" color "green")
+
+diff_robot(pose [ 3.000000 0.000000 0.0 -180.000000 ] name "robot_30" color "VioletRed")
+diff_robot(pose [ 2.427051 1.763356 0.0 -144.000000 ] name "robot_31" color "tan")
+diff_robot(pose [ 0.927051 2.853170 0.0 -108.000000 ] name "robot_32" color "salmon")
+diff_robot(pose [ -0.927051 2.853170 0.0 -72.000000 ] name "robot_33" color "LightSeaGreen")
+diff_robot(pose [ -2.427051 1.763356 0.0 -36.000000 ] name "robot_34" color "HotPink")
+diff_robot(pose [ -3.000000 0.000000 0.0 -0.000000 ] name "robot_35" color "ForestGreen")
+diff_robot(pose [ -2.427051 -1.763356 0.0 36.000000 ] name "robot_36" color "orange")
+diff_robot(pose [ -0.927051 -2.853170 0.0 72.000000 ] name "robot_37" color "MediumSlateBlue")
+diff_robot(pose [ 0.927051 -2.853170 0.0 108.000000 ] name "robot_38" color "red")
+diff_robot(pose [ 2.427051 -1.763356 0.0 144.000000 ] name "robot_39" color "green")
+
+diff_robot(pose [ 3.000000 0.000000 0.0 -180.000000 ] name "robot_40" color "VioletRed")
+diff_robot(pose [ 2.427051 1.763356 0.0 -144.000000 ] name "robot_41" color "tan")
+diff_robot(pose [ 0.927051 2.853170 0.0 -108.000000 ] name "robot_42" color "salmon")
+diff_robot(pose [ -0.927051 2.853170 0.0 -72.000000 ] name "robot_43" color "LightSeaGreen")
+diff_robot(pose [ -2.427051 1.763356 0.0 -36.000000 ] name "robot_44" color "HotPink")
+diff_robot(pose [ -3.000000 0.000000 0.0 -0.000000 ] name "robot_45" color "ForestGreen")
+diff_robot(pose [ -2.427051 -1.763356 0.0 36.000000 ] name "robot_46" color "orange")
+diff_robot(pose [ -0.927051 -2.853170 0.0 72.000000 ] name "robot_47" color "MediumSlateBlue")
+diff_robot(pose [ 0.927051 -2.853170 0.0 108.000000 ] name "robot_48" color "red")
+diff_robot(pose [ 2.427051 -1.763356 0.0 144.000000 ] name "robot_49" color "green")
+
+diff_robot(pose [ 3.000000 0.000000 0.0 -180.000000 ] name "robot_50" color "VioletRed")
+diff_robot(pose [ 2.427051 1.763356 0.0 -144.000000 ] name "robot_51" color "tan")
+diff_robot(pose [ 0.927051 2.853170 0.0 -108.000000 ] name "robot_52" color "salmon")
+diff_robot(pose [ -0.927051 2.853170 0.0 -72.000000 ] name "robot_53" color "LightSeaGreen")
+diff_robot(pose [ -2.427051 1.763356 0.0 -36.000000 ] name "robot_54" color "HotPink")
+diff_robot(pose [ -3.000000 0.000000 0.0 -0.000000 ] name "robot_55" color "ForestGreen")
+diff_robot(pose [ -2.427051 -1.763356 0.0 36.000000 ] name "robot_56" color "orange")
+diff_robot(pose [ -0.927051 -2.853170 0.0 72.000000 ] name "robot_57" color "MediumSlateBlue")
+diff_robot(pose [ 0.927051 -2.853170 0.0 108.000000 ] name "robot_58" color "red")
+diff_robot(pose [ 2.427051 -1.763356 0.0 144.000000 ] name "robot_59" color "green")
+
+diff_robot(pose [ 3.000000 0.000000 0.0 -180.000000 ] name "robot_60" color "VioletRed")
+diff_robot(pose [ 2.427051 1.763356 0.0 -144.000000 ] name "robot_61" color "tan")
+diff_robot(pose [ 0.927051 2.853170 0.0 -108.000000 ] name "robot_62" color "salmon")
+diff_robot(pose [ -0.927051 2.853170 0.0 -72.000000 ] name "robot_63" color "LightSeaGreen")
+diff_robot(pose [ -2.427051 1.763356 0.0 -36.000000 ] name "robot_64" color "HotPink")
+diff_robot(pose [ -3.000000 0.000000 0.0 -0.000000 ] name "robot_65" color "ForestGreen")
+diff_robot(pose [ -2.427051 -1.763356 0.0 36.000000 ] name "robot_66" color "orange")
+diff_robot(pose [ -0.927051 -2.853170 0.0 72.000000 ] name "robot_67" color "MediumSlateBlue")
+diff_robot(pose [ 0.927051 -2.853170 0.0 108.000000 ] name "robot_68" color "red")
+diff_robot(pose [ 2.427051 -1.763356 0.0 144.000000 ] name "robot_69" color "green")
+
+diff_robot(pose [ 3.000000 0.000000 0.0 -180.000000 ] name "robot_70" color "VioletRed")
+diff_robot(pose [ 2.427051 1.763356 0.0 -144.000000 ] name "robot_71" color "tan")
+diff_robot(pose [ 0.927051 2.853170 0.0 -108.000000 ] name "robot_72" color "salmon")
+diff_robot(pose [ -0.927051 2.853170 0.0 -72.000000 ] name "robot_73" color "LightSeaGreen")
+diff_robot(pose [ -2.427051 1.763356 0.0 -36.000000 ] name "robot_74" color "HotPink")
+diff_robot(pose [ -3.000000 0.000000 0.0 -0.000000 ] name "robot_75" color "ForestGreen")
+diff_robot(pose [ -2.427051 -1.763356 0.0 36.000000 ] name "robot_76" color "orange")
+diff_robot(pose [ -0.927051 -2.853170 0.0 72.000000 ] name "robot_77" color "MediumSlateBlue")
+diff_robot(pose [ 0.927051 -2.853170 0.0 108.000000 ] name "robot_78" color "red")
+diff_robot(pose [ 2.427051 -1.763356 0.0 144.000000 ] name "robot_79" color "green")
+
+diff_robot(pose [ 3.000000 0.000000 0.0 -180.000000 ] name "robot_80" color "VioletRed")
+diff_robot(pose [ 2.427051 1.763356 0.0 -144.000000 ] name "robot_81" color "tan")
+diff_robot(pose [ 0.927051 2.853170 0.0 -108.000000 ] name "robot_82" color "salmon")
+diff_robot(pose [ -0.927051 2.853170 0.0 -72.000000 ] name "robot_83" color "LightSeaGreen")
+diff_robot(pose [ -2.427051 1.763356 0.0 -36.000000 ] name "robot_84" color "HotPink")
+diff_robot(pose [ -3.000000 0.000000 0.0 -0.000000 ] name "robot_85" color "ForestGreen")
+diff_robot(pose [ -2.427051 -1.763356 0.0 36.000000 ] name "robot_86" color "orange")
+diff_robot(pose [ -0.927051 -2.853170 0.0 72.000000 ] name "robot_87" color "MediumSlateBlue")
+diff_robot(pose [ 0.927051 -2.853170 0.0 108.000000 ] name "robot_88" color "red")
+diff_robot(pose [ 2.427051 -1.763356 0.0 144.000000 ] name "robot_89" color "green")
+
+diff_robot(pose [ 3.000000 0.000000 0.0 -180.000000 ] name "robot_90" color "VioletRed")
+diff_robot(pose [ 2.427051 1.763356 0.0 -144.000000 ] name "robot_91" color "tan")
+diff_robot(pose [ 0.927051 2.853170 0.0 -108.000000 ] name "robot_92" color "salmon")
+diff_robot(pose [ -0.927051 2.853170 0.0 -72.000000 ] name "robot_93" color "LightSeaGreen")
+diff_robot(pose [ -2.427051 1.763356 0.0 -36.000000 ] name "robot_94" color "HotPink")
+diff_robot(pose [ -3.000000 0.000000 0.0 -0.000000 ] name "robot_95" color "ForestGreen")
+diff_robot(pose [ -2.427051 -1.763356 0.0 36.000000 ] name "robot_96" color "orange")
+diff_robot(pose [ -0.927051 -2.853170 0.0 72.000000 ] name "robot_97" color "MediumSlateBlue")
+diff_robot(pose [ 0.927051 -2.853170 0.0 108.000000 ] name "robot_98" color "red")
+diff_robot(pose [ 2.427051 -1.763356 0.0 144.000000 ] name "robot_99" color "green")
+
