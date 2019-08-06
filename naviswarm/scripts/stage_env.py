@@ -349,15 +349,18 @@ class StageEnv(object):
 
 
         update_goal_request = UpdateModelRequest()
-        state_msg = ModelState()
         i = 0
         for s, g in zip(self.starts, self.goals):
+            state_msg = ModelState()
             state_msg.model_name = "turtlebot%d"%i
             state_msg.pose.position.x = s[0]
             state_msg.pose.position.y = s[1]
-            state_msg.pose.orientation.z = np.cos(s[2] / 2)
-            state_msg.pose.orientation.w = np.sin(s[2] / 2)
-            state_msg.reference_frame = 'ground_plane'
+            state_msg.pose.orientation.z = np.sin(s[2] / 2)
+            state_msg.pose.orientation.w = np.cos(s[2] / 2)
+            #print(state_msg.pose.orientation.w)
+            #print(state_msg.pose.orientation.z)
+            #print('start____________')
+            #state_msg.reference_frame = 'ground_plane'
             rospy.wait_for_service('/gazebo/set_model_state')
             try:
                 reset_robots = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)

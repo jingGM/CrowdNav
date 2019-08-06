@@ -49,6 +49,7 @@
  #include <naviswarm/Velocities.h>
  #include <naviswarm/Action.h>
  #include <naviswarm/Actions.h>
+#include <naviswarm/ActionObs.h>
  #include <naviswarm/Goal.h>
  #include <naviswarm/Scan.h>
  #include <naviswarm/State.h>
@@ -400,10 +401,15 @@ int GazeboTrain::create_sharedmemory(){
 
   reward_pub = nh.advertise<naviswarm::Reward>("/reward", 1000);
 
-  /*for (int i=0;i<num_robots;i++){
-      last_states.actionObsBatch[i].ac_prev.vx = 0;
-      last_states.actionObsBatch[i].ac_prev.vz = 0;
-    }*/
+  for (int i=0;i<num_robots;i++){
+    std::string name_space = "/turtlebot" + std::to_string(i);
+    naviswarm::ActionObs actionobs_data;
+    actionobs_data.ac_prev.vx = 0; 
+    actionobs_data.ac_prev.vz = 0; 
+    actionobs_data.ac_pprev.vx = 0; 
+    actionobs_data.ac_pprev.vz = 0; 
+    last_states.actionObsBatch.push_back(actionobs_data);
+  }
 
 
   share_id = shmget(KEY, SIZE, IPC_CREAT | IPC_EXCL | PERMISSION);
@@ -456,11 +462,11 @@ int GazeboTrain::train(){
 
       image_sub   = nh.subscribe<sensor_msgs::Image>(name_space + "/camera/image_raw", 1, &GazeboTrain::image_Callback, this); //"/camera/depth/image_raw"
       scan_sub    = nh.subscribe<sensor_msgs::LaserScan>(name_space + "/scan", 1, &GazeboTrain::scan_Callback, this);
-      velocity_sub  = nh.subscribe<nav_msgs::Odometry>(name_space + "/odom", 1, &GazeboTrain::velocity_Callback, this);
+      //velocity_sub  = nh.subscribe<nav_msgs::Odometry>(name_space + "/odom", 1, &GazeboTrain::velocity_Callback, this);
       groundtruth_sub = nh.subscribe<gazebo_msgs::ModelStates>("/gazebo/model_states", 1, &GazeboTrain::gt_Callback, this);
       bumper_sub    = nh.subscribe<kobuki_msgs::BumperEvent>(name_space + "/mobile_base/events/bumper", 1, boost::bind(&GazeboTrain::bumper_Callback, this, _1, i));
 
-		  int checkstatus[4] = {1,1,1,1};
+		  int checkstatus[4] = {1,1,0,1};
       bool condition=(substatus[0]!=checkstatus[0])||(substatus[1]!=checkstatus[1])||(substatus[3]!=checkstatus[3])||(substatus[2]!=checkstatus[2]);
 		  while(condition){condition=(substatus[0]!=checkstatus[0])||(substatus[1]!=checkstatus[1])||(substatus[3]!=checkstatus[3])||(substatus[2]!=checkstatus[2]);}
 		  for(int ind=0;ind<4;ind++){substatus[ind]=0;}
@@ -486,11 +492,11 @@ int GazeboTrain::train(){
       // std::cout<< state.goalObs.goal_now.goal_theta << std::endl;
 
       // v is subscribed from odom in our case.
-      state.velObs.vel_now.vx = odom_data.vx;
-      state.velObs.vel_now.vz = odom_data.vz;
-
-      //state.velObs.vel_now.vx = last_states.actionObsBatch[current_robot].ac_prev.vx;
-      //state.velObs.vel_now.vz = last_states.actionObsBatch[current_robot].ac_prev.vz;
+      //state.velObs.vel_now.vx = odom_data.vx;
+      //state.velObs.vel_now.vz = odom_data.vz;
+      //std::cout<<last_states.actionObsBatch[current_robot].ac_prev<<std::endl;
+      state.velObs.vel_now.vx = last_states.actionObsBatch[current_robot].ac_prev.vx;
+      state.velObs.vel_now.vz = last_states.actionObsBatch[current_robot].ac_prev.vz;
       
       //std::cout<<last_states.goalObsBatch.size()<<std::endl;
       //ROS_INFO("+++++++++++++++++++size+++++++++++++++++++");
@@ -638,7 +644,7 @@ int GazeboTrain::train(){
     } // end of for loop
 
     last_states = current_states;
-    
+    /*
     ROS_INFO("++++++++state+++++++");
     std::cout<<current_transitions.data[0].state.velObs.vel_now.vx<<current_transitions.data[0].state.velObs.vel_now.vz<<current_transitions.data[1].state.velObs.vel_now.vx<<current_transitions.data[1].state.velObs.vel_now.vz<<std::endl;
     int infodatasize1 = current_transitions.data[0].state.scanObs.scan_now.ranges.size();
@@ -662,7 +668,8 @@ int GazeboTrain::train(){
     std::cout<<current_transitions.data[0].state.goalObs.goal_now.goal_dist<<'|'<<current_transitions.data[0].state.goalObs.goal_now.goal_theta<<'/'<<current_transitions.data[0].state.goalObs.goal_prev.goal_dist<<'|'<<current_transitions.data[0].state.goalObs.goal_prev.goal_theta<<'/'<<current_transitions.data[0].state.goalObs.goal_pprev.goal_dist<<'|'<<current_transitions.data[0].state.goalObs.goal_pprev.goal_theta<<std::endl;
     std::cout<<current_transitions.data[1].state.goalObs.goal_now.goal_dist<<'|'<<current_transitions.data[1].state.goalObs.goal_now.goal_theta<<'/'<<current_transitions.data[1].state.goalObs.goal_prev.goal_dist<<'|'<<current_transitions.data[1].state.goalObs.goal_prev.goal_theta<<'/'<<current_transitions.data[1].state.goalObs.goal_pprev.goal_dist<<'|'<<current_transitions.data[1].state.goalObs.goal_pprev.goal_theta<<std::endl;
     std::cout<<current_transitions.data[0].state.actionObs.ac_prev.vx<<'|'<<current_transitions.data[0].state.actionObs.ac_prev.vz<<'|'<<current_transitions.data[0].state.actionObs.ac_pprev.vx<<'|'<<current_transitions.data[0].state.actionObs.ac_pprev.vz<<'/'<<current_transitions.data[1].state.actionObs.ac_prev.vx<<'|'<<current_transitions.data[1].state.actionObs.ac_prev.vz<<'|'<<current_transitions.data[1].state.actionObs.ac_pprev.vx<<'|'<<current_transitions.data[1].state.actionObs.ac_pprev.vz<<std::endl;
-
+	*/
+	
     //ROS_INFO("lock memory");
     acquire_semaphore();
     uint32_t length = ros::serialization::serializationLength(current_transitions);
