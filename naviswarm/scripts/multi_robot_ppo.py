@@ -37,7 +37,7 @@ parser = argparse.ArgumentParser(
 parser.add_argument(
     '--train', default=True, type=bool, help='train or test')
 parser.add_argument(
-    '--num_agents', default=2, type=int, help='number of robots')
+    '--num_agents', default=4, type=int, help='number of robots')
 parser.add_argument(
     '--num_obstacles', default=0, type=int, help='number of obstacles')
 parser.add_argument(
@@ -236,7 +236,7 @@ class MultiRobotDRL(object):
             paths = self._get_paths(seed_iter)
             if args.train:
                 stats = self.alg.update(paths)
-                print("in training==============================")
+                print("in training===")
             else:
                 stats, succ_agent = self.alg.test(paths)
                 stats["MeanDistance"] = (self.env.perfect_distance * succ_agent).sum() / succ_agent.sum()
@@ -250,6 +250,9 @@ class MultiRobotDRL(object):
             stats["Iteration"] = iterCounter
 
             self._print_statistics(stats)
+
+        self.agent.policy.save_network('last')
+        self.agent.Value.save_network('last')
 
 if __name__ == "__main__":
     rospy.init_node("multi_robot_drl_stage")

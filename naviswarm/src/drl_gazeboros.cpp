@@ -200,10 +200,11 @@ class GazeboTrain {
 
     void setvelocities( int robotindex, naviswarm::Action velocity){
         std::string topicname = "/turtlebot"+std::to_string(robotindex)+"/cmd_vel_mux/input/navi";
-        ros::Publisher pubrobotvelocity = nh.advertise<geometry_msgs::Twist>(topicname, 1000);
+        ros::Publisher pubrobotvelocity = nh.advertise<geometry_msgs::Twist>(topicname, 1);
         geometry_msgs::Twist action;
         action.linear.x = velocity.vx;
         action.angular.z = velocity.vz;
+        ros::Duration(0.01);
         int counter = 0;
         while ( (counter == 0) && ros::ok()){
           if (pubrobotvelocity.getNumSubscribers()>0){
@@ -697,7 +698,7 @@ int GazeboTrain::train(){
       //std::cout<< "Length ="<< length <<" New length = "<< new_length << std::endl;
       if (new_length != length) {
         succ = true;
-        std::cout<<"Im here."<<std::endl;
+        std::cout<<"data writen"<<std::endl;
       } // Write has succeeded
 
       if (succ)
@@ -712,10 +713,13 @@ int GazeboTrain::train(){
               ROS_BREAK();
           }
           
+          std::cout<<actions.data[0]<<std::endl;
+          std::cout<<actions.data[1]<<std::endl;
+          std::cout<<actions.data[2]<<std::endl;
+          std::cout<<actions.data[3]<<std::endl;
+          ROS_INFO("=========");
           for (int j = 0 ; j < actions.data.size(); ++j){
               std::cout<<actions.data[j]<<std::endl;
-              ROS_INFO("============action=================");
-              setvelocities(j, actions.data[j]);
 
               last_states.actionObsBatch[j].ac_pprev = last_states.actionObsBatch[j].ac_prev;
               last_states.actionObsBatch[j].ac_prev = actions.data[j];
@@ -733,7 +737,7 @@ int GazeboTrain::train(){
 
 int main(int argc, char **argv){
   ros::init(argc, argv, "drl_gazeboros");
-  GazeboTrain gazeboc(2);
+  GazeboTrain gazeboc(4);
 
   if(gazeboc.create_sharedmemory() != 0)
         exit(-1);

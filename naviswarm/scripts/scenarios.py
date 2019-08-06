@@ -34,6 +34,41 @@ class Scenarios(object):
         self.starts = []
         self.goals = []
 
+    def circle_scene_uniform(self):
+        for i in range(self.num_agents):
+            succ = False
+            sx, sy, sa = 0., 0., 0.
+            while not succ:
+                angle = i*2*np.pi / self.num_agents
+                sx = self.env_size * np.cos(angle)
+                sy = self.env_size * np.sin(angle)
+                sa = np.arctan2(-sy, -sx)
+                succ = True
+
+                if self.starts:
+                    for s in self.starts:
+                        if np.hypot(sx - s[0], sy - s[1]) < self.agent_size*4+0.15:
+                            succ = False
+
+            self.starts.append([sx, sy, sa])
+            self.goals.append([-sx, -sy, sa])
+
+        return self.starts, self.goals
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     def mit_crossing_scene(self, alpha):
         alpha = math.radians(alpha)
         self.starts = [[-4., 0., 0.],
@@ -232,28 +267,6 @@ class Scenarios(object):
 
             self.starts.append([sx, sy, sa])
             self.goals.append([sx, sy, sa])
-
-        return self.starts, self.goals
-
-
-    def circle_scene_uniform(self):
-        for i in range(self.num_agents):
-            succ = False
-            sx, sy, sa = 0., 0., 0.
-            while not succ:
-                angle = i*2*np.pi / self.num_agents
-                sx = self.env_size * np.cos(angle)
-                sy = self.env_size * np.sin(angle)
-                sa = np.arctan2(-sy, -sx)
-                succ = True
-
-                if self.starts:
-                    for s in self.starts:
-                        if np.hypot(sx - s[0], sy - s[1]) < self.agent_size*4+0.15:
-                            succ = False
-
-            self.starts.append([sx, sy, sa])
-            self.goals.append([-sx, -sy, sa])
 
         return self.starts, self.goals
 
