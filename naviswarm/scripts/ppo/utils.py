@@ -154,8 +154,8 @@ class RunningAverageFilter(object):
                              x[i].scan_prev.ranges,
                              x[i].scan_now.ranges),
                             axis=1)
-                        print(data.shape)
-                        print('==========scan shape======================')
+                        #print(data.shape)
+                        #print('==========scan shape======================')
                 elif self.obstype == "image":
                     bridge = CvBridge()
                     try:
@@ -190,8 +190,8 @@ class RunningAverageFilter(object):
                     else:
                         data = np.stack((np.array(image_now),np.array(image_p1rev),np.array(image_p2rev),
                                          np.array(image_p3rev),np.array(image_p4rev)),axis=0)
-                        print(data.shape)
-                        print('==========image shape======================')
+                        #print(data.shape)
+                        #print('==========image shape======================')
                         
                 elif self.obstype == "goal":
                     data = [x[i].goal_now.goal_dist, x[i].goal_now.goal_theta]

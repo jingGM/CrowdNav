@@ -25,5 +25,10 @@
 		<param name="publish_frequency" type="double" value="30.0" />
 	</node>
 
+	<node pkg="laser_filters" type="scan_to_scan_filter_chain"
+	name="filter_chain" ns="$(arg ns)">
+		<rosparam command="load" file="$(find naviswarm)/models/hokuyo/config.yaml" />
+		<!--remap from="scan" to="$(arg ns)/scan" /-->
+	</node>
 
 </launch>

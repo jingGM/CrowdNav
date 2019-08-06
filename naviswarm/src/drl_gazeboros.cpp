@@ -96,6 +96,8 @@ using namespace message_filters;
  #define OBSTACLE_NUM 0
  //#define MIN_DIST_BETWEEN_AGENTS ROBOT_RADIUS*2
 
+ #define LidarMaxDistance 5
+
 //Class definition
 class GazeboTrain {
   private:
@@ -306,12 +308,13 @@ void GazeboTrain::scan_Callback(const sensor_msgs::LaserScanConstPtr& scan){
   if (scan_data.ranges.size()>0){substatus[1] =1;}
 
   float min_range = 0.5;
-    collision_status[current_robot] = false; // NOTE: collision status for robot 0 is stored in collision_status[0].
-    for (int j = 0; j < scan->ranges.size(); j++) {
-        if (scan->ranges[j] < min_range) {
-            collision_status[current_robot] = true;  // true indicates presence of obstacle
-        }
-    }
+  collision_status[current_robot] = false; // NOTE: collision status for robot 0 is stored in collision_status[0].
+  for (int j = 0; j < scan->ranges.size(); j++) {
+      if (scan->ranges[j] < min_range) {
+        collision_status[current_robot] = true;  // true indicates presence of obstacle
+      }
+      //if (not(scan->ranges[j])){scan->ranges[j] = LidarMaxDistance;}
+  }
 }
 
 void GazeboTrain::velocity_Callback(const nav_msgs::OdometryConstPtr& odom){
@@ -461,7 +464,7 @@ int GazeboTrain::train(){
       */
 
       image_sub   = nh.subscribe<sensor_msgs::Image>(name_space + "/camera/image_raw", 1, &GazeboTrain::image_Callback, this); //"/camera/depth/image_raw"
-      scan_sub    = nh.subscribe<sensor_msgs::LaserScan>(name_space + "/scan", 1, &GazeboTrain::scan_Callback, this);
+      scan_sub    = nh.subscribe<sensor_msgs::LaserScan>(name_space + "/scan_filtered", 1, &GazeboTrain::scan_Callback, this);
       //velocity_sub  = nh.subscribe<nav_msgs::Odometry>(name_space + "/odom", 1, &GazeboTrain::velocity_Callback, this);
       groundtruth_sub = nh.subscribe<gazebo_msgs::ModelStates>("/gazebo/model_states", 1, &GazeboTrain::gt_Callback, this);
       bumper_sub    = nh.subscribe<kobuki_msgs::BumperEvent>(name_space + "/mobile_base/events/bumper", 1, boost::bind(&GazeboTrain::bumper_Callback, this, _1, i));
