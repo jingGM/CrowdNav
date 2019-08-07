@@ -83,17 +83,17 @@ parser.add_argument(
     help='max timesteps of the whole training')
 parser.add_argument(
     '--batch_max_steps',
-    default=8000,
+    default=10, #8000,
     type=int,
     help='max timesteps of a batch for updating')
 parser.add_argument(
     '--episode_max_steps',
-    default=400,
+    default=10, #400,
     type=int,
     help='max timesteps of an episode')
 parser.add_argument(
     '--train_max_iters',
-    default=4000,
+    default=5, #4000,
     type=int,
     help='maximum training iterations')
 parser.add_argument(
@@ -166,10 +166,11 @@ class MultiRobotDRL(object):
                 action_agents = self.agent.policy.act_test([scan_input, goal_input, vel_input,image_input], terminateds)
             paths["action"].append(action_agents)
 
-            print(action_agents)
-            print("============agent actions====================")
-            obs_agents, reward_agents, done_agents, _ = env.step(action_agents)
-
+            #print(action_agents)
+            #print("===agent actions===")
+            obs_agents, reward_agents, done_agents, _ = env.step(action_agents,step)
+            print(reward_agents)
+            print("===agents reward===")
             if step == 0:
                 reward_agents = np.zeros(args.num_agents)
             paths["reward"].append(reward_agents)
@@ -234,6 +235,8 @@ class MultiRobotDRL(object):
         while iterCounter < args.train_max_iters and not rospy.is_shutdown():
             iterCounter += 1
             paths = self._get_paths(seed_iter)
+            print(paths)
+            print("=== path ===")
             if args.train:
                 stats = self.alg.update(paths)
                 print("in training===")

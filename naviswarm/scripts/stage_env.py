@@ -30,7 +30,7 @@ import numpy as np
 import rospy
 import sysv_ipc
 from geometry_msgs.msg import Point, Pose
-from naviswarm.msg import Action, Actions, States, Transitions
+from naviswarm.msg import Action, Actions, States, Transitions,SCtoCP
 from naviswarm.srv import UpdateModel, UpdateModelRequest
 from gazebo_msgs.msg import ModelState
 from gazebo_msgs.srv import SetModelState
@@ -142,7 +142,7 @@ class StageEnv(object):
         cols = np.array(cols) / 255.
         return cols
 
-    def step(self, actions):
+    def step(self, actions,current_step):
         """
         Run one timestep of the env's dynamics.
 
@@ -180,7 +180,11 @@ class StageEnv(object):
             actions_probuf.data.append(apb)
             # rospy.logwarn('action: {0}'.format(apb))
 
-        self._write_data(actions_probuf)
+        data_write_memory = SCtoCP()
+        data_write_memory.actions = actions_probuf
+        data_write_memory.step = current_step
+
+        self._write_data(data_write_memory)
 
         self.agent_last_poses = copy.deepcopy(self.agent_poses)
         # tell Stage we've calculated actions, please execute actions
@@ -468,14 +472,7 @@ class StageEnv(object):
         self.path_markers_pub.publish(self.path_markers)
 
 
-    def _add_marker(self,
-                    markerType,
-                    color,
-                    scale,
-                    pose=None,
-                    ns=None,
-                    text=None,
-                    points=None):
+    def _add_marker(self,markerType,color,scale,pose=None,ns=None,text=None,points=None):
         if pose is not None:
             pose = self._to_pose(pose)
         marker = Marker()

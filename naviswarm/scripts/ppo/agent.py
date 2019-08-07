@@ -79,13 +79,13 @@ class Policy(object):
         image= tf.placeholder(tf.float32, [None, self.obs_shape[3],self.obs_shape[4],self.obs_shape[5],self.obs_shape[6]], 'image_ph')
 
         net = tl.layers.InputLayer(scan, name='scan_input')
-        net = tl.layers.MeanPool1d(net, filter_size=3, strides=2, name='min_pooling1')
-        net = tl.layers.MeanPool1d(net, filter_size=3, strides=2, name='min_pooling2')
-        net = tl.layers.MeanPool1d(net, filter_size=3, strides=2, name='min_pooling3')
-        net = tl.layers.Conv1dLayer(net, act=tf.nn.relu, shape=[5, self.obs_shape[0], 8], stride=2,name='cnn1')
-        net = tl.layers.Conv1dLayer(net, act=tf.nn.relu, shape=[3, 8, 16], stride=2,name='cnn2')
+        #net = tl.layers.MeanPool1d(net, filter_size=3, strides=2, name='min_pooling1')
+        #net = tl.layers.MeanPool1d(net, filter_size=3, strides=2, name='min_pooling2')
+        #net = tl.layers.MeanPool1d(net, filter_size=3, strides=2, name='min_pooling3')
+        net = tl.layers.Conv1dLayer(net, act=tf.nn.relu, shape=[5, self.obs_shape[0], 32], stride=2,name='cnn1')
+        net = tl.layers.Conv1dLayer(net, act=tf.nn.relu, shape=[3, 32, 16], stride=2,name='cnn2')
         net = tl.layers.FlattenLayer(net, name='fl')
-        net = tl.layers.DenseLayer(net, n_units=128, act=tf.nn.relu, name='scan_output')
+        net = tl.layers.DenseLayer(net, n_units=256, act=tf.nn.relu, name='scan_output')
         scan_output = net.outputs
 
         '''
@@ -100,6 +100,20 @@ class Policy(object):
             imagenet = tf.keras.layers.BatchNormalization()(imagenet)
             imagenet = tf.keras.layers.Conv3D(filters=1, kernel_size=(3, 3, 3),activation=tf.nn.relu,padding='same')(imagenet)
             return imagenet
+        '''
+        '''
+        def keras_block(imagenetx):
+            imagenet = tf.keras.layers.ConvLSTM2D(filters=16,kernel_size=[7,7],strides=[2,2],padding='same',activation=tf.nn.relu,return_sequences=True)(imagenetx)
+            imagenet = tf.keras.layers.BatchNormalization()(imagenet)
+            imagenet = tf.keras.layers.ConvLSTM2D(filters=32,kernel_size=[5,5],strides=[2,2],padding='same',activation=tf.nn.relu,return_sequences=True)(imagenet)
+            imagenet = tf.keras.layers.BatchNormalization()(imagenet)
+            imagenet = tf.keras.layers.ConvLSTM2D(filters=64,kernel_size=[3,3],strides=[2,2],padding='same',activation=tf.nn.relu,return_sequences=True)(imagenet)
+            imagenet = tf.keras.layers.BatchNormalization()(imagenet)
+            imagenet = tf.keras.layers.ConvLSTM2D(filters=64,kernel_size=[3,3],strides=[1,1],padding='same',activation=tf.nn.relu,return_sequences=True)(imagenet)
+            imagenet = tf.keras.layers.BatchNormalization()(imagenet)
+            imagenet = tf.keras.layers.Conv3D(filters=1, kernel_size=(5, 3, 3),strides=(2,2,2),activation=tf.nn.relu,padding='same')(imagenet)
+            imagenet = tf.keras.layers.Conv3D(filters=1, kernel_size=(3, 3, 3),strides=(3,1,1),activation=tf.nn.relu,padding='same')(imagenet)
+            return imagenet
 
         imagenet = tl.layers.InputLayer(image, name='image_input')
         imagenet = tl.layers.LambdaLayer(imagenet, fn=keras_block, name='kerasImage')
@@ -111,8 +125,10 @@ class Policy(object):
         imagenet = tl.layers.InputLayer(image, name='image_input')
 
         act_net = tl.layers.InputLayer(tf.concat([goal, vel, scan_output], axis=1), name='goal_input')
-        act_net = tl.layers.DenseLayer(act_net, n_units=64, act=tf.nn.tanh, name='act1')
-        act_net = tl.layers.DenseLayer(act_net, n_units=64, act=tf.nn.tanh, name='act2')
+        #act_net = tl.layers.InputLayer(tf.concat([goal, vel, scan_output, image_output], axis=1), name='goal_input')
+        
+        #act_net = tl.layers.DenseLayer(act_net, n_units=64, act=tf.nn.tanh, name='act1')
+        act_net = tl.layers.DenseLayer(act_net, n_units=128, act=tf.nn.relu, name='act2')
         linear  = tl.layers.DenseLayer(act_net, n_units=1, act=tf.nn.sigmoid, name='linear')
         angular = tl.layers.DenseLayer(act_net, n_units=1, act=tf.nn.tanh, name='angular')
         with tf.variable_scope('means'):
@@ -191,15 +207,16 @@ class Value(object):
         image= tf.placeholder(tf.float32, [None, self.obs_shape[3],self.obs_shape[4],self.obs_shape[5],self.obs_shape[6]], 'image_ph')
 
         net = tl.layers.InputLayer(scan, name='scan_input_value')
-        net = tl.layers.MeanPool1d(net, filter_size=3, strides=2, name='min_pooling1_value')
-        net = tl.layers.MeanPool1d(net, filter_size=3, strides=2, name='min_pooling2_value')
-        net = tl.layers.MeanPool1d(net, filter_size=3, strides=2, name='min_pooling3_value')
+        #net = tl.layers.MeanPool1d(net, filter_size=3, strides=2, name='min_pooling1_value')
+        #net = tl.layers.MeanPool1d(net, filter_size=3, strides=2, name='min_pooling2_value')
+        #net = tl.layers.MeanPool1d(net, filter_size=3, strides=2, name='min_pooling3_value')
 
-        net = tl.layers.Conv1dLayer(net, act=tf.nn.relu, shape=[5, self.obs_shape[0], 8], stride=2,name='cnn1_value')
-        net = tl.layers.Conv1dLayer(net, act=tf.nn.relu, shape=[3, 8, 16], stride=2,name='cnn2_value')
+        net = tl.layers.Conv1dLayer(net, act=tf.nn.relu, shape=[5, self.obs_shape[0], 32], stride=2,name='cnn1_value')
+        net = tl.layers.Conv1dLayer(net, act=tf.nn.relu, shape=[3, 32, 16], stride=2,name='cnn2_value')
         net = tl.layers.FlattenLayer(net, name='fl_value')
-        net = tl.layers.DenseLayer(net, n_units=128, act=tf.nn.relu, name='cnn_output_value')
+        net = tl.layers.DenseLayer(net, n_units=256, act=tf.nn.relu, name='cnn_output_value')
         cnn_output = net.outputs
+
         '''
         def keras_block(imagenetx):
             imagenet = tf.keras.layers.ConvLSTM2D(filters=16,kernel_size=[7,7],strides=[2,2],padding='same',activation=tf.nn.relu,return_sequences=True)(imagenetx)
@@ -212,6 +229,20 @@ class Value(object):
             imagenet = tf.keras.layers.BatchNormalization()(imagenet)
             imagenet = tf.keras.layers.Conv3D(filters=1, kernel_size=(3, 3, 3),activation=tf.nn.relu,padding='same')(imagenet)
             return imagenet
+        '''
+        '''
+        def keras_block(imagenetx):
+            imagenet = tf.keras.layers.ConvLSTM2D(filters=16,kernel_size=[7,7],strides=[2,2],padding='same',activation=tf.nn.relu,return_sequences=True)(imagenetx)
+            imagenet = tf.keras.layers.BatchNormalization()(imagenet)
+            imagenet = tf.keras.layers.ConvLSTM2D(filters=32,kernel_size=[5,5],strides=[2,2],padding='same',activation=tf.nn.relu,return_sequences=True)(imagenet)
+            imagenet = tf.keras.layers.BatchNormalization()(imagenet)
+            imagenet = tf.keras.layers.ConvLSTM2D(filters=64,kernel_size=[3,3],strides=[2,2],padding='same',activation=tf.nn.relu,return_sequences=True)(imagenet)
+            imagenet = tf.keras.layers.BatchNormalization()(imagenet)
+            imagenet = tf.keras.layers.ConvLSTM2D(filters=64,kernel_size=[3,3],strides=[1,1],padding='same',activation=tf.nn.relu,return_sequences=True)(imagenet)
+            imagenet = tf.keras.layers.BatchNormalization()(imagenet)
+            imagenet = tf.keras.layers.Conv3D(filters=1, kernel_size=(5, 3, 3),strides=(2,2,2),activation=tf.nn.relu,padding='same')(imagenet)
+            imagenet = tf.keras.layers.Conv3D(filters=1, kernel_size=(3, 3, 3),strides=(3,1,1),activation=tf.nn.relu,padding='same')(imagenet)
+            return imagenet
 
         imagevnet = tl.layers.InputLayer(image, name='image_input_value')
         imagevnet = tl.layers.LambdaLayer(imagevnet, fn=keras_block, name='kerasImage_value')
@@ -219,12 +250,15 @@ class Value(object):
         imagevnet = tl.layers.DenseLayer(imagevnet, n_units=960, act=tf.nn.relu, name='image_output_value')
         image_voutput = imagevnet.outputs
         '''
+
         imagevnet = tl.layers.InputLayer(image, name='image_input_value')
 
 
         value_net = tl.layers.InputLayer(tf.concat([goal, vel, cnn_output], axis=1),name='goal_input_value')
-        value_net = tl.layers.DenseLayer(value_net, n_units=64, act=tf.nn.tanh, name='value1')
-        value_net = tl.layers.DenseLayer(value_net, n_units=64, act=tf.nn.tanh, name='value2')
+        #value_net = tl.layers.InputLayer(tf.concat([goal, vel, cnn_output,image_voutput], axis=1),name='goal_input_value')
+        
+        #value_net = tl.layers.DenseLayer(value_net, n_units=64, act=tf.nn.tanh, name='value1')
+        value_net = tl.layers.DenseLayer(value_net, n_units=128, act=tf.nn.relu, name='value2')
         value_net = tl.layers.DenseLayer(value_net, n_units=1, name='value')
         value = value_net.outputs
 

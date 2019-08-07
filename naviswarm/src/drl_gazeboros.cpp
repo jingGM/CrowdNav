@@ -58,6 +58,8 @@
  #include <naviswarm/Transitions.h>
  #include <naviswarm/RobotStatus.h>
  #include <naviswarm/Reward.h>
+ #include <naviswarm/SCtoCP.h>
+
 
  // Service header
  #include <naviswarm/UpdateModel.h>
@@ -118,6 +120,7 @@ class GazeboTrain {
     ros::Subscriber velocity_sub;
     ros::Publisher reward_pub;
 
+    int current_steps = 0;
     geometry_msgs::Pose gpose;
     naviswarm::Velocity odom_data;
 
@@ -129,6 +132,7 @@ class GazeboTrain {
     std_msgs::Header odom_header;
 
     int substatus[4] = {0,0,0,0};//check if get messages
+    
 
     // Defining vec3 = {x, y, theta}
     typedef struct {
@@ -197,30 +201,29 @@ class GazeboTrain {
     // Other ROS tf broadcaster. (I dont think this is needed for this code)
     tf::TransformBroadcaster tf;
     ros::Time sim_time;
-
+    /*
     void setvelocities( int robotindex, naviswarm::Action velocity){
         std::string topicname = "/turtlebot"+std::to_string(robotindex)+"/cmd_vel_mux/input/navi";
         ros::Publisher pubrobotvelocity = nh.advertise<geometry_msgs::Twist>(topicname, 1);
         geometry_msgs::Twist action;
         action.linear.x = velocity.vx;
         action.angular.z = velocity.vz;
-        ros::Duration(0.01);
-        int counter = 0;
-        while ( (counter == 0) && ros::ok()){
+        //ros::Duration(0.01);
+        int velocitycounter = 0;
+        while ( (velocitycounter == 0) && ros::ok()){
           if (pubrobotvelocity.getNumSubscribers()>0){
             pubrobotvelocity.publish(action);
-            counter = 1;
+            velocitycounter = 1;
           }
         }
       }
-
+    */
   public:
     // Function declarations
     GazeboTrain(int num_robots);
 
     void gt_Callback(const gazebo_msgs::ModelStates gt);
-    void sync_Callback( const sensor_msgs::ImageConstPtr& image,
-                        const sensor_msgs::LaserScanConstPtr& scan);
+    //void sync_Callback( const sensor_msgs::ImageConstPtr& image,const sensor_msgs::LaserScanConstPtr& scan);
     void image_Callback(const sensor_msgs::ImageConstPtr& image);
     void scan_Callback(const sensor_msgs::LaserScanConstPtr& scan);
     void bumper_Callback(const kobuki_msgs::BumperEventConstPtr& bumper_msg, int i);
@@ -264,9 +267,8 @@ void GazeboTrain::release_semaphore()
         ROS_WARN("Watch out! Release semaphore failed.");
     }
 }
-
-void GazeboTrain::sync_Callback(const sensor_msgs::ImageConstPtr& image,
-                const sensor_msgs::LaserScanConstPtr& scan)
+/*
+void GazeboTrain::sync_Callback(const sensor_msgs::ImageConstPtr& image, const sensor_msgs::LaserScanConstPtr& scan)
 {
   int robotindex = current_robot;
   substatus[0] = 1;
@@ -291,7 +293,7 @@ void GazeboTrain::sync_Callback(const sensor_msgs::ImageConstPtr& image,
         }
     }
 }
-
+*/
 void GazeboTrain::image_Callback(const sensor_msgs::ImageConstPtr& image){
 	//ROS_INFO("running image callback");
 	
@@ -383,6 +385,7 @@ bool GazeboTrain::cb_update_srv(naviswarm::UpdateModelRequest& request, naviswar
         last_states.scanObsBatch.clear();
         last_states.velObsBatch.clear();
         executed_actions.data.clear();
+        current_steps = 0;
         // WARNING: IT MAY NOT FREE THE MEMORY SPACE
 
         response.success = true;
@@ -612,13 +615,7 @@ int GazeboTrain::train(){
                   }
 
                   double penalty_for_deviation = 0.0;
-                  // if (state.goalObs.goal_now.goal_dist < 1.)
-                  // {
-                  //     penalty_for_deviation = -0.1 * std::abs(state.goalObs.goal_now.goal_theta);
-                  //     penalty_for_deviation -= 0.1 * v.x;
-                  // }
-                  // else
-                  // {
+                  
                   if (std::abs(state.goalObs.goal_now.goal_theta) > 0.785)
                   {
                       penalty_for_deviation = -0.1 * (std::abs(state.goalObs.goal_now.goal_theta) - 0.785);
@@ -626,8 +623,9 @@ int GazeboTrain::train(){
                   // }
 
                   // current_transition.reward = 0;
-                  current_transition.reward = reward_approaching_goal;
+                  current_transition.reward = reward_approaching_goal + (current_steps+1) *(-0.1) + state.velObs.vel_now.vz * (-0.1);
                   // current_transition.reward = reward_approaching_goal + penalty_for_deviation;
+
                   reward.reward_approaching_goal = reward_approaching_goal;
                   reward.penalty_for_deviation = penalty_for_deviation;
               }
@@ -703,26 +701,47 @@ int GazeboTrain::train(){
 
       if (succ)
       {
-          naviswarm::Actions actions;
+          
+          naviswarm::SCtoCP read_data_as;
           ros::serialization::IStream stream((share_addr + 4), new_length);
-          ros::serialization::Serializer<naviswarm::Actions>::read(stream, actions); // Reads actions from shared memory
+          ros::serialization::Serializer<naviswarm::SCtoCP>::read(stream, read_data_as); // Reads actions from shared memory
           release_semaphore();
+
+          naviswarm::Actions actions = read_data_as.actions;
+          current_steps = read_data_as.step;
+
+          std::cout<<"===steps:  "<<current_steps<<"==="<<std::endl;
+          std::cout<<actions.data[0]<<std::endl;
+          std::cout<<actions.data[1]<<std::endl;
+          std::cout<<actions.data[2]<<std::endl;
+          std::cout<<actions.data[3]<<std::endl;
+
           ROS_INFO("got data and released memory");
           if (actions.data.size() != num_robots){
               ROS_INFO("actions_size != robots_size, actions_size is %d", static_cast<int>(actions.data.size()));
               ROS_BREAK();
           }
           
-          std::cout<<actions.data[0]<<std::endl;
-          std::cout<<actions.data[1]<<std::endl;
-          std::cout<<actions.data[2]<<std::endl;
-          std::cout<<actions.data[3]<<std::endl;
-          ROS_INFO("=========");
-          for (int j = 0 ; j < actions.data.size(); ++j){
-              std::cout<<actions.data[j]<<std::endl;
+          for (int j = 0 ; j < num_robots; ++j){
 
-              last_states.actionObsBatch[j].ac_pprev = last_states.actionObsBatch[j].ac_prev;
-              last_states.actionObsBatch[j].ac_prev = actions.data[j];
+            std::string topicname = "/turtlebot"+std::to_string(j)+"/cmd_vel_mux/input/navi";
+            ros::Publisher pubrobotvelocity = nh.advertise<geometry_msgs::Twist>(topicname, 1);
+            geometry_msgs::Twist action;
+            action.linear.x = actions.data[j].vx;
+            action.angular.z = actions.data[j].vz;
+            int velocitycounter = 0;
+            while ( (velocitycounter == 0) && ros::ok()){
+              if (pubrobotvelocity.getNumSubscribers()>0){
+                pubrobotvelocity.publish(action);
+                velocitycounter = 1;
+              }
+            }
+            
+            usleep(300000);
+            std::cout<<"-"; 
+            last_states.actionObsBatch[j].ac_pprev = last_states.actionObsBatch[j].ac_prev;
+            last_states.actionObsBatch[j].ac_prev = actions.data[j];
+            //ros::Duration(1);
           }
           executed_actions = actions;
           break;

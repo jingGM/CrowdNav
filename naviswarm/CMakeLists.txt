@@ -47,6 +47,7 @@ add_message_files(
     Reward.msg
     CameraImage.msg
     CameraImageObs.msg
+    SCtoCP.msg
 )
 
 add_service_files(

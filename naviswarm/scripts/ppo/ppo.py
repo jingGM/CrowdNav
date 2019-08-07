@@ -76,15 +76,11 @@ class PPO(object):
         self.session.run(tf.global_variables_initializer())
 
     def _placeholder(self):
-        self.act_ph = tf.placeholder(
-            tf.float32, [None, self.act_dim], 'act_ph')
-        self.advantages_ph = tf.placeholder(
-            tf.float32, [None, ], 'advantages_ph')
+        self.act_ph = tf.placeholder(tf.float32, [None, self.act_dim], 'act_ph')
+        self.advantages_ph = tf.placeholder(tf.float32, [None, ], 'advantages_ph')
 
-        self.old_log_vars_ph = tf.placeholder(
-            tf.float32, [self.act_dim, ], 'old_log_vars')
-        self.old_means_ph = tf.placeholder(
-            tf.float32, [None, self.act_dim], 'old_means')
+        self.old_log_vars_ph = tf.placeholder(tf.float32, [self.act_dim, ], 'old_log_vars')
+        self.old_means_ph = tf.placeholder(tf.float32, [None, self.act_dim], 'old_means')
 
         self.beta_ph = tf.placeholder(tf.float32, name='beta')
         self.eta_ph = tf.placeholder(tf.float32, name='eta')
@@ -94,46 +90,32 @@ class PPO(object):
 
     def _build_actor_training_method(self):
         # compute logprob
-        self.logp = -0.5 * tf.reduce_sum(
-            self.log_vars) + -0.5 * tf.reduce_sum(
-                tf.square(self.act_ph - self.means) / tf.exp(self.log_vars),
-                axis=1)
-        self.logp_old = -0.5 * tf.reduce_sum(
-            self.old_log_vars_ph) + -0.5 * tf.reduce_sum(
-                tf.square(self.act_ph - self.old_means_ph) / tf.exp(self.old_log_vars_ph),
-                axis=1)
+        self.logp = -0.5 * tf.reduce_sum(self.log_vars) + -0.5 * tf.reduce_sum(tf.square(self.act_ph - self.means) / tf.exp(self.log_vars),axis=1)
+        self.logp_old = -0.5 * tf.reduce_sum(self.old_log_vars_ph) + -0.5 * tf.reduce_sum(tf.square(self.act_ph - self.old_means_ph) / tf.exp(self.old_log_vars_ph),axis=1)
         # compute kl
         with tf.variable_scope('kl'):
-            self.kl = 0.5 * tf.reduce_mean(
-                tf.reduce_sum(tf.exp(self.old_log_vars_ph - self.log_vars)) +
-                tf.reduce_sum(tf.square(self.means - self.old_means_ph) / tf.exp(self.log_vars),axis=1) - 
-                self.act_dim + tf.reduce_sum(self.log_vars) -
-                tf.reduce_sum(self.old_log_vars_ph))
+            self.kl = 0.5 * tf.reduce_mean( tf.reduce_sum(tf.exp(self.old_log_vars_ph - self.log_vars)) + 
+                                            tf.reduce_sum(tf.square(self.means - self.old_means_ph) / tf.exp(self.log_vars),axis=1) - 
+                                            self.act_dim + tf.reduce_sum(self.log_vars) -
+                                            tf.reduce_sum(self.old_log_vars_ph))
         # compute entropy
         with tf.variable_scope('entropy'):
-            self.entropy = 0.5 * (
-                self.act_dim *
-                (np.log(2 * np.pi) + 1) + tf.reduce_sum(self.log_vars))
+            self.entropy = 0.5 * (self.act_dim * (np.log(2 * np.pi) + 1) + tf.reduce_sum(self.log_vars))
         # compute actor loss
         with tf.variable_scope('actor_loss'):
-            loss1 = -tf.reduce_mean(
-                self.advantages_ph * tf.exp(self.logp - self.logp_old))
+            loss1 = -tf.reduce_mean(self.advantages_ph * tf.exp(self.logp - self.logp_old))
             loss2 = tf.reduce_mean(self.beta_ph * self.kl)
-            loss3 = self.eta_ph * tf.square(
-                tf.maximum(0.0, self.kl - 2.0 * self.kl_targ))
+            loss3 = self.eta_ph * tf.square(tf.maximum(0.0, self.kl - 2.0 * self.kl_targ))
             self.actor_loss = loss1 + loss2 + loss3
         # opt actor loss
-        self.actor_opt = tf.train.AdamOptimizer(self.lr_ph).minimize(
-            self.actor_loss)
+        self.actor_opt = tf.train.AdamOptimizer(self.lr_ph).minimize(self.actor_loss)
 
     def _build_critic_training_method(self):
         with tf.variable_scope('critic_loss'):
-            self.critic_loss = tf.reduce_mean(
-                tf.square(tf.squeeze(self.value) - self.ret_ph))
+            self.critic_loss = tf.reduce_mean(tf.square(tf.squeeze(self.value) - self.ret_ph))
 
     def _build_tensorboard(self):
-        self.visual_reward = tf.placeholder(
-            tf.float32, name="visual_reward")
+        self.visual_reward = tf.placeholder(tf.float32, name="visual_reward")
         self.visual_kl = tf.placeholder(tf.float32, name="visual_kl")
 
         with tf.name_scope('param'):
@@ -186,6 +168,7 @@ class PPO(object):
         stats["EpPathLengthsMax"] = epPathLengths.max()
         stats["EpPathLengthsMin"] = epPathLengths.min()
         stats["RewardPerStep"] = epRewards.sum() / epPathLengths.sum()
+
         if self.time_step > 1:
             stats["Beta"] = self.beta
             stats["ActorLearningRate"] = self.actor_lr * self.lr_multiplier
@@ -285,11 +268,11 @@ class PPO(object):
         if self.replay_buffer_obs_scan is None:
             obs_scan_train, obs_goal_train, obs_vel_train,obs_image_train, ret_train = obs_scan, obs_goal, obs_vel,obs_image, rets
         else:
-            obs_scan_train  = np.concatenate([obs_scan, self.replay_buffer_obs_scan])
-            obs_goal_train  = np.concatenate([obs_goal, self.replay_buffer_obs_goal])
-            obs_vel_train   = np.concatenate([obs_vel, self.replay_buffer_obs_vel])
+            obs_scan_train  = np.concatenate([obs_scan,  self.replay_buffer_obs_scan])
+            obs_goal_train  = np.concatenate([obs_goal,  self.replay_buffer_obs_goal])
+            obs_vel_train   = np.concatenate([obs_vel,   self.replay_buffer_obs_vel])
             obs_image_train = np.concatenate([obs_image, self.replay_buffer_obs_image])
-            ret_train       = np.concatenate([rets, self.replay_buffer_ret])
+            ret_train       = np.concatenate([rets,      self.replay_buffer_ret])
 
         self.replay_buffer_obs_scan = obs_scan
         self.replay_buffer_obs_goal = obs_goal
@@ -298,8 +281,7 @@ class PPO(object):
         self.replay_buffer_ret      = rets
 
         for e in range(self.critic_epochs):
-            obs_scan_train, obs_goal_train, obs_vel_train,obs_image_train, ret_train = shuffle(
-                obs_scan_train, obs_goal_train, obs_vel_train,obs_image_train, ret_train)
+            obs_scan_train, obs_goal_train, obs_vel_train,obs_image_train, ret_train = shuffle(obs_scan_train, obs_goal_train, obs_vel_train,obs_image_train, ret_train)
             for j in range(num_batches):
                 start = j * batch_size
                 end = (j + 1) * batch_size
@@ -309,5 +291,4 @@ class PPO(object):
                 obs_image_set = obs_image_train[start:end, :]
                 ret_set = ret_train[start:end]
 
-                self.baseline.update(
-                    [obs_scan_set, obs_goal_set, obs_vel_set,obs_image_set], ret_set)
+                self.baseline.update([obs_scan_set, obs_goal_set, obs_vel_set,obs_image_set], ret_set)
