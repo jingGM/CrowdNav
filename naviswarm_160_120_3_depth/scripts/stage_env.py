@@ -70,7 +70,7 @@ class StageEnv(object):
             low=np.array([0., -1.0]), high=np.array([1., 1.]))
         self.scan_space = spaces.Box(low=0., high=4., shape=(512, ))
         #image_size = 480*640*3        depth_size = 480*640
-        self.image_space = spaces.Box(low=0., high=4., shape=(120,160,1,)) 
+        self.image_space = spaces.Box(low=0., high=4., shape=(60,80,1,)) 
         self.goal_space = spaces.Box(
             low=np.array([0., -np.pi]), high=np.array([np.inf, np.pi]))
 
