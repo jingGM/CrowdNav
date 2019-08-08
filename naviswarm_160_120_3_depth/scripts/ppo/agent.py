@@ -122,10 +122,10 @@ class Policy(object):
         image_output = imagenet.outputs
         #print(image_output.shape)
         
-        imagenet = tl.layers.InputLayer(image, name='image_input')
+        #imagenet = tl.layers.InputLayer(image, name='image_input')
 
-        act_net = tl.layers.InputLayer(tf.concat([goal, vel, scan_output], axis=1), name='goal_input')
-        #act_net = tl.layers.InputLayer(tf.concat([goal, vel, scan_output, image_output], axis=1), name='goal_input')
+        #act_net = tl.layers.InputLayer(tf.concat([goal, vel, scan_output], axis=1), name='goal_input')
+        act_net = tl.layers.InputLayer(tf.concat([goal, vel, scan_output, image_output], axis=1), name='goal_input')
         
         #act_net = tl.layers.DenseLayer(act_net, n_units=64, act=tf.nn.tanh, name='act1')
         act_net = tl.layers.DenseLayer(act_net, n_units=128, act=tf.nn.relu, name='act2')
