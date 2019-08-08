@@ -310,7 +310,7 @@ void GazeboTrain::scan_Callback(const sensor_msgs::LaserScanConstPtr& scan){
   scan_header  = scan->header;
   if (scan_data.ranges.size()>0){substatus[1] =1;}
 
-  float min_range = 0.5;
+  float min_range = 5;
   //collision_status[current_robot] = false; // NOTE: collision status for robot 0 is stored in collision_status[0].
   for (int j = 0; j < scan->ranges.size(); j++) {
       if (scan->ranges[j] < min_range) {
@@ -389,7 +389,10 @@ bool GazeboTrain::cb_update_srv(naviswarm::UpdateModelRequest& request, naviswar
         last_states.velObsBatch.clear();
         executed_actions.data.clear();
         current_steps = 0;
-        collision_status.clear();
+
+        for (int i=0;i<num_robots;i++){
+          collision_status[i]=false;
+        }
         // WARNING: IT MAY NOT FREE THE MEMORY SPACE
 
         response.success = true;
