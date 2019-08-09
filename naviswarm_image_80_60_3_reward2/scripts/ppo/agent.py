@@ -103,11 +103,11 @@ class Policy(object):
         '''
         
         def keras_block(imagenetx):
-            imagenet = tf.keras.layers.ConvLSTM2D(filters=16,kernel_size=[5,5],strides=[2,2],padding='same',activation=tf.nn.relu,return_sequences=True)(imagenetx)
+            imagenet = tf.keras.layers.ConvLSTM2D(filters=32,kernel_size=[5,5],strides=[2,2],padding='same',activation=tf.nn.relu,return_sequences=True)(imagenetx)
             imagenet = tf.keras.layers.BatchNormalization()(imagenet)
-            imagenet = tf.keras.layers.ConvLSTM2D(filters=32,kernel_size=[5,5],strides=[2,2],padding='same',activation=tf.nn.relu,return_sequences=True)(imagenet)
+            imagenet = tf.keras.layers.ConvLSTM2D(filters=64,kernel_size=[5,5],strides=[2,2],padding='same',activation=tf.nn.relu,return_sequences=True)(imagenet)
             imagenet = tf.keras.layers.BatchNormalization()(imagenet)
-            imagenet = tf.keras.layers.ConvLSTM2D(filters=64,kernel_size=[3,3],strides=[2,2],padding='same',activation=tf.nn.relu,return_sequences=True)(imagenet)
+            imagenet = tf.keras.layers.ConvLSTM2D(filters=64,kernel_size=[3,3],strides=[1,1],padding='same',activation=tf.nn.relu,return_sequences=True)(imagenet)
             imagenet = tf.keras.layers.BatchNormalization()(imagenet)
             imagenet = tf.keras.layers.ConvLSTM2D(filters=64,kernel_size=[3,3],strides=[1,1],padding='same',activation=tf.nn.relu,return_sequences=True)(imagenet)
             imagenet = tf.keras.layers.BatchNormalization()(imagenet)
@@ -232,11 +232,11 @@ class Value(object):
         '''
         
         def keras_block(imagenetx):
-            imagenet = tf.keras.layers.ConvLSTM2D(filters=16,kernel_size=[5,5],strides=[2,2],padding='same',activation=tf.nn.relu,return_sequences=True)(imagenetx)
+            imagenet = tf.keras.layers.ConvLSTM2D(filters=32,kernel_size=[5,5],strides=[2,2],padding='same',activation=tf.nn.relu,return_sequences=True)(imagenetx)
             imagenet = tf.keras.layers.BatchNormalization()(imagenet)
-            imagenet = tf.keras.layers.ConvLSTM2D(filters=32,kernel_size=[5,5],strides=[2,2],padding='same',activation=tf.nn.relu,return_sequences=True)(imagenet)
+            imagenet = tf.keras.layers.ConvLSTM2D(filters=64,kernel_size=[5,5],strides=[2,2],padding='same',activation=tf.nn.relu,return_sequences=True)(imagenet)
             imagenet = tf.keras.layers.BatchNormalization()(imagenet)
-            imagenet = tf.keras.layers.ConvLSTM2D(filters=64,kernel_size=[3,3],strides=[2,2],padding='same',activation=tf.nn.relu,return_sequences=True)(imagenet)
+            imagenet = tf.keras.layers.ConvLSTM2D(filters=64,kernel_size=[3,3],strides=[1,1],padding='same',activation=tf.nn.relu,return_sequences=True)(imagenet)
             imagenet = tf.keras.layers.BatchNormalization()(imagenet)
             imagenet = tf.keras.layers.ConvLSTM2D(filters=64,kernel_size=[3,3],strides=[1,1],padding='same',activation=tf.nn.relu,return_sequences=True)(imagenet)
             imagenet = tf.keras.layers.BatchNormalization()(imagenet)
