@@ -112,29 +112,18 @@ class GazeboTrain {
 
     int num_robots = 1; // The actual value is assigned in the Constructor. By default it is 1.
     std::vector<bool> collision_status;
+    std::vector<geometry_msgs::Pose> gpose;
+    std::vector<naviswarm::Velocity> odom_data;
+    std::vector<naviswarm::Scan> scan_data;
+    std::vector<naviswarm::CameraImage> img_data;
 
-    ros::Subscriber groundtruth_sub; // Subscriber for Groundtruth data from Gazebo
-    ros::Subscriber bumper_sub;
-    ros::Subscriber scan_sub;
-    ros::Subscriber image_sub;
-    ros::Subscriber velocity_sub;
+    std::vector<std_msgs::Header> img_header;
+    std::vector<std_msgs::Header> scan_header;
+    std::vector<std_msgs::Header> odom_header;
+
     ros::Publisher reward_pub;
 
-    int current_steps = 0;
-    geometry_msgs::Pose gpose;
-    naviswarm::Velocity odom_data;
-
-    naviswarm::Scan         scan_data;
-    naviswarm::CameraImage  img_data;
-
-    std_msgs::Header img_header;
-    std_msgs::Header scan_header;
-    std_msgs::Header odom_header;
-
-    int substatus[4] = {0,0,0,0};//check if get messages
-    
-
-    // Defining vec3 = {x, y, theta}
+	// Defining vec3 = {x, y, theta}
     typedef struct {
         double x, y, theta;
     } vec3;
@@ -143,6 +132,42 @@ class GazeboTrain {
     typedef struct {
         double x, y;
     } vec2;
+
+    ros::Subscriber groundtruth_sub;
+    struct Robotinfo
+    {
+        ros::Subscriber bumper_sub; //one odom
+        ros::Subscriber scan_sub; //multiple lasers
+        ros::Subscriber image_sub;
+        ros::Subscriber velocity_sub;
+    };
+    std::vector<Robotinfo *> robots_info;
+
+    int current_steps = 0;
+    
+    int substatus[4] = {0,0,0,0};//check if get messages
+    
+     // Training parameters
+    int num_episode;
+    int current_robot;
+    std::vector<vec2> current_goal;
+    naviswarm::States last_states;
+    
+    naviswarm::Actions executed_actions;
+    std::vector<double> path_length;
+    std::vector<double> time_elapsed;
+
+    // Other ROS tf broadcaster. (I dont think this is needed for this code)
+    tf::TransformBroadcaster tf;
+    ros::Time sim_time;
+
+    // Used to remember initial poses for soft reset
+    // Soft reset is when robots are spawned again in the original initial poses.
+    std::vector<geometry_msgs::Pose> initial_poses;
+    ros::ServiceServer reset_srv_;
+
+    // Service to reset simulation with a set new initial poses and goals for each robot.
+    ros::ServiceServer update_srv=nh.advertiseService("update_goals", &GazeboTrain::cb_update_srv, this);
 
     // Function to return distance = sqrt(x^2 + y^2) in 2-D
     double GetDistance(double x, double y) {
@@ -176,59 +201,24 @@ class GazeboTrain {
         return t;
     }
 
-    // Used to remember initial poses for soft reset
-    // Soft reset is when robots are spawned again in the original initial poses.
-    std::vector<geometry_msgs::Pose> initial_poses;
-    ros::ServiceServer reset_srv_;
-
-    // Service to reset simulation with a set new initial poses and goals for each robot.
-    ros::ServiceServer update_srv=nh.advertiseService("update_goals", &GazeboTrain::cb_update_srv, this);
-
     // for semaphore operation
     void acquire_semaphore();
     void release_semaphore();
 
-    // Training parameters
-    int num_episode;
-    int current_robot;
-    std::vector<vec2> current_goal;
-    naviswarm::States last_states;
+   
     
-    naviswarm::Actions executed_actions;
-    std::vector<double> path_length;
-    std::vector<double> time_elapsed;
 
-    // Other ROS tf broadcaster. (I dont think this is needed for this code)
-    tf::TransformBroadcaster tf;
-    ros::Time sim_time;
-    /*
-    void setvelocities( int robotindex, naviswarm::Action velocity){
-        std::string topicname = "/turtlebot"+std::to_string(robotindex)+"/cmd_vel_mux/input/navi";
-        ros::Publisher pubrobotvelocity = nh.advertise<geometry_msgs::Twist>(topicname, 1);
-        geometry_msgs::Twist action;
-        action.linear.x = velocity.vx;
-        action.angular.z = velocity.vz;
-        //ros::Duration(0.01);
-        int velocitycounter = 0;
-        while ( (velocitycounter == 0) && ros::ok()){
-          if (pubrobotvelocity.getNumSubscribers()>0){
-            pubrobotvelocity.publish(action);
-            velocitycounter = 1;
-          }
-        }
-      }
-    */
   public:
     // Function declarations
     GazeboTrain(int num_robots);
 
     void gt_Callback(const gazebo_msgs::ModelStates gt);
-    //void sync_Callback( const sensor_msgs::ImageConstPtr& image,const sensor_msgs::LaserScanConstPtr& scan);
-    void image_Callback(const sensor_msgs::ImageConstPtr& image);
-    void scan_Callback(const sensor_msgs::LaserScanConstPtr& scan);
+    void image_Callback(const sensor_msgs::ImageConstPtr& image, int i);
+    void scan_Callback(const sensor_msgs::LaserScanConstPtr& scan, int i);
     void bumper_Callback(const kobuki_msgs::BumperEventConstPtr& bumper_msg, int i);
+    //void velocity_Callback(const nav_msgs::OdometryConstPtr& odom, int i);
+
     bool cb_update_srv(naviswarm::UpdateModelRequest& request, naviswarm::UpdateModelResponse& response);
-    void velocity_Callback(const nav_msgs::OdometryConstPtr& odom);
     int create_sharedmemory();
    
     int train();
@@ -236,10 +226,31 @@ class GazeboTrain {
 
 // Constructor for the class
 GazeboTrain::GazeboTrain(int n){
-  collision_status.resize(n, false);
+	bool collision_ = false;
+  geometry_msgs::Pose gpose_;
+  naviswarm::Velocity odom_;
+  naviswarm::Scan scan_;
+  naviswarm::CameraImage img_;
+  std_msgs::Header imgh_;
+  std_msgs::Header scanh_;
+  std_msgs::Header odomh_;
+  gpose_.orientation.w=1;
+
+  for(int i=0;i<n;i++){
+		collision_status.push_back(collision_);
+		gpose.push_back(gpose_);
+		odom_data.push_back(odom_);
+		scan_data.push_back(scan_);
+		img_data.push_back(img_);
+		img_header.push_back(imgh_);
+		odom_header.push_back(odomh_);
+		scan_header.push_back(scanh_);
+	}
+//std::cout<<"robots number: "<<collision_status.size()<<"/"<<gpose.size()<<std::endl;
+
   num_robots = n;
-  /*
-    ROS_INFO("++++++++++++++");*/
+  
+    //ROS_INFO("++++++++++++++");
 }
 
 void GazeboTrain::acquire_semaphore()
@@ -267,93 +278,63 @@ void GazeboTrain::release_semaphore()
         ROS_WARN("Watch out! Release semaphore failed.");
     }
 }
-/*
-void GazeboTrain::sync_Callback(const sensor_msgs::ImageConstPtr& image, const sensor_msgs::LaserScanConstPtr& scan)
-{
-  int robotindex = current_robot;
-  substatus[0] = 1;
 
-  img_data.data    = *image;
-  scan_data.ranges = scan->ranges;
+void GazeboTrain::image_Callback(const sensor_msgs::ImageConstPtr& image, int i){
+	//ROS_INFO("running image in");
+	//std::cout<<"i= "<<i<<std::endl;
+	img_data[i].data= *image;
+	img_header[i]   = image->header;
 
-  img_header   = image->header;
-  scan_header  = scan->header;
-
-  //std::cout<<"----"<<std::endl;
-  std::cout<<scan_header.stamp<<std::endl;
-  //std::cout<<img_header<<std::endl;
-  //std::cout<<odom_header<<std::endl;
-
-
-  float min_range = 0.5;
-    collision_status[robotindex] = false; // NOTE: collision status for robot 0 is stored in collision_status[0].
-    for (int j = 0; j < scan->ranges.size(); j++) {
-        if (scan->ranges[j] < min_range) {
-            collision_status[robotindex] = true;  // true indicates presence of obstacle
-        }
-    }
-}
-*/
-void GazeboTrain::image_Callback(const sensor_msgs::ImageConstPtr& image){
-	//ROS_INFO("running image callback");
-	
-	img_data.data= *image;
-	img_header   = image->header;
-
-  if (img_data.data.data.size()>0){substatus[0] =1;}
-
+  if (img_data[i].data.data.size()>0){substatus[0] =1;}
+  //ROS_INFO("running image callback");
 }
 
-void GazeboTrain::scan_Callback(const sensor_msgs::LaserScanConstPtr& scan){
-  //ROS_INFO("running scan callback");
-  scan_data.ranges = scan->ranges;
-  scan_header  = scan->header;
-  if (scan_data.ranges.size()>0){substatus[1] =1;}
+void GazeboTrain::scan_Callback(const sensor_msgs::LaserScanConstPtr& scan, int i){
+  //ROS_INFO("running scan in");
+  //std::cout<<"i= "<<i<<std::endl;
 
-  //float min_range = 5;
+  scan_data[i].ranges = scan->ranges;
+  scan_header[i]  = scan->header;
+
+  if (scan_data[i].ranges.size()>0){substatus[1] =1;}
+
+  float min_range = 5;
   //collision_status[current_robot] = false; // NOTE: collision status for robot 0 is stored in collision_status[0].
   for (int j = 0; j < scan->ranges.size(); j++) {
-      if (scan->ranges[j] < LidarMinDistance) {
-        collision_status[current_robot] = true;
+      if (scan->ranges[j] < min_range) {
+        min_range = scan->ranges[j];
       }
   }
-}
 
-void GazeboTrain::velocity_Callback(const nav_msgs::OdometryConstPtr& odom){
-	//ROS_INFO("running velocity callback");
-  substatus[2]=1;
-	odom_data.vx = odom->twist.twist.linear.x;
-	odom_data.vz = odom->twist.twist.angular.z;
-	odom_header  = odom->header;
-  
-  if (std::isnan(odom->twist.twist.angular.z) && std::isnan(odom->twist.twist.linear.x)){
-    odom_data.vx = 0;
-    odom_data.vz = 0;
+  //std::cout<<collision_status.size()<<std::endl;
+  //std::cout<<collision_status[0]<<collision_status[1]<<collision_status[2]<<collision_status[3]<<std::endl;
+  if (min_range<LidarMinDistance){
+    collision_status[i] = true;
   }
-
+  //ROS_INFO("running scan callback");
 }
 
 // Bumper CallBack
 void GazeboTrain::bumper_Callback(const kobuki_msgs::BumperEventConstPtr& bumper_msg, int i) {
-	//ROS_INFO("running bumper callback");
-	// ROS_INFO("bumper hit. value = [%d] for robot %d", bumper_msg->bumper, i);
 	if (bumper_msg->bumper == 1)
 		collision_status[i] = true;
+  //ROS_INFO("running bumper callback");
 }
 
 
 // Ground Truth callback
 void GazeboTrain::gt_Callback(const gazebo_msgs::ModelStates gt){
-	//ROS_INFO("running frame_trans callback");
-
-  std::string current_robot_name ="turtlebot"+std::to_string(current_robot);
-	for (int i = 0; i < gt.name.size(); i++){
-		if(gt.name[i]== current_robot_name) {
-		  gpose = gt.pose[i];
-		}
+// ROS_INFO("running frame_trans in"); 
+	
+  for (int j=0; j< num_robots;j++){
+    for (int i = 0; i < gt.name.size(); i++){
+      std::string current_robot_name ="turtlebot"+std::to_string(j);
+      if(gt.name[i]== current_robot_name)
+        gpose[j] = gt.pose[i];
+    }
 	}
   substatus[3] =1;
-
+  // ROS_INFO("running frame_trans callback");
 }
 
 // Update Goal service CallBack
@@ -384,9 +365,42 @@ bool GazeboTrain::cb_update_srv(naviswarm::UpdateModelRequest& request, naviswar
         last_states.scanObsBatch.clear();
         last_states.velObsBatch.clear();
         executed_actions.data.clear();
+
         current_steps = 0;
-        for(int i=0;i<num_robots;i++){collision_status[i]=false;}
+        for (int i=0;i<num_robots;i++){
+          collision_status[i]=false;
+        }
         // WARNING: IT MAY NOT FREE THE MEMORY SPACE
+
+        collision_status.clear();
+        gpose.clear();
+        odom_data.clear();
+        scan_data.clear();
+        img_data.clear();
+        img_header.clear();
+        scan_header.clear();
+        odom_header.clear();
+
+        bool collision_ = false;
+        geometry_msgs::Pose gpose_;
+        naviswarm::Velocity odom_;
+        naviswarm::Scan scan_;
+        naviswarm::CameraImage img_;
+        std_msgs::Header imgh_;
+        std_msgs::Header scanh_;
+        std_msgs::Header odomh_;
+        gpose_.orientation.w=1;
+
+        for(int i=0;i<num_robots;i++){
+            collision_status.push_back(collision_);
+            gpose.push_back(gpose_);
+            odom_data.push_back(odom_);
+            scan_data.push_back(scan_);
+            img_data.push_back(img_);
+            img_header.push_back(imgh_);
+            odom_header.push_back(odomh_);
+            scan_header.push_back(scanh_);
+          }
 
         response.success = true;
     }
@@ -396,27 +410,37 @@ bool GazeboTrain::cb_update_srv(naviswarm::UpdateModelRequest& request, naviswar
 
 int GazeboTrain::create_sharedmemory(){
 
-  for (int j = 0; j < num_robots; ++j)
+  for (int i = 0; i < num_robots; ++i)
     {
-        vec2 temp_goal;
-        temp_goal.x = 0.;
-        temp_goal.y = 0.;
-        current_goal.push_back(temp_goal);
+      std::string name_space = "/turtlebot" + std::to_string(i);
+
+      naviswarm::ActionObs actionobs_data;
+      actionobs_data.ac_prev.vx = 0; 
+      actionobs_data.ac_prev.vz = 0; 
+      actionobs_data.ac_pprev.vx = 0; 
+      actionobs_data.ac_pprev.vz = 0; 
+      last_states.actionObsBatch.push_back(actionobs_data);
+
+      //naviswarm::Action 
+
+      vec2 temp_goal;
+      temp_goal.x = 0.;
+      temp_goal.y = 0.;
+      current_goal.push_back(temp_goal);
+
+      Robotinfo* new_robot = new Robotinfo;
+
+      new_robot->image_sub   = nh.subscribe<sensor_msgs::Image>(name_space + "/camera/depth/image_raw", 1, boost::bind(&GazeboTrain::image_Callback, this, _1, i)); //"/camera/depth/image_raw"
+    	new_robot->scan_sub    = nh.subscribe<sensor_msgs::LaserScan>(name_space + "/scan_filtered", 1, boost::bind(&GazeboTrain::scan_Callback, this, _1, i));
+      new_robot->bumper_sub    = nh.subscribe<kobuki_msgs::BumperEvent>(name_space + "/mobile_base/events/bumper", 1, boost::bind(&GazeboTrain::bumper_Callback, this, _1, i));
+
+      robots_info.push_back(new_robot);
     }
-    path_length.resize(num_robots, 0.0); // Resize to size = no. of robots, init the new spaces to 0.0.
+    groundtruth_sub = nh.subscribe<gazebo_msgs::ModelStates>("/gazebo/model_states", 1, &GazeboTrain::gt_Callback, this);
+    path_length.resize(num_robots, 0.0); 
     time_elapsed.resize(num_robots, 0.0);
 
   reward_pub = nh.advertise<naviswarm::Reward>("/reward", 1000);
-
-  for (int i=0;i<num_robots;i++){
-    std::string name_space = "/turtlebot" + std::to_string(i);
-    naviswarm::ActionObs actionobs_data;
-    actionobs_data.ac_prev.vx = 0; 
-    actionobs_data.ac_prev.vz = 0; 
-    actionobs_data.ac_pprev.vx = 0; 
-    actionobs_data.ac_pprev.vz = 0; 
-    last_states.actionObsBatch.push_back(actionobs_data);
-  }
 
 
   share_id = shmget(KEY, SIZE, IPC_CREAT | IPC_EXCL | PERMISSION);
@@ -456,105 +480,75 @@ int GazeboTrain::train(){
     for(int i = 0; i < num_robots; i++){
       current_robot = i;
 
-      std::string name_space = "/turtlebot" + std::to_string(i);
+      //Robotinfo const * robotmodel = this->robots_info[i];
 
-      /* synchronizer is slow
-      message_filters::Subscriber<sensor_msgs::Image>   image_sub(nh, name_space + "/camera/image_raw", 1);
-      //message_filters::Subscriber<sensor_msgs::Image>   image_sub(nh, name_space + "/camera/depth/image_raw", 1);
-      message_filters::Subscriber<sensor_msgs::LaserScan> scan_sub(nh, name_space + "/scan", 1);
 
-      //according to situation, choose synchronize odometry or not
-      TimeSynchronizer<sensor_msgs::Image,sensor_msgs::LaserScan> sync(image_sub,scan_sub, 1);
-      sync.registerCallback(boost::bind(& GazeboTrain::sync_Callback,this, _1, _2));
-      */
+    std::cout<<substatus[0]<<"/"<<substatus[1]<<"/"<<substatus[2]<<"/"<<substatus[3]<<std::endl;
+	   int checkstatus[4] = {1,1,0,1};
+     bool condition=(substatus[0]!=checkstatus[0])||(substatus[1]!=checkstatus[1])||(substatus[3]!=checkstatus[3])||(substatus[2]!=checkstatus[2]);
+	   while(condition){
+      condition=(substatus[0]!=checkstatus[0])||(substatus[1]!=checkstatus[1])||(substatus[3]!=checkstatus[3])||(substatus[2]!=checkstatus[2]);}
+	   for(int ind=0;ind<4;ind++){substatus[ind]=0;}
 
-      image_sub   = nh.subscribe<sensor_msgs::Image>(name_space + "/camera/image_raw", 1, &GazeboTrain::image_Callback, this); //"/camera/depth/image_raw"
-      scan_sub    = nh.subscribe<sensor_msgs::LaserScan>(name_space + "/scan_filtered", 1, &GazeboTrain::scan_Callback, this);
-      //velocity_sub  = nh.subscribe<nav_msgs::Odometry>(name_space + "/odom", 1, &GazeboTrain::velocity_Callback, this);
-      groundtruth_sub = nh.subscribe<gazebo_msgs::ModelStates>("/gazebo/model_states", 1, &GazeboTrain::gt_Callback, this);
-      bumper_sub    = nh.subscribe<kobuki_msgs::BumperEvent>(name_space + "/mobile_base/events/bumper", 1, boost::bind(&GazeboTrain::bumper_Callback, this, _1, i));
 
-		  int checkstatus[4] = {1,1,0,1};
-      bool condition=(substatus[0]!=checkstatus[0])||(substatus[1]!=checkstatus[1])||(substatus[3]!=checkstatus[3])||(substatus[2]!=checkstatus[2]);
-		  while(condition){condition=(substatus[0]!=checkstatus[0])||(substatus[1]!=checkstatus[1])||(substatus[3]!=checkstatus[3])||(substatus[2]!=checkstatus[2]);}
-		  for(int ind=0;ind<4;ind++){substatus[ind]=0;}
-
-      // NOTE: Block to write the subscribed data into Shared memory
       naviswarm::Transition current_transition;
-      // Initially the robot is at ground truth (x, y, theta)
-      current_transition.pose.push_back(gpose.position.x);
-      current_transition.pose.push_back(gpose.position.y);
-      tf::Quaternion q(gpose.orientation.x, gpose.orientation.y, gpose.orientation.z, gpose.orientation.w);
+
+      current_transition.pose.push_back(gpose[i].position.x);
+      current_transition.pose.push_back(gpose[i].position.y);
+      tf::Quaternion q(gpose[i].orientation.x, gpose[i].orientation.y, gpose[i].orientation.z, gpose[i].orientation.w);
       tf::Matrix3x3  m(q);
       double roll, pitch, yaw;
       m.getRPY(roll, pitch, yaw);
       current_transition.pose.push_back(yaw);
 
-      // state is a combination of 4 Obs.
       naviswarm::State state;
-      tf::Transform gt = pose2transform(gpose);
-      // std::cout<< gpose.position.x << " "<< gpose.position.y<< std::endl;
+      tf::Transform gt = pose2transform(gpose[i]);
+      
+
       vec2 local_goal = getTransformedPoint(current_goal[i], gt.inverse());
       state.goalObs.goal_now.goal_dist = GetDistance(local_goal.x, local_goal.y);
       state.goalObs.goal_now.goal_theta = atan2(local_goal.y, local_goal.x);
-      // std::cout<< state.goalObs.goal_now.goal_theta << std::endl;
 
-      // v is subscribed from odom in our case.
-      //state.velObs.vel_now.vx = odom_data.vx;
-      //state.velObs.vel_now.vz = odom_data.vz;
-      //std::cout<<last_states.actionObsBatch[current_robot].ac_prev<<std::endl;
-      state.velObs.vel_now.vx = last_states.actionObsBatch[current_robot].ac_prev.vx;
-      state.velObs.vel_now.vz = last_states.actionObsBatch[current_robot].ac_prev.vz;
+
+// std::cout<<"goal"<<i<<":	"<< state.goalObs.goal_now.goal_theta << std::endl;
+
+
+      state.velObs.vel_now.vx = last_states.actionObsBatch[i].ac_prev.vx;
+      state.velObs.vel_now.vz = last_states.actionObsBatch[i].ac_prev.vz;
       
-      //std::cout<<last_states.goalObsBatch.size()<<std::endl;
-      //ROS_INFO("+++++++++++++++++++size+++++++++++++++++++");
 
       if (last_states.goalObsBatch.size() == 0) {
-          state.goalObs.goal_pprev = state.goalObs.goal_now; //pprev is previous to previous goal. (We take 3 instances of observations.)
+          state.goalObs.goal_pprev = state.goalObs.goal_now; 
           state.goalObs.goal_prev = state.goalObs.goal_now;
       }
       else {
-          state.goalObs.goal_pprev = last_states.goalObsBatch[current_robot].goal_prev;
-          state.goalObs.goal_prev = last_states.goalObsBatch[current_robot].goal_now;
+          state.goalObs.goal_pprev = last_states.goalObsBatch[i].goal_prev;
+          state.goalObs.goal_prev = last_states.goalObsBatch[i].goal_now;
       }
 
-      // TODO: Need to confirm if this is same as what was given in drl_stageros.
-      state.scanObs.scan_now.ranges = scan_data.ranges;
+
+      state.scanObs.scan_now.ranges = scan_data[i].ranges;
       if (last_states.goalObsBatch.size() == 0) {
-          //robotmodel->lasermodels[0]->GetSensors()[0].ranges;
           state.scanObs.scan_pprev = state.scanObs.scan_now;
           state.scanObs.scan_prev = state.scanObs.scan_now;
       }
       else {
-          state.scanObs.scan_pprev = last_states.scanObsBatch[current_robot].scan_prev;
-          state.scanObs.scan_prev = last_states.scanObsBatch[current_robot].scan_now;
+          state.scanObs.scan_pprev = last_states.scanObsBatch[i].scan_prev;
+          state.scanObs.scan_prev = last_states.scanObsBatch[i].scan_now;
       }
 
-      state.ImageObs.image_now.data = img_data.data;
-      if (last_states.goalObsBatch.size() == 0) {
-          //robotmodel->lasermodels[0]->GetSensors()[0].ranges;
-          state.ImageObs.image_p1rev.data = img_data.data;
-          state.ImageObs.image_p2rev.data = img_data.data;
-      }
-      else {
-          state.ImageObs.image_p2rev.data = last_states.ImageObsBatch[current_robot].image_p1rev.data;
-          state.ImageObs.image_p1rev.data = last_states.ImageObsBatch[current_robot].image_now.data;
-      }
+//std::cout<<"scan"<<i<<":	"<< state.scanObs.scan_pprev.ranges.size()<<"/"<<state.scanObs.scan_prev.ranges.size()<<"/"<<state.scanObs.scan_now.ranges.size()<<"/"<<std::endl;
 
-      /*state.DepthObs.image_now.data = depth_data.data;
+      state.ImageObs.image_now.data = img_data[i].data;
       if (last_states.goalObsBatch.size() == 0) {
-          //robotmodel->lasermodels[0]->GetSensors()[0].ranges;
-          state.DepthObs.image_p1rev.data = depth_data.data;
-          state.DepthObs.image_p2rev.data = depth_data.data;
-          state.DepthObs.image_p3rev.data = depth_data.data;
-          state.DepthObs.image_p4rev.data = depth_data.data;
+          state.ImageObs.image_p1rev.data = state.ImageObs.image_now.data;
+          state.ImageObs.image_p2rev.data = state.ImageObs.image_now.data;
       }
       else {
-          state.DepthObs.image_p4rev.data = state.DepthObs.image_p3rev.data;
-          state.DepthObs.image_p3rev.data = state.DepthObs.image_p2rev.data;
-          state.DepthObs.image_p2rev.data = state.DepthObs.image_p1rev.data;
-          state.DepthObs.image_p1rev.data = state.DepthObs.image_now.data;
-      }*/
+          state.ImageObs.image_p2rev.data = last_states.ImageObsBatch[i].image_p1rev.data;
+          state.ImageObs.image_p1rev.data = last_states.ImageObsBatch[i].image_now.data;
+//std::cout<<state.ImageObs.image_now.data.header.frame_id<<":  "<<state.ImageObs.image_p2rev.data.header.stamp<<"/"<<state.ImageObs.image_p1rev.data.header.stamp<<"/"<<state.ImageObs.image_now.data.header.stamp<<std::endl;
+      }
 
       //
       if (last_states.goalObsBatch.size() == 0) {
@@ -564,12 +558,10 @@ int GazeboTrain::train(){
           state.actionObs.ac_prev.vz = 0.;
       }
       else {
-          // should set last_states.data[r].acobs.ac_prev = actions.data[i] (this is ac_now)
           state.actionObs.ac_pprev = last_states.actionObsBatch[current_robot].ac_pprev;
           state.actionObs.ac_prev = last_states.actionObsBatch[current_robot].ac_prev;
       }
-
-      // initial obs/state/transition
+//ROS_INFO("------actions------");
       if (last_states.goalObsBatch.size() == 0) {
           current_transition.state = state;
           current_transition.reward = 0.;
@@ -586,31 +578,36 @@ int GazeboTrain::train(){
 
           current_transition.state = state;
 
-          if (state.goalObs.goal_now.goal_dist < 0.2) {  // arrived the goal
+          if (state.goalObs.goal_now.goal_dist < 0.5) {  // arrived the goal
               current_transition.terminal = true;
               current_transition.reward = 20.0;
               reward.reached_goal = 20.0;
           }
           else // if goal has not been reached
           {
-
+            ROS_INFO("----reward----");
               // rs.stalled[r] = collision;
+            //std::cout<<"collision status"<<i<<":  "<<collision_status[i]<<std::endl;
+
               if(collision_status[i] == true) { // stalled is obtained from an in-built function from stage. we must write a function to detect collisions
                   current_transition.terminal = true;
                   current_transition.reward = -20.0;
                   reward.collision = -20.0;
               }
               else { // Goal not reached and no collisions
+                  ROS_INFO("in else");
                   current_transition.terminal = false;
 
                   double reward_approaching_goal = 5*(state.goalObs.goal_prev.goal_dist - state.goalObs.goal_now.goal_dist);
-
+                  //ROS_INFO("in else2");
+                  //std::cout<<std::abs(executed_actions.data[i].vz)<<std::endl;
+                  //ROS_INFO("in else4");
                   double penalty_for_bigvz = 0.0;
                   if (std::abs(executed_actions.data[i].vz) > 0.7) // executed actions = actions (set later)
                   {
-                      penalty_for_bigvz = -0.05*std::abs(executed_actions.data[current_robot].vz);
+                      penalty_for_bigvz = -0.05*std::abs(executed_actions.data[i].vz);
                   }
-
+                  //ROS_INFO("in else3");
                   double penalty_for_deviation = 0.0;
                   
                   if (std::abs(state.goalObs.goal_now.goal_theta) > 0.785)
@@ -618,19 +615,19 @@ int GazeboTrain::train(){
                       penalty_for_deviation = -0.1 * (std::abs(state.goalObs.goal_now.goal_theta) - 0.785);
                   }
                   // }
-
+                  //ROS_INFO("for testing");
                   // current_transition.reward = 0;
-                  current_transition.reward = reward_approaching_goal + (current_steps+1) *(-0.01) + std::abs(state.velObs.vel_now.vz) * (-0.02);
+                  current_transition.reward = reward_approaching_goal + (current_steps+1) *(-0.002) + std::abs(state.velObs.vel_now.vz) * (-0.01);
                   // current_transition.reward = reward_approaching_goal + penalty_for_deviation;
 
                   reward.reward_approaching_goal = reward_approaching_goal;
                   reward.penalty_for_deviation = penalty_for_deviation;
-                  std::cout<<"robot:"<<current_robot<<"  "<<reward_approaching_goal<<std::endl;
+                  
               }
           }
 
-        std::cout<<"robot:"<<current_robot<<"  "<<reward.reward_approaching_goal<<" /"<<std::to_string((current_steps+1) *(-0.02))<<" /"<<std::to_string(std::abs(state.velObs.vel_now.vz) * (-0.02))<<"  /"<<state.goalObs.goal_now.goal_dist<<" /"<<std::to_string(collision_status[i])<<std::endl;
-        
+        //std::cout<<"robot:"<<i<<"  "<<reward.reward_approaching_goal<<" /"<<std::to_string((current_steps+1) *(-0.02))<<" /"<<std::to_string(std::abs(state.velObs.vel_now.vz) * (-0.02))<<"  /"<<state.goalObs.goal_now.goal_dist<<" /"<<std::to_string(collision_status[i])<<std::endl;
+        ROS_INFO("-----------");
         reward.sum = reward.collision + reward.reached_goal + reward.reward_approaching_goal + reward.penalty_for_deviation;
         reward_pub.publish(reward); // We need a publisher for reward
       }
@@ -671,6 +668,7 @@ int GazeboTrain::train(){
     std::cout<<current_transitions.data[1].state.goalObs.goal_now.goal_dist<<'|'<<current_transitions.data[1].state.goalObs.goal_now.goal_theta<<'/'<<current_transitions.data[1].state.goalObs.goal_prev.goal_dist<<'|'<<current_transitions.data[1].state.goalObs.goal_prev.goal_theta<<'/'<<current_transitions.data[1].state.goalObs.goal_pprev.goal_dist<<'|'<<current_transitions.data[1].state.goalObs.goal_pprev.goal_theta<<std::endl;
     std::cout<<current_transitions.data[0].state.actionObs.ac_prev.vx<<'|'<<current_transitions.data[0].state.actionObs.ac_prev.vz<<'|'<<current_transitions.data[0].state.actionObs.ac_pprev.vx<<'|'<<current_transitions.data[0].state.actionObs.ac_pprev.vz<<'/'<<current_transitions.data[1].state.actionObs.ac_prev.vx<<'|'<<current_transitions.data[1].state.actionObs.ac_prev.vz<<'|'<<current_transitions.data[1].state.actionObs.ac_pprev.vx<<'|'<<current_transitions.data[1].state.actionObs.ac_pprev.vz<<std::endl;
 	*/
+
 	
     //ROS_INFO("lock memory");
     acquire_semaphore();
@@ -684,6 +682,7 @@ int GazeboTrain::train(){
     release_semaphore();
     //std::cout<<length<<std::endl;
     //ROS_INFO("lock released");
+
 
     // wait command processed
     bool succ = false;
@@ -710,21 +709,21 @@ int GazeboTrain::train(){
           naviswarm::Actions actions = read_data_as.actions;
           current_steps = read_data_as.step;
 
-          /*
-          std::cout<<"===steps:  "<<current_steps<<"==="<<std::endl;
-          std::cout<<actions.data[0]<<std::endl;
-          std::cout<<actions.data[1]<<std::endl;
-          std::cout<<actions.data[2]<<std::endl;
-          std::cout<<actions.data[3]<<std::endl;
-          */
+          
+          //std::cout<<"===steps:  "<<current_steps<<"==="<<std::endl;
+          //std::cout<<actions.data[0]<<std::endl;
+          //std::cout<<actions.data[1]<<std::endl;
+          //std::cout<<actions.data[2]<<std::endl;
+          //std::cout<<actions.data[3]<<std::endl;
+          
           //ROS_INFO("got data and released memory");
           if (actions.data.size() != num_robots){
               ROS_INFO("actions_size != robots_size, actions_size is %d", static_cast<int>(actions.data.size()));
               ROS_BREAK();
           }
           
+          //usleep(300000);
           for (int j = 0 ; j < num_robots; ++j){
-
             std::string topicname = "/turtlebot"+std::to_string(j)+"/cmd_vel_mux/input/navi";
             ros::Publisher pubrobotvelocity = nh.advertise<geometry_msgs::Twist>(topicname, 1);
             geometry_msgs::Twist action;
@@ -737,7 +736,7 @@ int GazeboTrain::train(){
                 velocitycounter = 1;
               }
             }
-            
+            std::cout<<"robot"<<j<<":   "<<action.linear.x<<"|"<<action.angular.z<<std::endl;
             usleep(300000);
             //std::cout<<"-"; 
             last_states.actionObsBatch[j].ac_pprev = last_states.actionObsBatch[j].ac_prev;
@@ -752,6 +751,7 @@ int GazeboTrain::train(){
           release_semaphore();
       }
     }
+
 }
 
 
@@ -763,6 +763,7 @@ int main(int argc, char **argv){
         exit(-1);
 
   boost::thread t = boost::thread(boost::bind(&ros::spin));
+  usleep(1000000);
 
   while(ros::ok() ){ //TODO: add method to check if gazebo is running
     gazeboc.train();
