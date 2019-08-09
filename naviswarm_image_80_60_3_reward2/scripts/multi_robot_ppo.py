@@ -254,9 +254,6 @@ class MultiRobotDRL(object):
 
             self._print_statistics(stats)
 
-        self.agent.policy.save_network('last')
-        self.agent.value.save_network('last')
-
 if __name__ == "__main__":
     rospy.init_node("multi_robot_drl_stage")
 
