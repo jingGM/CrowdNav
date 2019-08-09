@@ -449,7 +449,7 @@ class StageEnv(object):
             self.agent_last_poses = self.agent_poses
         for i in range(self.num_agents):
             self._add_marker(
-                Marker.LINE_STRIP, [
+                Marker.LINE_LIST, [
                     self.agent_colors[i][0], self.agent_colors[i][1],
                     self.agent_colors[i][2], 0.1 + t / 15.
                 ], [0.1, 0., 0.],
@@ -463,7 +463,7 @@ class StageEnv(object):
         for i, option in enumerate(options):
             if i == 20:
                 self._add_marker(
-                Marker.LINE_STRIP, [
+                Marker.LINE_LIST, [
                 self.option_colors[option][0], self.option_colors[option][1],
                 self.option_colors[option][2], 0.1 + t / 15.
                 ], [0.1, 0., 0.],
@@ -517,7 +517,7 @@ class StageEnv(object):
             self.goal_markers_id += 1
         if ns == "usv":
             marker.type = marker.MESH_RESOURCE
-            marker.mesh_resource = "file:///home/tingxfan/ws/src/stage_ros/rviz/usv.dae"
+            marker.mesh_resource = "file:///home/jing/Documents/catkin_workspace/catkin_CamNavi/src/naviswarm_160_120_3_depth/rviz/cube.dae"
             marker.id = self.agent_markers_id
             self.agent_markers.markers.append(marker)
             self.agent_markers_id += 1

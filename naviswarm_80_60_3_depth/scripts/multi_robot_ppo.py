@@ -115,8 +115,7 @@ class MultiRobotDRL(object):
             self.agent.value.load_network( 'last')
             self.agent.policy.load_network('last')
 
-        self.reward_pub = rospy.Publisher(
-            '/drl/reward', numpy_msg(Floats), queue_size=1)
+        self.reward_pub = rospy.Publisher('/drl/reward', numpy_msg(Floats), queue_size=1)
 
         self.num_agents = args.num_agents
         self.episodes_counter = 0

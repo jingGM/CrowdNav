@@ -626,7 +626,7 @@ int GazeboTrain::train(){
                   // }
 
                   // current_transition.reward = 0;
-                  current_transition.reward = reward_approaching_goal + (current_steps+1) *(-0.01) + std::abs(state.velObs.vel_now.vz) * (-0.02);
+                  current_transition.reward = reward_approaching_goal + (current_steps+1) *(-0.002) + std::abs(state.velObs.vel_now.vz) * (-0.01);
                   // current_transition.reward = reward_approaching_goal + penalty_for_deviation;
 
                   reward.reward_approaching_goal = reward_approaching_goal;
@@ -744,7 +744,7 @@ int GazeboTrain::train(){
               }
             }
             std::cout<<"robot"<<j<<":   "<<action.linear.x<<"|"<<action.angular.z<<std::endl;
-            usleep(400000);
+            usleep(300000);
             //std::cout<<"-"; 
             last_states.actionObsBatch[j].ac_pprev = last_states.actionObsBatch[j].ac_prev;
             last_states.actionObsBatch[j].ac_prev = actions.data[j];
