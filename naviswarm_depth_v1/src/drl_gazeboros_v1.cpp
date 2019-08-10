@@ -606,6 +606,13 @@ int GazeboTrain::train(){
               }
               else { // Goal not reached and no collisions
                   //ROS_INFO("in else");
+              	double penalty_for_deviation = 0.0;
+	          if (std::abs(state.goalObs.goal_now.goal_theta) > 0.785)
+	          {
+	              penalty_for_deviation = -0.1 * (std::abs(state.goalObs.goal_now.goal_theta) - 0.785);
+	          }
+
+	          
                   current_transition.terminal = false;
 
                   reward_approaching_goal = 2*(state.goalObs.goal_prev.goal_dist - state.goalObs.goal_now.goal_dist);
