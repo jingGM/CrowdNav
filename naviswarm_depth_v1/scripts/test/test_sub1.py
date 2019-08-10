@@ -21,6 +21,7 @@ from gazebo_msgs.msg import ContactState
 
 import rosservice
 import csv
+import cv2
 import numpy as np
 
 
@@ -161,61 +162,34 @@ def callbackunsync(data,args):
 
 
 from cv_bridge import CvBridge, CvBridgeError
+import math
 
 def testcompressed():
-    #data = CameraImage()
-    #print(type(data.data))
-    #data.data+='1'
-    #data.data.append(1)
     rospy.Subscriber("/turtlebot0/camera/depth/image_raw", Image, callbackfortest, queue_size=1)
     
     rospy.spin()
-    #print(data)
-    '''
-    callbackstatus = False
-    while(not callbackstatus):
-        if (rosservice.get_service_node("update_goals")!=none):
-            callbackstatus=True
-            value = [geometry_msgs.Point()]
-    '''  
+   
 
 
 def callbackfortest(data):
-    '''
-    ranges = data.ranges
-    minrange = 5
-    for i in range(len(ranges)):
-        if (ranges[i]<minrange):
-            minrange = ranges[i]
-
-    print(minrange)
-
-    '''
-    image = data.data
     bridge = CvBridge()
-    try:
-      cv_image = bridge.imgmsg_to_cv2(data, "32FC1")
-    except CvBridgeError as e:
-      print(e)
+    img = bridge.imgmsg_to_cv2(data, "32FC1")
+    img = np.array(img, dtype=np.float32)
+    MAXDISTANCE = 5
 
-    a = np.array(cv_image)
-    a = np.expand_dims(a,axis=2)
-    print(a.shape)
-    #print(data.data)
-    '''
-    #print("--------------------------------")
-    #print(image.cams)
-    #image.cams.append(data.data)
-    #print(len(data.ranges))
-    #print(data.header)
-    
-    with open('sales.csv', 'w') as csv_file:
-        print("writing")
-        csv_writer = csv.writer(csv_file, delimiter=',')
-        csv_writer.writerow(data.data)
-    
-    
-    '''
+    # img = cv2.normalize(img, img, 0, 255, cv2.NORM_MINMAX)
+
+    #print(type(img))
+    r,c = np.shape(img)
+    for i in range(r):
+        for j in range(c):
+            if math.isnan(img[i][j]):
+                img[i][j] = MAXDISTANCE
+    np.savetxt("foo.csv", img, delimiter=",")
+    print(img)
+    cv2.imshow("Depth", img)
+    cv2.waitKey(5)
+
 if __name__ == '__main__':
     rospy.init_node('test', anonymous=True)
 

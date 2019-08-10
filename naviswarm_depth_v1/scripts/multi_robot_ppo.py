@@ -93,7 +93,7 @@ parser.add_argument(
     help='max timesteps of an episode')
 parser.add_argument(
     '--train_max_iters',
-    default=200, #4000,
+    default=400, #4000,
     type=int,
     help='maximum training iterations')
 parser.add_argument(
