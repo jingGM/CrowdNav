@@ -234,10 +234,10 @@ class RunningAverageFilter(object):
                   print(e)
                 image_now = np.expand_dims(np.array(image_now_cv),axis=2)
                 r,c = np.shape(image_now)
-                    for i in range(r):
-                        for j in range(c):
-                            if math.isnan(image_now[i][j]):
-                                image_now[i][j] = CAMMAXDISTANCE
+                for i in range(r):
+                    for j in range(c):
+                        if math.isnan(image_now[i][j]):
+                            image_now[i][j] = CAMMAXDISTANCE
 
                 try:
                   image_p1rev_cv = bridge.imgmsg_to_cv2(x[0].image_p1rev.data, "32FC1")
@@ -245,10 +245,10 @@ class RunningAverageFilter(object):
                   print(e)
                 image_p1rev = np.expand_dims(np.array(image_p1rev_cv),axis=2)
                 r,c = np.shape(image_p1rev)
-                    for i in range(r):
-                        for j in range(c):
-                            if math.isnan(image_p1rev[i][j]):
-                                image_p1rev[i][j] = CAMMAXDISTANCE
+                for i in range(r):
+                    for j in range(c):
+                        if math.isnan(image_p1rev[i][j]):
+                            image_p1rev[i][j] = CAMMAXDISTANCE
 
                 try:
                   image_p2rev_cv = bridge.imgmsg_to_cv2(x[0].image_p2rev.data, "32FC1")
@@ -256,10 +256,10 @@ class RunningAverageFilter(object):
                   print(e)
                 image_p2rev = np.expand_dims(np.array(image_p2rev_cv),axis=2)
                 r,c = np.shape(image_p2rev)
-                    for i in range(r):
-                        for j in range(c):
-                            if math.isnan(image_p2rev[i][j]):
-                                image_p2rev[i][j] = CAMMAXDISTANCE
+                for i in range(r):
+                    for j in range(c):
+                        if math.isnan(image_p2rev[i][j]):
+                            image_p2rev[i][j] = CAMMAXDISTANCE
 
                 data = np.stack((image_now,image_p1rev,image_p2rev),axis=0)
             else: 
