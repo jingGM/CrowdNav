@@ -17,6 +17,7 @@ import numpy as np
 import scipy.signal
 import tensorflow as tf
 from cv_bridge import CvBridge, CvBridgeError
+import math
 
 
 def gauss_log_prob(mean, logstd, x):
@@ -162,35 +163,37 @@ class RunningAverageFilter(object):
                       image_now_cv = bridge.imgmsg_to_cv2(x[i].image_now.data, "32FC1")
                     except CvBridgeError as e:
                       print(e)
-                    image_now = np.expand_dims(np.array(image_now_cv),axis=2)
+                    image_now = np.array(image_now_cv)
                     r,c = np.shape(image_now)
-                    for i in range(r):
+                    for k in range(r):
                         for j in range(c):
-                            if math.isnan(image_now[i][j]):
-                                image_now[i][j] = CAMMAXDISTANCE
-                    
+                            if math.isnan(image_now[k][j]):
+                                image_now[k][j] = CAMMAXDISTANCE
+                    image_now = np.expand_dims(image_now,axis=2)
 
                     try:
                       image_p1rev_cv = bridge.imgmsg_to_cv2(x[i].image_p1rev.data, "32FC1")
                     except CvBridgeError as e:
                       print(e)
-                    image_p1rev = np.expand_dims(np.array(image_p1rev_cv),axis=2)
+                    image_p1rev = np.array(image_p1rev_cv)
                     r,c = np.shape(image_p1rev)
-                    for i in range(r):
+                    for k in range(r):
                         for j in range(c):
-                            if math.isnan(image_p1rev[i][j]):
-                                image_p1rev[i][j] = CAMMAXDISTANCE
+                            if math.isnan(image_p1rev[k][j]):
+                                image_p1rev[k][j] = CAMMAXDISTANCE
+                    image_p1rev = np.expand_dims(image_p1rev,axis=2)
 
                     try:
                       image_p2rev_cv = bridge.imgmsg_to_cv2(x[i].image_p2rev.data, "32FC1")
                     except CvBridgeError as e:
                       print(e)
-                    image_p2rev = np.expand_dims(np.array(image_p2rev_cv),axis=2)
+                    image_p2rev = np.array(image_p2rev_cv)
                     r,c = np.shape(image_p2rev)
-                    for i in range(r):
+                    for k in range(r):
                         for j in range(c):
-                            if math.isnan(image_p2rev[i][j]):
-                                image_p2rev[i][j] = CAMMAXDISTANCE
+                            if math.isnan(image_p2rev[k][j]):
+                                image_p2rev[k][j] = CAMMAXDISTANCE
+                    image_p2rev = np.expand_dims(image_p2rev,axis=2)
 
 
 
@@ -232,34 +235,37 @@ class RunningAverageFilter(object):
                   image_now_cv = bridge.imgmsg_to_cv2(x[0].image_now.data, "32FC1")
                 except CvBridgeError as e:
                   print(e)
-                image_now = np.expand_dims(np.array(image_now_cv),axis=2)
+                image_now = np.array(image_now_cv)
                 r,c = np.shape(image_now)
-                for i in range(r):
+                for k in range(r):
                     for j in range(c):
-                        if math.isnan(image_now[i][j]):
-                            image_now[i][j] = CAMMAXDISTANCE
+                        if math.isnan(image_now[k][j]):
+                            image_now[k][j] = CAMMAXDISTANCE
+                image_now = np.expand_dims(image_now,axis=2)
 
                 try:
                   image_p1rev_cv = bridge.imgmsg_to_cv2(x[0].image_p1rev.data, "32FC1")
                 except CvBridgeError as e:
                   print(e)
-                image_p1rev = np.expand_dims(np.array(image_p1rev_cv),axis=2)
+                image_p1rev = np.array(image_p1rev_cv)
                 r,c = np.shape(image_p1rev)
-                for i in range(r):
+                for k in range(r):
                     for j in range(c):
-                        if math.isnan(image_p1rev[i][j]):
-                            image_p1rev[i][j] = CAMMAXDISTANCE
+                        if math.isnan(image_p1rev[k][j]):
+                            image_p1rev[k][j] = CAMMAXDISTANCE
+                image_p1rev = np.expand_dims(image_p1rev,axis=2)
 
                 try:
                   image_p2rev_cv = bridge.imgmsg_to_cv2(x[0].image_p2rev.data, "32FC1")
                 except CvBridgeError as e:
                   print(e)
-                image_p2rev = np.expand_dims(np.array(image_p2rev_cv),axis=2)
+                image_p2rev = np.array(image_p2rev_cv)
                 r,c = np.shape(image_p2rev)
-                for i in range(r):
+                for k in range(r):
                     for j in range(c):
-                        if math.isnan(image_p2rev[i][j]):
-                            image_p2rev[i][j] = CAMMAXDISTANCE
+                        if math.isnan(image_p2rev[k][j]):
+                            image_p2rev[k][j] = CAMMAXDISTANCE
+                image_p2rev = np.expand_dims(image_p2rev,axis=2)
 
                 data = np.stack((image_now,image_p1rev,image_p2rev),axis=0)
             else: 
