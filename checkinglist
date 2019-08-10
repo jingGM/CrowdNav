@@ -1,0 +1,12 @@
+For every environment, always remember to change the path in stage_env file:
+marker.mesh_resource = "file:///home/jingl/Documents/catkin_ws/src/CrowdNav/naviswarm_80_60_3_depth/rviz/usv.dae"
+to your own file directory
+
+
+
+multi_agent_ppo.py:
+	batch_max_steps
+	episode_max_steps
+	train_max_iters
+
+	load_network
