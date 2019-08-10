@@ -210,7 +210,7 @@ class GazeboTrain {
 
   public:
     // Function declarations
-    GazeboTrain(int num_robots);
+    GazeboTrain(int n);
 
     void gt_Callback(const gazebo_msgs::ModelStates gt);
     void image_Callback(const sensor_msgs::ImageConstPtr& image, int i);
@@ -340,10 +340,11 @@ void GazeboTrain::gt_Callback(const gazebo_msgs::ModelStates gt){
 // Update Goal service CallBack
 bool GazeboTrain::cb_update_srv(naviswarm::UpdateModelRequest& request, naviswarm::UpdateModelResponse& response)
 {
+
     ROS_INFO("Updatting Gazebo!");
 
     std::cout << "Request goal size: " << request.points.size() << std::endl;
-
+	usleep(3000000);
     if (request.points.size() != num_robots) {
         ROS_WARN("Robot Number and number of goals don't match!");
         response.success = false;
@@ -367,11 +368,10 @@ bool GazeboTrain::cb_update_srv(naviswarm::UpdateModelRequest& request, naviswar
         executed_actions.data.clear();
 
         current_steps = 0;
-        for (int i=0;i<num_robots;i++){
-          collision_status[i]=false;
-        }
+        // for (int i=0;i<num_robots;i++){
+        //   collision_status[i]=false;
+        // }
         // WARNING: IT MAY NOT FREE THE MEMORY SPACE
-
         collision_status.clear();
         gpose.clear();
         odom_data.clear();
@@ -405,6 +405,10 @@ bool GazeboTrain::cb_update_srv(naviswarm::UpdateModelRequest& request, naviswar
         response.success = true;
     }
 
+    std::cout<<"collision status: "<<collision_status.size()<<"/"<<collision_status[0]<<"/"<<collision_status[1]<<"/"<<collision_status[2]<<"/"<<collision_status[3]<<"/"<<std::endl;
+    std::cout<<gpose.size()<<"/"<<scan_data.size()<<"/"<<img_data.size()<<std::endl;
+
+    
     return true;
 }
 
@@ -483,7 +487,7 @@ int GazeboTrain::train(){
       //Robotinfo const * robotmodel = this->robots_info[i];
 
 
-    std::cout<<substatus[0]<<"/"<<substatus[1]<<"/"<<substatus[2]<<"/"<<substatus[3]<<std::endl;
+    //std::cout<<substatus[0]<<"/"<<substatus[1]<<"/"<<substatus[2]<<"/"<<substatus[3]<<std::endl;
 	   int checkstatus[4] = {1,1,0,1};
      bool condition=(substatus[0]!=checkstatus[0])||(substatus[1]!=checkstatus[1])||(substatus[3]!=checkstatus[3])||(substatus[2]!=checkstatus[2]);
 	   while(condition){
@@ -585,7 +589,7 @@ int GazeboTrain::train(){
           }
           else // if goal has not been reached
           {
-            ROS_INFO("----reward----");
+            //ROS_INFO("----reward----");
               // rs.stalled[r] = collision;
             //std::cout<<"collision status"<<i<<":  "<<collision_status[i]<<std::endl;
 
@@ -595,10 +599,10 @@ int GazeboTrain::train(){
                   reward.collision = -20.0;
               }
               else { // Goal not reached and no collisions
-                  ROS_INFO("in else");
+                  //ROS_INFO("in else");
                   current_transition.terminal = false;
 
-                  double reward_approaching_goal = 5*(state.goalObs.goal_prev.goal_dist - state.goalObs.goal_now.goal_dist);
+                  double reward_approaching_goal = 2*(state.goalObs.goal_prev.goal_dist - state.goalObs.goal_now.goal_dist);
                   //ROS_INFO("in else2");
                   //std::cout<<std::abs(executed_actions.data[i].vz)<<std::endl;
                   //ROS_INFO("in else4");
@@ -626,7 +630,7 @@ int GazeboTrain::train(){
               }
           }
 
-        //std::cout<<"robot:"<<i<<"  "<<reward.reward_approaching_goal<<" /"<<std::to_string((current_steps+1) *(-0.02))<<" /"<<std::to_string(std::abs(state.velObs.vel_now.vz) * (-0.02))<<"  /"<<state.goalObs.goal_now.goal_dist<<" /"<<std::to_string(collision_status[i])<<std::endl;
+        std::cout<<"robot:"<<i<<"  "<<current_transition.reward<<"/"<<reward.reward_approaching_goal<<" /"<<std::to_string((current_steps+1) *(-0.01))<<" /"<<std::to_string(std::abs(state.velObs.vel_now.vz) * (-0.02))<<"  /"<<state.goalObs.goal_now.goal_dist<<" /"<<std::to_string(collision_status[i])<<std::endl;
         ROS_INFO("-----------");
         reward.sum = reward.collision + reward.reached_goal + reward.reward_approaching_goal + reward.penalty_for_deviation;
         reward_pub.publish(reward); // We need a publisher for reward
@@ -736,7 +740,7 @@ int GazeboTrain::train(){
                 velocitycounter = 1;
               }
             }
-            std::cout<<"robot"<<j<<":   "<<action.linear.x<<"|"<<action.angular.z<<std::endl;
+            //std::cout<<"robot"<<j<<":   "<<action.linear.x<<"|"<<action.angular.z<<std::endl;
             usleep(300000);
             //std::cout<<"-"; 
             last_states.actionObsBatch[j].ac_pprev = last_states.actionObsBatch[j].ac_prev;
