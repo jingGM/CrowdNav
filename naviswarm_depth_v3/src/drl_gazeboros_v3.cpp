@@ -617,7 +617,7 @@ int GazeboTrain::train(){
 
                   reward_approaching_goal = 5*(state.goalObs.goal_prev.goal_dist - state.goalObs.goal_now.goal_dist);
                   penalty_for_bigvz = std::abs(state.velObs.vel_now.vz) * (-0.1)+std::abs(state.velObs.vel_now.vx) * (0.5);
-                  penalty_for_time = (current_steps+1) *(-0.001);
+                  penalty_for_time = (current_steps+1) *(0);
                   
                   current_transition.reward = reward_approaching_goal + penalty_for_bigvz + penalty_for_time;
                   reward.reward_approaching_goal = reward_approaching_goal;
