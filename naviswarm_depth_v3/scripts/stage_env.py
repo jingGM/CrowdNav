@@ -517,7 +517,7 @@ class StageEnv(object):
             self.goal_markers_id += 1
         if ns == "usv":
             marker.type = marker.MESH_RESOURCE
-            marker.mesh_resource = "file:///home/utsavp/Documents/catkin_ws/src/naviswarm_depth_v1/rviz/usv.dae"
+            marker.mesh_resource = "file:///home/utsavp/Documents/catkin_ws/src/naviswarm_depth_v3/rviz/usv.dae"
             marker.id = self.agent_markers_id
             self.agent_markers.markers.append(marker)
             self.agent_markers_id += 1

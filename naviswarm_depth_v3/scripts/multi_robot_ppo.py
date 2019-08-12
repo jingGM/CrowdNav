@@ -158,6 +158,8 @@ class MultiRobotDRL(object):
             #print("============velocity=========================")
             #print(terminateds)
             #print("============terminats========================")
+            #print(len(image_input))
+            #print("===============image==================")
 
             if args.train:
                 action_agents = self.agent.policy.act([scan_input, goal_input, vel_input, image_input], terminateds)

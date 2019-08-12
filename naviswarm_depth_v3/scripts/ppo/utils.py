@@ -198,7 +198,7 @@ class RunningAverageFilter(object):
 
 
                     if self.delta:
-                        data = np.stack((image_now - image_p2rev,image_now - image_p1rev,image_now),axis=1)
+                        data = np.stack((image_now - image_p2rev,image_now - image_p1rev,image_now),axis=0)
                     else:
                         data = np.stack((image_now,image_p1rev,image_p2rev),axis=0)
                         #print(data.shape)

@@ -34,8 +34,8 @@ environment: naviswarm_depth_v3
 double reched_goal_reward = 40;
 double collision_penalty =-40;
 reward_approaching_goal = 5*(state.goalObs.goal_prev.goal_dist - state.goalObs.goal_now.goal_dist);
-penalty_for_bigvz = std::abs(state.velObs.vel_now.vz) * (-0.1)+std::abs(state.velObs.vel_now.vx) * (0.5);
-penalty_for_time = (current_steps+1) *(-0.001);
+penalty_for_bigvz = std::abs(state.velObs.vel_now.vz) * (-0.01)+std::abs(state.velObs.vel_now.vx) * (0.05);
+penalty_for_time = (current_steps+1) *(-0.01);
 
 
 
