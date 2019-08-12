@@ -588,7 +588,7 @@ int GazeboTrain::train(){
           
           if (state.goalObs.goal_now.goal_dist < 0.5) {  // arrived the goal
               current_transition.terminal = true;
-              double reched_goal_reward = 20;
+              double reched_goal_reward = 40;
               current_transition.reward = reched_goal_reward;
               reward.reached_goal = reched_goal_reward;
           }
@@ -600,7 +600,7 @@ int GazeboTrain::train(){
 
               if(collision_status[i] == true) { // stalled is obtained from an in-built function from stage. we must write a function to detect collisions
                   current_transition.terminal = true;
-                  double collision_penalty =-20;
+                  double collision_penalty =-40;
                   current_transition.reward = collision_penalty;
                   reward.collision = collision_penalty;
               }
@@ -616,9 +616,9 @@ int GazeboTrain::train(){
                   
                   current_transition.terminal = false;
 
-                  reward_approaching_goal = 2*(state.goalObs.goal_prev.goal_dist - state.goalObs.goal_now.goal_dist);
-                  penalty_for_bigvz = std::abs(state.velObs.vel_now.vz) * (-0.01);
-                  penalty_for_time = (current_steps+1) *(-0.002);
+                  reward_approaching_goal = 5*(state.goalObs.goal_prev.goal_dist - state.goalObs.goal_now.goal_dist);
+                  penalty_for_bigvz = std::abs(state.velObs.vel_now.vz) * (-0.01)+std::abs(state.velObs.vel_now.vx) * (0.05);
+                  penalty_for_time = (current_steps+1) *(0);
                   
                   current_transition.reward = reward_approaching_goal + penalty_for_bigvz + penalty_for_time;
                   reward.reward_approaching_goal = reward_approaching_goal;
