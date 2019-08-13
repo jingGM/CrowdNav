@@ -122,9 +122,7 @@ class Policy(object):
         actions = self.sess.run(self.sampled_act, feed_dict={
                 self.obs[0]: obs[0],
                 self.obs[1]: obs[1],
-                self.obs[2]: obs[2]#,
-                #self.obs[3]: obs[3]
-            })
+                self.obs[2]: obs[2]  })
 
         for i, t in enumerate(terminated):
             if t:

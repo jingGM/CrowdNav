@@ -226,7 +226,21 @@ class RunningAverageFilter(object):
                 filtered_x.append(data)
             return np.array(filtered_x)
         else:
-            if self.obstype == "image":
+            if self.obstype == "scan":
+                    if self.delta:
+                        data = np.stack(
+                            (np.array(x[0].scan_now.ranges) - np.array(x[0].scan_pprev.ranges),
+                             np.array(x[0].scan_now.ranges) - np.array(x[0].scan_prev.ranges),
+                             np.array(x[0].scan_now.ranges)),
+                            axis=1)
+                    else:
+                        data = np.stack(
+                            (x[0].scan_pprev.ranges,
+                             x[0].scan_prev.ranges,
+                             x[0].scan_now.ranges),
+                            axis=1)
+                    data = np.expand_dims(data, axis=0)
+            elif self.obstype == "image":
                 bridge = CvBridge()
                 try:
                   image_now_cv = bridge.imgmsg_to_cv2(x[0].image_now.data, "32FC1")
@@ -262,8 +276,19 @@ class RunningAverageFilter(object):
                             image_p2rev[k][j] = CAMMAXDISTANCE
 
                 data = np.stack((image_now,image_p1rev,image_p2rev),axis=2)
+                data = np.expand_dims(data, axis=0)
+            elif self.obstype == "goal":
+                    data = np.array([x[0].goal_now.goal_dist, x[0].goal_now.goal_theta])
+                    data = np.expand_dims(data, axis=0)
+            elif self.obstype == "action":
+                data = np.array([[x[0].ac_pprev.vx, x[0].ac_pprev.vz],[x[0].ac_prev.vx, x[0].ac_prev.vz]])
+                data = np.expand_dims(data, axis=0)
+            elif self.obstype == "vel":
+                data = np.array([x[0].vel_now.vx, x[0].vel_now.vz])
+                data = np.expand_dims(data, axis=0)
             else: 
                 data = np.array(x)
+                data = np.expand_dims(data, axis=0)
 
             if self.update:
                 self.rs.add(data)

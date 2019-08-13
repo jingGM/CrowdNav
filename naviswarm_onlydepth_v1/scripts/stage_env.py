@@ -319,7 +319,7 @@ class StageEnv(object):
         # self.starts, self.goals = self.scenarios.random_obstacles_scene()
         # self.starts, self.goals = self.scenarios.circle_scene()
         # self.starts, self.goals = self.scenarios.circle_scene_with_obstacles()
-        self.starts, self.goals = self.scenarios.circle_scene_uniform()
+        self.starts, self.goals = self.scenarios.corridor_ped()
         # self.starts, self.goals = self.scenarios.crossing_scene(6)
         # self.starts, self.goals = self.scenarios.ten_cross_scene(0.8, 6)
         # self.starts, self.goals = self.scenarios.crossing_with_obstacle_scene(6)
