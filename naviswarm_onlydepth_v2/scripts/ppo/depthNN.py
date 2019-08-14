@@ -93,8 +93,8 @@ class ImageNN(object):
         self.imagemodule = load_model("training_depth.h5")
 
     def predict_image(self,inputimage):
-        return self.imagemodule.predict(inputimage)
-
+        predicted_image = self.imagemodule.predict(inputimage[np.newaxis,::,::,::,::])
+        return predicted_image[0,2,::,::,::]
 
 
 

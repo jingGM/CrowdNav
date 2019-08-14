@@ -733,7 +733,7 @@ int GazeboTrain::train(){
 
 int main(int argc, char **argv){
   ros::init(argc, argv, "drl_gazeboros");
-  GazeboTrain gazeboc(1);
+  GazeboTrain gazeboc(2);
 
   if(gazeboc.create_sharedmemory() != 0)
         exit(-1);

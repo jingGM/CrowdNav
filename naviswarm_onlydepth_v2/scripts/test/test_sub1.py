@@ -18,6 +18,7 @@ from naviswarm.msg import ScanObs, Scan, Velocities, Velocity, ActionObs,Action,
 from kobuki_msgs.msg import BumperEvent, CliffEvent
 
 from gazebo_msgs.msg import ContactState
+from std_srvs.srv import Empty
 
 import rosservice
 import csv
@@ -165,10 +166,12 @@ from cv_bridge import CvBridge, CvBridgeError
 import math
 
 def testcompressed():
-    rospy.Subscriber("/turtlebot0/camera/depth/image_raw", Image, callbackfortest, queue_size=1)
+    # rospy.Subscriber("/turtlebot0/camera/depth/image_raw", Image, callbackfortest, queue_size=1)
     
-    rospy.spin()
-   
+    # rospy.spin()
+    rospy.wait_for_service('/gazebo/reset_simulation') #reset_world
+    reset_simulation = rospy.ServiceProxy('/gazebo/reset_simulation', Empty)
+    reset_simulation()
 
 
 def callbackfortest(data):

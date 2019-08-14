@@ -264,7 +264,7 @@ class PPO(object):
         return kl
 
     def critic_update(self,obs_image, obs_goal, obs_vel, rets):
-        num_batches = max(obs_image.shape[0] // 100, 1)
+        num_batches = max(obs_image.shape[0] // 256, 1)
         batch_size = obs_image.shape[0] // num_batches
         if self.replay_buffer_obs_image is None:
             obs_goal_train, obs_vel_train,obs_image_train, ret_train = obs_goal, obs_vel,obs_image, rets

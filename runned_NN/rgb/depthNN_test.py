@@ -111,9 +111,9 @@ which = 2020
 track = noisy_movies[which][np.newaxis,:3, ::, ::, ::]
 
 predict_image = seq.predict(track)
-ground_truth = noisy_movies[which][3, ::, ::, 0]
+ground_truth = noisy_movies[which][2, ::, ::, 0]
 
-np.savetxt("predict.csv", predict_image[0,2,::,::,0], delimiter=",")
+np.savetxt("predict.csv", predict_image[0,1,::,::,0], delimiter=",")
 
 np.savetxt("ground.csv", ground_truth, delimiter=",")
 

@@ -49,11 +49,13 @@ class Agent(object):
         vel_filtered   = self.vel_filter(obs.velObsBatch)
 
         image_out_NN = []
-        for i in len(image_filtered):
+        for i in range(len(image_filtered)):
             image_in_NN = image_filtered[i]
             output = self.imagenetwork.predict_image(image_in_NN)
             image_out_NN.append(output)
         image_out_NN = np.array(image_out_NN)
+        print(image_out_NN.shape)
+        #print('-------- NN output ---------')
 
         if not self.delta:
             scan_filtered /= 4.0
