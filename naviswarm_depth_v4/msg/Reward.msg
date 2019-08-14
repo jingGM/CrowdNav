@@ -1,0 +1,5 @@
+float32 sum
+float32 reached_goal
+float32 collision
+float32 reward_approaching_goal
+float32 penalty_for_deviation
