@@ -56,12 +56,18 @@ class Scenarios(object):
         return self.starts, self.goals
 
     def corridor_ped(self):
-        sx, sy, sa = 8., 0., 3.14
+      distance = self.env_size/self.num_agents
+      halfdis = self.env_size/2
+      sx, sy, sa = 11., 0., 3.14
 
+      for i in range(self.num_agents):
         self.starts.append([sx, sy, sa])
-        self.goals.append([-sx, -sy, sa])
+        self.goals.append([halfdis, sy, sa])
+        halfdis -= distance
+        sx -= distance
 
-        return self.starts, self.goals
+      return self.starts, self.goals 
+
 
 
 

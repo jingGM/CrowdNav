@@ -168,19 +168,19 @@ class RunningAverageFilter(object):
                       image_now_cv = bridge.imgmsg_to_cv2(x[i].image_now.data, "bgr8")
                     except CvBridgeError as e:
                       print(e)
-                    image_now = rgb2gray(np.array(image_now_cv))
+                    image_now = np.expand_dims(rgb2gray(np.array(image_now_cv)),axis=2)
 
                     try:
                       image_p1rev_cv = bridge.imgmsg_to_cv2(x[i].image_p1rev.data, "bgr8")
                     except CvBridgeError as e:
                       print(e)
-                    image_p1rev = rgb2gray(np.array(image_p1rev_cv))
+                    image_p1rev = np.expand_dims(rgb2gray(np.array(image_p1rev_cv)),axis=2)
 
                     try:
                       image_p2rev_cv = bridge.imgmsg_to_cv2(x[i].image_p2rev.data, "bgr8")
                     except CvBridgeError as e:
                       print(e)
-                    image_p2rev = rgb2gray(np.array(image_p2rev_cv))
+                    image_p2rev = np.expand_dims(rgb2gray(np.array(image_p2rev_cv)),axis=2)
 
 
 
@@ -236,19 +236,19 @@ class RunningAverageFilter(object):
                   image_now_cv = bridge.imgmsg_to_cv2(x[0].image_now.data, "bgr8")
                 except CvBridgeError as e:
                   print(e)
-                image_now = rgb2gray(np.array(image_now_cv))
+                image_now = np.expand_dims(rgb2gray(np.array(image_now_cv)),axis=2)
 
                 try:
                   image_p1rev_cv = bridge.imgmsg_to_cv2(x[0].image_p1rev.data, "bgr8")
                 except CvBridgeError as e:
                   print(e)
-                image_p1rev = rgb2gray(np.array(image_p1rev_cv))
+                image_p1rev = np.expand_dims(rgb2gray(np.array(image_p1rev_cv)),axis=2)
 
                 try:
                   image_p2rev_cv = bridge.imgmsg_to_cv2(x[0].image_p2rev.data, "bgr8")
                 except CvBridgeError as e:
                   print(e)
-                image_p2rev = rgb2gray(np.array(image_p2rev_cv))
+                image_p2rev = np.expand_dims(rgb2gray(np.array(image_p2rev_cv)),axis=2)
 
                 data = np.stack((image_now,image_p1rev,image_p2rev),axis=0)
                 

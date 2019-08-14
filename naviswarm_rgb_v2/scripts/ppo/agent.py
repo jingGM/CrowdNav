@@ -37,7 +37,7 @@ class Agent(object):
         self.imagenetwork = ImageNN()
 
         self.scan_filter  = RunningAverageFilter(obs_shape[1], obstype="scan",  demean=False, destd=False, update=False, delta=self.delta)
-        self.image_filter = RunningAverageFilter([obs_shape[3],obs_shape[4],obs_shape[5],obs_shape[6]], obstype="image", demean=False, destd=False, update=False, delta=self.delta)
+        self.image_filter = RunningAverageFilter([3,obs_shape[3],obs_shape[4],3], obstype="image", demean=False, destd=False, update=False, delta=self.delta)
         self.goal_filter  = RunningAverageFilter(obs_shape[2], obstype="goal",  demean=False, destd=False, update=False, delta=self.delta)
         self.vel_filter   = RunningAverageFilter(ac_shape,     obstype="vel",   demean=False, destd=False, update=False, delta=self.delta)
         self.reward_filter= RunningAverageFilter((), demean=False, clip=1)
@@ -49,10 +49,14 @@ class Agent(object):
         vel_filtered   = self.vel_filter(obs.velObsBatch)
 
         image_out_NN = []
-        for i in len(image_filtered):
+        for i in range(len(image_filtered)):
             image_in_NN = image_filtered[i]
+            print(image_in_NN.shape)
             output = self.imagenetwork.predict_image(image_in_NN)
             image_out_NN.append(output)
+            
+            print(output.shape)
+            print('--------------')
         image_out_NN = np.array(image_out_NN)
 
         if not self.delta:
@@ -86,7 +90,7 @@ class Policy(object):
         scan = tf.placeholder(tf.float32, [None, self.obs_shape[1], self.obs_shape[0]],'scan_ph')
         goal = tf.placeholder(tf.float32, [None, 2], 'goal_ph')
         vel  = tf.placeholder(tf.float32, [None, 2], 'vel_ph')
-        image= tf.placeholder(tf.float32, [None, self.obs_shape[4], self.obs_shape[5], self.obs_shape[6]], 'image_ph')
+        image= tf.placeholder(tf.float32, [None, self.obs_shape[3], self.obs_shape[4], self.obs_shape[5]], 'image_ph')
 
         net = tl.layers.InputLayer(scan, name='scan_input')
         net = tl.layers.Conv1dLayer(net, act=tf.nn.relu, shape=[5, self.obs_shape[0], 32], stride=2,name='cnn1')
@@ -182,7 +186,7 @@ class Value(object):
         scan = tf.placeholder(tf.float32, [None, self.obs_shape[1], self.obs_shape[0]],'scan_value_ph')
         goal = tf.placeholder(tf.float32, [None, 2], 'goal_value_ph')
         vel  = tf.placeholder(tf.float32, [None, 2], 'vel_ph')
-        image= tf.placeholder(tf.float32, [None, self.obs_shape[3],self.obs_shape[4],self.obs_shape[5],self.obs_shape[6]], 'image_ph')
+        image= tf.placeholder(tf.float32, [None, self.obs_shape[3],self.obs_shape[4],self.obs_shape[5]], 'image_ph')
 
         net = tl.layers.InputLayer(scan, name='scan_input_value')
         #net = tl.layers.MeanPool1d(net, filter_size=3, strides=2, name='min_pooling1_value')

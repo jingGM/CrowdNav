@@ -22,5 +22,11 @@
     <arg name="y"             value="-2"/>
   </include>
 
+  <arg name="ns1"        default="turtlebot1"/>
+  <include file="$(find naviswarm)/launch/include/turtlebot_base.launch">
+    <arg name="ns"            value="$(arg ns1)"/>
+    <arg name="y"             value="0"/>
+  </include>
+
 
 </launch>

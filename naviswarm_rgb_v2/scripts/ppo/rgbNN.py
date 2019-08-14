@@ -90,10 +90,11 @@ def create_module():
     
 class ImageNN(object):
     def __init__(self):
-        self.imagemodule = load_model("training_depth.h5")
+        self.imagemodule = load_model("training_rgb.h5")
 
     def predict_image(self,inputimage):
-        return self.imagemodule.predict(inputimage)
+        predicted_image = self.imagemodule.predict(inputimage[np.newaxis,::,::,::,::])
+        return predicted_image[0,2,::,::,::]
 
 
 
