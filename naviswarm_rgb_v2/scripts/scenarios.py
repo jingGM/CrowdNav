@@ -55,6 +55,13 @@ class Scenarios(object):
 
         return self.starts, self.goals
 
+    def corridor_ped(self):
+        sx, sy, sa = 8., 0., 3.14
+
+        self.starts.append([sx, sy, sa])
+        self.goals.append([-sx, -sy, sa])
+
+        return self.starts, self.goals
 
 
 
