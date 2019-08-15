@@ -36,7 +36,7 @@ def generate_movies(n_samples=1500, n_frames=15):
             # Size of the square
             w = np.random.randint(2, 10)
 
-            pix_val = np.random.randint(0,4)
+            pix_val = np.random.randint(0,5)
             for t in range(n_frames):
                 x_shift = xstart + directionx * t
                 y_shift = ystart + directiony * t
