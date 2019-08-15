@@ -1,0 +1,5 @@
+pedestrians: 
+	depth+lidar
+	rgb+lidar
+
+
