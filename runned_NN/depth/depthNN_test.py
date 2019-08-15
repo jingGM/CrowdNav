@@ -63,8 +63,7 @@ def generate_movies(n_samples=2200, n_frames=15):
     # Cut to a 40x40 window
     noisy_movies = noisy_movies[::, ::, 20:80, 20:100,::]
     shifted_movies = shifted_movies[::, ::, 20:80, 20:100,::]
-    noisy_movies[noisy_movies >= 1] = 1
-    shifted_movies[shifted_movies >= 1] = 1
+
     return noisy_movies, shifted_movies
 
 def create_module():

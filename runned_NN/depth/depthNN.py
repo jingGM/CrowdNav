@@ -15,7 +15,7 @@ import os
 # For convenience we first create movies with bigger width and height (80x80)
 # and at the end we select a 40x40 window.
 
-def generate_movies(n_samples=2200, n_frames=15):
+def generate_movies(n_samples=1500, n_frames=15):
     row = 100
     col = 120
     noisy_movies = np.zeros((n_samples, n_frames, row, col,1), dtype=np.float)
@@ -63,8 +63,6 @@ def generate_movies(n_samples=2200, n_frames=15):
     # Cut to a 40x40 window
     noisy_movies = noisy_movies[::, ::, 20:80, 20:100,::]
     shifted_movies = shifted_movies[::, ::, 20:80, 20:100,::]
-    noisy_movies[noisy_movies >= 1] = 1
-    shifted_movies[shifted_movies >= 1] = 1
     return noisy_movies, shifted_movies
 
 def create_module():
@@ -89,10 +87,10 @@ def create_module():
     return seq
     
 # Train the network
-noisy_movies, shifted_movies = generate_movies(n_samples=2200)
+noisy_movies, shifted_movies = generate_movies(n_samples=1500)
 #noisy_movies.shape
 seq = create_module()
-seq.fit(noisy_movies[:2000], shifted_movies[:2000], batch_size=10, epochs=300, validation_split=0.05)
+seq.fit(noisy_movies[:1400], shifted_movies[:1400], batch_size=10, epochs=300, validation_split=0.05)
 
 
 checkpoint_path = "cp.ckpt"
@@ -106,7 +104,7 @@ save_model(seq, save_path)
 
 
 
-which = 2004
+which = 1450
 track = noisy_movies[which][:3, ::, ::, ::]
 
 for j in range(16):
