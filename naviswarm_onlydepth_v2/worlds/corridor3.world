@@ -315,15 +315,6 @@
       </script>
     </actor-->
 
-
-
-
-
-
-
-
-
-
     <actor name="actor6">
       <pose>0 1 0 0 0 0</pose>
       <skin>
@@ -406,13 +397,6 @@
         </trajectory>
       </script>
     </actor>
-
-
-
-
-
-
-
 
 
     <actor name="actor7">
@@ -512,14 +496,6 @@
       </script>
     </actor>
 
-
-    
-
-
-
-
-
-
     <actor name='actor2'>
       <pose frame=''>0 1 0 0 -0 0</pose>
       <skin>
@@ -607,11 +583,6 @@
       </script>
     </actor>
 
-
-
-
-
-
     <actor name='actor3'>
       <pose frame=''>0 1 0 0 -0 0</pose>
       <skin>
@@ -651,11 +622,6 @@
         </trajectory>
       </script>
     </actor>
-
-
-
-
-
 
     <actor name='actor4'>
       <pose frame=''>-2 -1 0 0 -0 0</pose>
