@@ -15,7 +15,7 @@
         <collision name='collision'>
           <geometry>
             <box>
-              <size>20 1 5</size>
+              <size>24 1 5</size>
             </box>
           </geometry>
           <max_contacts>10</max_contacts>
@@ -36,7 +36,7 @@
           <geometry>
             <mesh>
               <uri>model://brick_box_3x1x3/meshes/simple_box.dae</uri>
-              <scale>20 1 5</scale>
+              <scale>24 1 5</scale>
             </mesh>
           </geometry>
           <material>
@@ -62,7 +62,7 @@
         <collision name='collision'>
           <geometry>
             <box>
-              <size>20 1 5</size>
+              <size>24 1 5</size>
             </box>
           </geometry>
           <max_contacts>10</max_contacts>
@@ -83,7 +83,7 @@
           <geometry>
             <mesh>
               <uri>model://brick_box_3x1x3/meshes/simple_box.dae</uri>
-              <scale>20 1 5</scale>
+              <scale>24 1 5</scale>
             </mesh>
           </geometry>
           <material>
@@ -146,7 +146,7 @@
         <gravity>1</gravity>
         <enable_wind>0</enable_wind>
       </link>
-      <pose frame=''>10.5 0 0 0 -0 0</pose>
+      <pose frame=''>12.5 0 0 0 -0 0</pose>
     </model>
 
 
@@ -163,27 +163,27 @@
         <loop>1</loop>
         <trajectory id='0' type='walking' tension='0'>
           <waypoint>
-            <time>0</time>
+            <time>0*5</time>
             <pose>2 1 0 0 -0 0</pose>
           </waypoint>
           <waypoint>
-            <time>8</time>
+            <time>8*5</time>
             <pose>10 1 0 0 -0 0</pose>
           </waypoint>
           <waypoint>
-            <time>11</time>
+            <time>11*5</time>
             <pose>10 4 0 0 -0 3.14</pose>
           </waypoint>
           <waypoint>
-            <time>31</time>
+            <time>31*5</time>
             <pose>-10 4 0 0 -0 3.14</pose>
           </waypoint>
           <waypoint>
-            <time>34</time>
+            <time>34*5</time>
             <pose>-10 1 0 0 -0 6.28</pose>
           </waypoint>
           <waypoint>
-            <time>46</time>
+            <time>46*5</time>
             <pose>2 1 0 0 -0 6.28</pose>
           </waypoint>
         </trajectory>
@@ -205,27 +205,27 @@
         <loop>1</loop>
         <trajectory id='1' type='walking' tension='0'>
           <waypoint>
-            <time>0</time>
+            <time>0*5</time>
             <pose>-2 -1 0 0 -0 0</pose>
           </waypoint>
           <waypoint>
-            <time>12</time>
+            <time>12*5</time>
             <pose>10 -1 0 0 -0 0</pose>
           </waypoint>
           <waypoint>
-            <time>15</time>
+            <time>15*5</time>
             <pose>10 -4 0 0 0 -3.14</pose>
           </waypoint>
           <waypoint>
-            <time>35</time>
+            <time>35*5</time>
             <pose>-10 -4 0 0 0 -3.14</pose>
           </waypoint>
           <waypoint>
-            <time>38</time>
+            <time>38*5</time>
             <pose>-10 -1 0 0 -0 -6.28</pose>
           </waypoint>
           <waypoint>
-            <time>46</time>
+            <time>46*5</time>
             <pose>-2 -1 0 0 -0 -6.28</pose>
           </waypoint>
         </trajectory>
@@ -250,65 +250,65 @@
             <pose>10 -4 0 0 0 3.14</pose>
           </waypoint>
           <waypoint>
-            <time>20*1</time>
+            <time>20*5</time>
             <pose>-10 -4 0 0 0 3.14</pose>
           </waypoint>
           <waypoint>
-            <time>23*1</time>
+            <time>23*5</time>
             <pose>-10 -1 0 0 0 0</pose>
           </waypoint>
           
           <waypoint>
-            <time>24.41*1</time>
+            <time>24.41*5</time>
             <pose>-9 0 0 0 -0 0.785</pose>
           </waypoint>
 
           <waypoint>
-            <time>25.82*1</time>
+            <time>25.82*5</time>
             <pose>-8 1 0 0 -0 0</pose>
           </waypoint>
           <waypoint>
-            <time>27.23*1</time>
+            <time>27.23*5</time>
             <pose>-7 0 0 0 -0 -0.785</pose>
           </waypoint>
           <waypoint>
-            <time>28.64*1</time>
+            <time>28.64*5</time>
             <pose>-6 -1 0 0 0 0</pose>
           </waypoint>
           <waypoint>
-            <time>30.87*1</time>
+            <time>30.87*5</time>
             <pose>-4 0 0 0 0 0.785</pose>
           </waypoint>
           <waypoint>
-            <time>33.1*1</time>
+            <time>33.1*5</time>
             <pose>-2 1 0 0 -0 0</pose>
           </waypoint>
           <waypoint>
-            <time>35.33*1</time>
+            <time>35.33*5</time>
             <pose>0 0 0 0 -0 -0.785</pose>
           </waypoint>
           <waypoint>
-            <time>37.56*1</time>
+            <time>37.56*5</time>
             <pose>2 -1 0 0 -0 0</pose>
           </waypoint>
           <waypoint>
-            <time>39.79*1</time>
+            <time>39.79*5</time>
             <pose>4 0 0 0 0 0.785</pose>
           </waypoint>
           <waypoint>
-            <time>42.02*1</time>
+            <time>42.02*5</time>
             <pose>6 1 0 0 -0 0</pose>
           </waypoint>
           <waypoint>
-            <time>44.25*1</time>
+            <time>44.25*5</time>
             <pose>8 0 0 0 -0 -0.785</pose>
           </waypoint>
           <waypoint>
-            <time>46.48*1</time>
+            <time>46.48*5</time>
             <pose>10 -1 0 0 -0 0</pose>
           </waypoint>
           <waypoint>
-            <time>49.48*1</time>
+            <time>49.48*5</time>
             <pose>10 -4 0 0 -0 3.14</pose>
           </waypoint>
         </trajectory>
@@ -338,69 +338,69 @@
         <trajectory id="6" type="walking">
           
           <waypoint>
-            <time>0</time>
+            <time>0*5</time>
             <pose>-10 -4 0 0 0 3.14</pose>
           </waypoint>
           <waypoint>
-            <time>3*1</time>
+            <time>3*5</time>
             <pose>-10 -1 0 0 0 0</pose>
           </waypoint>
           
           <waypoint>
-            <time>4.41*1</time>
+            <time>4.41*5</time>
             <pose>-9 0 0 0 -0 0.785</pose>
           </waypoint>
 
           <waypoint>
-            <time>5.82*1</time>
+            <time>5.82*5</time>
             <pose>-8 1 0 0 -0 0</pose>
           </waypoint>
           <waypoint>
-            <time>7.23*1</time>
+            <time>7.23*5</time>
             <pose>-7 0 0 0 -0 -0.785</pose>
           </waypoint>
           <waypoint>
-            <time>8.64*1</time>
+            <time>8.64*5</time>
             <pose>-6 -1 0 0 0 0</pose>
           </waypoint>
           <waypoint>
-            <time>10.87*1</time>
+            <time>10.87*5</time>
             <pose>-4 0 0 0 0 0.785</pose>
           </waypoint>
           <waypoint>
-            <time>13.1*1</time>
+            <time>13.1*5</time>
             <pose>-2 1 0 0 -0 0</pose>
           </waypoint>
           <waypoint>
-            <time>15.33*1</time>
+            <time>15.33*5</time>
             <pose>0 0 0 0 -0 -0.785</pose>
           </waypoint>
           <waypoint>
-            <time>17.56*1</time>
+            <time>17.56*5</time>
             <pose>2 -1 0 0 -0 0</pose>
           </waypoint>
           <waypoint>
-            <time>19.79*1</time>
+            <time>19.79*5</time>
             <pose>4 0 0 0 0 0.785</pose>
           </waypoint>
           <waypoint>
-            <time>22.02*1</time>
+            <time>22.02*5</time>
             <pose>6 1 0 0 -0 0</pose>
           </waypoint>
           <waypoint>
-            <time>24.25*1</time>
+            <time>24.25*5</time>
             <pose>8 0 0 0 -0 -0.785</pose>
           </waypoint>
           <waypoint>
-            <time>26.48*1</time>
+            <time>26.48*5</time>
             <pose>10 -1 0 0 -0 0</pose>
           </waypoint>
           <waypoint>
-            <time>29.48*1</time>
+            <time>29.48*5</time>
             <pose>10 -4 0 0 -0 3.14</pose>
           </waypoint>
           <waypoint>
-            <time>46*1</time>
+            <time>46*5</time>
             <pose>-10 -4 0 0 -0 3.14</pose>
           </waypoint>
         </trajectory>
@@ -434,78 +434,78 @@
           </waypoint>
 
           <waypoint>
-            <time>17*1</time>
+            <time>17*5</time>
             <pose>-10 4 0 0 0 3.14</pose>
           </waypoint>
 
           <waypoint>
-            <time>20*1</time>
+            <time>20*5</time>
             <pose>-10 1 0 0 0 5.495</pose>
           </waypoint>
 
           <waypoint>
-            <time>21.41*1</time>
+            <time>21.41*5</time>
             <pose>-9 0 0 0 0 5.495</pose>
           </waypoint>
           
           <waypoint>
-            <time>22.82*1</time>
+            <time>22.82*5</time>
             <pose>-8 -1 0 0 0 6.28</pose>
           </waypoint>
 
           
           <waypoint>
-            <time>24.23*1</time>
+            <time>24.23*5</time>
             <pose>-7 0 0 0 0 7.065</pose>
           </waypoint>
 
           <waypoint>
-            <time>25.64*1</time>
+            <time>25.64*5</time>
             <pose>-6 1 0 0 0 6.28</pose>
           </waypoint>
 
           <waypoint>
-            <time>27.87*1</time>
+            <time>27.87*5</time>
             <pose>-4 0 0 0 0 5.495</pose>
           </waypoint>
 
           <waypoint>
-            <time>30.1*1</time>
+            <time>30.1*5</time>
             <pose>-2 -1 0 0 0 6.28</pose>
           </waypoint>
 
           <waypoint>
-            <time>32.33*1</time>
+            <time>32.33*5</time>
             <pose>0 0 0 0 0 7.065</pose>
           </waypoint>
 
           <waypoint>
-            <time>34.56*1</time>
+            <time>34.56*5</time>
             <pose>2 1 0 0 0 6.28</pose>
           </waypoint>
 
           <waypoint>
-            <time>36.79*1</time>
+            <time>36.79*5</time>
             <pose>4 0 0 0 0 5.495</pose>
           </waypoint>
 
           <waypoint>
-            <time>39.02*1</time>
+            <time>39.02*5</time>
             <pose>6 -1 0 0 -0 6.28</pose>
           </waypoint>
 
           <waypoint>
-            <time>41.25*1</time>
+            <time>41.25*5</time>
             <pose>8 0 0 0 -0 7.065</pose>
           </waypoint>
 
           <waypoint>
-            <time>43.48*1</time>
+            <time>43.48*5</time>
             <pose>10 1 0 0 -0 6.28</pose>
           </waypoint>
 
           <waypoint>
-            <time>46*1</time>
+            <time>46*5</time>
             <pose>10 4 0 0 -0 9.42</pose>
           </waypoint>
         </trajectory>
@@ -537,70 +537,70 @@
             <pose>0 4 0 0 -0 3.14</pose>
           </waypoint>
           <waypoint>
-            <time>10*1</time>
+            <time>10*5</time>
             <pose>-10 4 0 0 0 3.14</pose>
           </waypoint>
           <waypoint>
-            <time>13*1</time>
+            <time>13*5</time>
             <pose>-10 1 0 0 -0 5.4995</pose>
           </waypoint>
 
           <waypoint>
-            <time>14.41*1</time>
+            <time>14.41*5</time>
             <pose>-9 0 0 0 -0 5.495</pose>
           </waypoint>
 
           <waypoint>
-            <time>15.82*1</time>
+            <time>15.82*5</time>
             <pose>-8 -1 0 0 -0 6.28</pose>
           </waypoint>
           <waypoint>
-            <time>17.23*1</time>
+            <time>17.23*5</time>
             <pose>-7 0 0 0 -0 7.065</pose>
           </waypoint>
           <waypoint>
-            <time>18.64*1</time>
+            <time>18.64*5</time>
             <pose>-6 1 0 0 0 6.28</pose>
           </waypoint>
           <waypoint>
-            <time>20.87*1</time>
+            <time>20.87*5</time>
             <pose>-4 0 0 0 0 5.495</pose>
           </waypoint>
           <waypoint>
-            <time>23.1*1</time>
+            <time>23.1*5</time>
             <pose>-2 -1 0 0 -0 6.28</pose>
           </waypoint>
           <waypoint>
-            <time>25.33*1</time>
+            <time>25.33*5</time>
             <pose>0 0 0 0 -0 7.065</pose>
           </waypoint>
           <waypoint>
-            <time>27.56*1</time>
+            <time>27.56*5</time>
             <pose>2 1 0 0 -0 6.28</pose>
           </waypoint>
           <waypoint>
-            <time>29.79*1</time>
+            <time>29.79*5</time>
             <pose>4 0 0 0 0 5.495</pose>
           </waypoint>
           <waypoint>
-            <time>32.02*1</time>
+            <time>32.02*5</time>
             <pose>6 -1 0 0 -0 6.28</pose>
           </waypoint>
           <waypoint>
-            <time>34.25*1</time>
+            <time>34.25*5</time>
             <pose>8 0 0 0 -0 7.065</pose>
           </waypoint>
           <waypoint>
-            <time>36.48*1</time>
+            <time>36.48*5</time>
             <pose>10 1 0 0 -0 6.28</pose>
           </waypoint>
           <waypoint>
-            <time>39.48*1</time>
+            <time>39.48*5</time>
             <pose>10 4 0 0 -0 9.42</pose>
           </waypoint>
          
           <waypoint>
-            <time>46</time>
+            <time>46*5</time>
             <pose>0 4 0 0 -0 9.42</pose>
           </waypoint>
         </trajectory>
@@ -625,27 +625,27 @@
         <loop>1</loop>
         <trajectory id='3' type='walking' tension='0'>
           <waypoint>
-            <time>0</time>
+            <time>0*5</time>
             <pose>6 -1 0 0 -0 0</pose>
           </waypoint>
           <waypoint>
-            <time>4</time>
+            <time>4*5</time>
             <pose>10 -1 0 0 -0 0</pose>
           </waypoint>
           <waypoint>
-            <time>7</time>
+            <time>7*5</time>
             <pose>10 -4 0 0 -0 -3.14</pose>
           </waypoint>
           <waypoint>
-            <time>27</time>
+            <time>27*5</time>
             <pose>-10 -4 0 0 -0 -3.14</pose>
           </waypoint>
           <waypoint>
-            <time>30</time>
+            <time>30*5</time>
             <pose>-10 -1 0 0 -0 -6.28</pose>
           </waypoint>
           <waypoint>
-            <time>46</time>
+            <time>46*5</time>
             <pose>6 -1 0 0 -0 -6.28</pose>
           </waypoint>
         </trajectory>
@@ -670,28 +670,28 @@
         <loop>1</loop>
         <trajectory id='4' type='walking' tension='0'>
           <waypoint>
-            <time>0</time>
+            <time>0*5</time>
             <pose>-6 1 0 0 -0 0</pose>
           </waypoint>
           <waypoint>
-            <time>16*1</time>
+            <time>16*5</time>
             <pose>10 1 0 0 -0 0</pose>
           </waypoint>
           <waypoint>
-            <time>19*1</time>
+            <time>19*5</time>
             <pose>10 4 0 0 0 -3.14</pose>
           </waypoint>
           <waypoint>
-            <time>39*1</time>
+            <time>39*5</time>
             <pose>-10 4 0 0 0 -3.14</pose>
           </waypoint>
           <waypoint>
-            <time>42*1</time>
+            <time>42*5</time>
             <pose>-10 1 0 0 -0 0</pose>
           </waypoint>
 
           <waypoint>
-            <time>46*1</time>
+            <time>46*5</time>
             <pose>-6 1 0 0 -0 0</pose>
           </waypoint>
         </trajectory>

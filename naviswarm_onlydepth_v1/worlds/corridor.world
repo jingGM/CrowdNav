@@ -1,0 +1,221 @@
+<sdf version='1.6'>
+  <world name='default'>
+
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <model name='brick_box_3x1x3'>
+      <static>1</static>
+      <link name='chassis'>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>20 1 5</size>
+            </box>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://brick_box_3x1x3/meshes/simple_box.dae</uri>
+              <scale>20 1 5</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://brick_box_3x1x3/materials/scripts</uri>
+              <uri>model://brick_box_3x1x3/materials/textures</uri>
+              <name>BrickBox/Diffuse</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <kinematic>0</kinematic>
+        <gravity>1</gravity>
+        <enable_wind>0</enable_wind>
+      </link>
+      <pose frame=''>0 -2.5 0 0 -0 0</pose>
+    </model>
+
+    <model name='brick_box_3x1x3_5'>
+      <static>1</static>
+      <link name='chassis'>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>20 1 5</size>
+            </box>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://brick_box_3x1x3/meshes/simple_box.dae</uri>
+              <scale>20 1 5</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <uri>model://brick_box_3x1x3/materials/scripts</uri>
+              <uri>model://brick_box_3x1x3/materials/textures</uri>
+              <name>BrickBox/Diffuse</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <kinematic>0</kinematic>
+        <gravity>1</gravity>
+        <enable_wind>0</enable_wind>
+      </link>
+      <pose frame=''>0 2.5 0 0 -0 0</pose>
+    </model>
+
+      
+    <actor name="pedr0">
+      <pose>0 1 0 0 0 0</pose>
+      <skin>
+        <filename>walk.dae</filename>
+      </skin>
+      <animation name="walking">
+        <filename>walk.dae</filename>
+        <interpolate_x>true</interpolate_x>
+      </animation>
+      <script>
+        <loop>true</loop>
+        <trajectory id="0" type="walking">
+          <waypoint>
+            <time>0</time>
+            <pose>0 1 0 0 0 0</pose>
+          </waypoint>
+          <waypoint>
+            <time>10*1</time>
+            <pose>10 1 0 0 0 0</pose>
+          </waypoint>
+          <waypoint>
+            <time>13*1</time>
+            <pose>10 4 0 0 0 3.14</pose>
+          </waypoint>
+          <waypoint>
+            <time>23*1</time>
+            <pose>-10 4 0 0 0 3.14</pose>
+          </waypoint>
+          <waypoint>
+            <time>26*1</time>
+            <pose>-10 1 0 0 0 6.28</pose>
+          </waypoint>
+          <waypoint>
+            <time>36*1</time>
+            <pose>0 1 0 0 0 6.28</pose>
+          </waypoint>
+        </trajectory>
+      </script>
+    </actor>
+
+    <actor name="actor0">
+      <pose>0 1 0 0 0 0</pose>
+      <skin>
+        <filename>walk.dae</filename>
+      </skin>
+      <animation name="walking">
+        <filename>walk.dae</filename>
+        <interpolate_x>true</interpolate_x>
+      </animation>
+      <script>
+        <loop>true</loop>
+        <trajectory id="0" type="walking">
+          <waypoint>
+            <time>0</time>
+            <pose>0 1 0 0 0 0</pose>
+          </waypoint>
+        </trajectory>
+      </script>
+    </actor>
+
+
+
+
+    <actor name="actor1">
+      <pose>-2 -1 0 0 0 0</pose>
+      <skin>
+        <filename>walk.dae</filename>
+      </skin>
+      <animation name="walking">
+        <filename>walk.dae</filename>
+        <interpolate_x>true</interpolate_x>
+      </animation>
+      <script>
+        <loop>true</loop>
+        <trajectory id="1" type="walking">
+          <waypoint>
+            <time>0</time>
+            <pose>-2 -1 0 0 0 0</pose>
+          </waypoint>
+          <waypoint>
+            <time>12*1</time>
+            <pose>10 -1 0 0 0 0</pose>
+          </waypoint>
+          <waypoint>
+            <time>15*1</time>
+            <pose>10 -4 0 0 0 -3.14</pose>
+          </waypoint>
+          <waypoint>
+            <time>25*1</time>
+            <pose>-10 -4 0 0 0 -3.14</pose>
+          </waypoint>
+          <waypoint>
+            <time>28*1</time>
+            <pose>-10 -1 0 0 0 -6.28</pose>
+          </waypoint>
+          <waypoint>
+            <time>36*1</time>
+            <pose>-2 -1 0 0 0 -6.28</pose>
+          </waypoint>
+        </trajectory>
+      </script>
+    </actor>
+      <!--plugin name="actor1_plugin" filename="libActorPlugin.so">
+        <target>0 -5 1.2138</target>
+        <target_weight>1.15</target_weight>
+        <obstacle_weight>1.8</obstacle_weight>
+        <animation_factor>5.1</animation_factor>
+        <ignore_obstacles>
+          <model>ground_plane</model>
+        </ignore_obstacles>
+      </plugin>
+    </actor-->
+
+  </world>
+</sdf>
