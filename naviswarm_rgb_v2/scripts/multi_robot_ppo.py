@@ -37,7 +37,7 @@ parser = argparse.ArgumentParser(
 parser.add_argument(
     '--train', default=True, type=bool, help='train or test')
 parser.add_argument(
-    '--num_agents', default=2, type=int, help='number of robots')
+    '--num_agents', default=1, type=int, help='number of robots')
 parser.add_argument(
     '--num_obstacles', default=0, type=int, help='number of obstacles')
 parser.add_argument(

@@ -49,7 +49,10 @@
  #include <naviswarm/Velocities.h>
  #include <naviswarm/Action.h>
  #include <naviswarm/Actions.h>
-#include <naviswarm/ActionObs.h>
+ #include <naviswarm/ActionObs.h>
+ #include <naviswarm/ScanObs.h>
+ #include <naviswarm/CameraImageObs.h>
+ 
  #include <naviswarm/Goal.h>
  #include <naviswarm/Scan.h>
  #include <naviswarm/State.h>
@@ -285,8 +288,22 @@ void GazeboTrain::image_Callback(const sensor_msgs::ImageConstPtr& image, int i)
 	img_data[i].data= *image;
 	img_header[i]   = image->header;
 
+  
+  if (last_states.ImageObsBatch.size() == 0) {
+      last_states.ImageObsBatch[i].image_p1rev.data = img_data[i].data;
+      last_states.ImageObsBatch[i].image_p2rev.data = img_data[i].data;
+  }
+  else {
+      last_states.ImageObsBatch[i].image_p2rev.data = last_states.ImageObsBatch[i].image_p1rev.data;
+      last_states.ImageObsBatch[i].image_p1rev.data = last_states.ImageObsBatch[i].image_now.data;
+  }
+  last_states.ImageObsBatch[i].image_now.data = img_data[i].data;
+
+  //if (i==0){ROS_INFO(" ");}
+
   if (img_data[i].data.data.size()>0){substatus[0] =1;}
   //ROS_INFO("running image callback");
+  usleep(100000);
 }
 
 void GazeboTrain::scan_Callback(const sensor_msgs::LaserScanConstPtr& scan, int i){
@@ -295,6 +312,18 @@ void GazeboTrain::scan_Callback(const sensor_msgs::LaserScanConstPtr& scan, int 
 
   scan_data[i].ranges = scan->ranges;
   scan_header[i]  = scan->header;
+
+  
+  if (last_states.scanObsBatch.size() == 0) {
+      last_states.scanObsBatch[i].scan_pprev.ranges = scan_data[i].ranges;
+      last_states.scanObsBatch[i].scan_prev.ranges = scan_data[i].ranges;
+  }
+  else {
+      last_states.scanObsBatch[i].scan_pprev = last_states.scanObsBatch[i].scan_prev;
+      last_states.scanObsBatch[i].scan_prev = last_states.scanObsBatch[i].scan_now;
+  }
+  last_states.scanObsBatch[i].scan_now.ranges = scan_data[i].ranges;
+
 
   if (scan_data[i].ranges.size()>0){substatus[1] =1;}
 
@@ -312,6 +341,7 @@ void GazeboTrain::scan_Callback(const sensor_msgs::LaserScanConstPtr& scan, int 
     collision_status[i] = true;
   }
   //ROS_INFO("running scan callback");
+  usleep(100000);
 }
 
 // Bumper CallBack
@@ -425,7 +455,11 @@ int GazeboTrain::create_sharedmemory(){
       actionobs_data.ac_pprev.vz = 0; 
       last_states.actionObsBatch.push_back(actionobs_data);
 
-      //naviswarm::Action 
+      naviswarm::ScanObs scan_temp;
+      last_states.scanObsBatch.push_back(scan_temp);
+
+      naviswarm::CameraImageObs image_temp;
+      last_states.ImageObsBatch.push_back(image_temp);
 
       vec2 temp_goal;
       temp_goal.x = 0.;
@@ -436,7 +470,7 @@ int GazeboTrain::create_sharedmemory(){
 
       new_robot->image_sub   = nh.subscribe<sensor_msgs::Image>(name_space + "/camera/image_raw", 1, boost::bind(&GazeboTrain::image_Callback, this, _1, i)); //"/camera/depth/image_raw"
     	new_robot->scan_sub    = nh.subscribe<sensor_msgs::LaserScan>(name_space + "/scan_filtered", 1, boost::bind(&GazeboTrain::scan_Callback, this, _1, i));
-      new_robot->bumper_sub    = nh.subscribe<kobuki_msgs::BumperEvent>(name_space + "/mobile_base/events/bumper", 1, boost::bind(&GazeboTrain::bumper_Callback, this, _1, i));
+      new_robot->bumper_sub  = nh.subscribe<kobuki_msgs::BumperEvent>(name_space + "/mobile_base/events/bumper", 1, boost::bind(&GazeboTrain::bumper_Callback, this, _1, i));
 
       robots_info.push_back(new_robot);
     }
@@ -531,26 +565,26 @@ int GazeboTrain::train(){
       }
 
 
-      state.scanObs.scan_now.ranges = scan_data[i].ranges;
+      state.scanObs.scan_now = last_states.scanObsBatch[i].scan_now;
       if (last_states.goalObsBatch.size() == 0) {
           state.scanObs.scan_pprev = state.scanObs.scan_now;
           state.scanObs.scan_prev = state.scanObs.scan_now;
       }
       else {
-          state.scanObs.scan_pprev = last_states.scanObsBatch[i].scan_prev;
-          state.scanObs.scan_prev = last_states.scanObsBatch[i].scan_now;
+          state.scanObs.scan_pprev = last_states.scanObsBatch[i].scan_pprev;
+          state.scanObs.scan_prev = last_states.scanObsBatch[i].scan_prev;
       }
 
 //std::cout<<"scan"<<i<<":	"<< state.scanObs.scan_pprev.ranges.size()<<"/"<<state.scanObs.scan_prev.ranges.size()<<"/"<<state.scanObs.scan_now.ranges.size()<<"/"<<std::endl;
 
-      state.ImageObs.image_now.data = img_data[i].data;
+      state.ImageObs.image_now.data = last_states.ImageObsBatch[i].image_now.data;
       if (last_states.goalObsBatch.size() == 0) {
           state.ImageObs.image_p1rev.data = state.ImageObs.image_now.data;
           state.ImageObs.image_p2rev.data = state.ImageObs.image_now.data;
       }
       else {
-          state.ImageObs.image_p2rev.data = last_states.ImageObsBatch[i].image_p1rev.data;
-          state.ImageObs.image_p1rev.data = last_states.ImageObsBatch[i].image_now.data;
+          state.ImageObs.image_p2rev.data = last_states.ImageObsBatch[i].image_p2rev.data;
+          state.ImageObs.image_p1rev.data = last_states.ImageObsBatch[i].image_p1rev.data;
 //std::cout<<state.ImageObs.image_now.data.header.frame_id<<":  "<<state.ImageObs.image_p2rev.data.header.stamp<<"/"<<state.ImageObs.image_p1rev.data.header.stamp<<"/"<<state.ImageObs.image_now.data.header.stamp<<std::endl;
       }
 
@@ -737,7 +771,7 @@ int GazeboTrain::train(){
               }
             }
             std::cout<<"robot"<<j<<":   "<<action.linear.x<<"|"<<action.angular.z<<std::endl;
-            usleep(300000);
+            //usleep(100000);
             //std::cout<<"-"; 
             last_states.actionObsBatch[j].ac_pprev = last_states.actionObsBatch[j].ac_prev;
             last_states.actionObsBatch[j].ac_prev = actions.data[j];
@@ -757,7 +791,9 @@ int GazeboTrain::train(){
 
 int main(int argc, char **argv){
   ros::init(argc, argv, "drl_gazeboros");
-  GazeboTrain gazeboc(2);
+  //ros::Rate r(10);
+
+  GazeboTrain gazeboc(1);
 
   if(gazeboc.create_sharedmemory() != 0)
         exit(-1);

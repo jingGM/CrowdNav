@@ -187,7 +187,7 @@ class RunningAverageFilter(object):
                     if self.delta:
                         data = np.stack((image_now - image_p2rev,image_now - image_p1rev,image_now),axis=0)
                     else:
-                        data = np.stack((image_now,image_p1rev,image_p2rev),axis=0)
+                        data = np.stack((image_p2rev,image_p1rev,image_now),axis=0)
                         #print(data.shape)
                         #print('==========image shape======================')
                         
@@ -250,12 +250,11 @@ class RunningAverageFilter(object):
                   print(e)
                 image_p2rev = np.expand_dims(rgb2gray(np.array(image_p2rev_cv)),axis=2)
 
-                data = np.stack((image_now,image_p1rev,image_p2rev),axis=0)
+                data = np.stack((image_p2rev,image_p1rev,image_now),axis=0)
                 
 
             elif self.obstype == "goal":
                     data = np.array([x[0].goal_now.goal_dist, x[0].goal_now.goal_theta])
-                    data = np.expand_dims(data, axis=0)
             elif self.obstype == "action":
                 data = np.array([[x[0].ac_pprev.vx, x[0].ac_pprev.vz],[x[0].ac_prev.vx, x[0].ac_prev.vz]])
                 

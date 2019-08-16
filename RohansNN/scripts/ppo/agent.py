@@ -23,8 +23,11 @@ import tensorlayer as tl
 from utils import RunningAverageFilter
 from vel_smoother import VelocitySmoother
 from RealTimeTracking.predict import Memory
+import pylab as plt
+
 
 def rgb2gray(rgb):
+    print(rgb.shape)
     r, g, b = rgb[:,:,0], rgb[:,:,1], rgb[:,:,2]
     gray = 0.2989 * r + 0.5870 * g + 0.1140 * b
     return gray
@@ -47,6 +50,7 @@ class Agent(object):
         self.goal_filter  = RunningAverageFilter(obs_shape[2], obstype="goal",  demean=False, destd=False, update=False, delta=self.delta)
         self.vel_filter   = RunningAverageFilter(ac_shape,     obstype="vel",   demean=False, destd=False, update=False, delta=self.delta)
         self.reward_filter= RunningAverageFilter((), demean=False, clip=1)
+        self.counter =0
 
     def obs_filter(self, obs):
         image_filtered = self.image_filter(obs.ImageObsBatch)
@@ -56,15 +60,46 @@ class Agent(object):
 
         image_out_NN = []
         for i in range(len(image_filtered)):
-            image_in_NN = image_filtered[i,0,::,::,::]
-            print(image_in_NN.shape)
-            output = self.imagenetwork.predict(image_in_NN)
+            image_in_NN0 = image_filtered[i,0,::,::,::]
+            # print(image_in_NN0.shape)
+            output = self.imagenetwork.predict(image_in_NN0)
+            image_in_NN1 = image_filtered[i,1,::,::,::]
+            # print(image_in_NN1.shape)
+            output = self.imagenetwork.predict(image_in_NN1)
+            image_in_NN2 = image_filtered[i,2,::,::,::]
+            # print(image_in_NN2.shape)
+            output = self.imagenetwork.predict(image_in_NN2)
+            # print(output.shape)
+            self.imagenetwork.reset()
+
             output = rgb2gray(output)
-            image_out_NN.append(output)
-            
+            image_out_NN.append(np.expand_dims(output, axis=3))
+            # image_out_NN.append(output)
+
+            fig = plt.figure(figsize=(10, 5))
+            ax = fig.add_subplot(231)
+            toplot = image_in_NN0
+            plt.imshow(toplot)
+            ax = fig.add_subplot(232)
+            toplot = image_in_NN1
+            plt.imshow(toplot)
+            ax = fig.add_subplot(233)
+            toplot = image_in_NN2
+            plt.imshow(toplot)
+            ax = fig.add_subplot(234)
+            toplot = output
+            toplot = toplot
+            plt.imshow(toplot)
+            ax = fig.add_subplot(235)
+            toplot = output* (1/output.max())
+            plt.imshow(toplot)
+            plt.savefig('./predictions/{0}_{1}.png'.format(i,self.counter))
+            self.counter +=1
+
             #print(output.shape)
             #print('--------------')
         image_out_NN = np.array(image_out_NN)
+        # image_out_NN = np.expand_dims(image_out_NN, axis=3)
 
         if not self.delta:
             scan_filtered /= 4.0

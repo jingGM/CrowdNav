@@ -168,8 +168,8 @@
           <horizontal_fov>1.22173</horizontal_fov>
           <image>
             <format>B8G8R8</format>
-            <width>80</width>
-            <height>60</height>
+            <width>400</width>
+            <height>360</height>
           </image>
           <clip>
             <near>0.1</near>

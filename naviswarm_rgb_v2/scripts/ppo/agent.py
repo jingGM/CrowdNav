@@ -23,6 +23,7 @@ import tensorlayer as tl
 from utils import RunningAverageFilter
 from vel_smoother import VelocitySmoother
 from rgbNN import ImageNN
+import pylab as plt
 
 
 class Agent(object):
@@ -41,7 +42,7 @@ class Agent(object):
         self.goal_filter  = RunningAverageFilter(obs_shape[2], obstype="goal",  demean=False, destd=False, update=False, delta=self.delta)
         self.vel_filter   = RunningAverageFilter(ac_shape,     obstype="vel",   demean=False, destd=False, update=False, delta=self.delta)
         self.reward_filter= RunningAverageFilter((), demean=False, clip=1)
-
+        self.counter = 0
     def obs_filter(self, obs):
         image_filtered = self.image_filter(obs.ImageObsBatch)
         scan_filtered  = self.scan_filter(obs.scanObsBatch)
@@ -54,10 +55,30 @@ class Agent(object):
             print(image_in_NN.shape)
             output = self.imagenetwork.predict_image(image_in_NN)
             image_out_NN.append(output)
-            
             print(output.shape)
-            print('--------------')
+            
+            fig = plt.figure(figsize=(10, 5))
+            #ax = fig.add_subplot(111)
+            toplot = image_in_NN[0,::,::,0]
+            plt.imshow(toplot)
+            plt.savefig('./predictions/{0}_{1}_{2}.png'.format(i,self.counter,0))
+            fig = plt.figure(figsize=(10, 5))
+            #ax = fig.add_subplot(111)
+            toplot = image_in_NN[1,::,::,0]
+            plt.imshow(toplot)
+            plt.savefig('./predictions/{0}_{1}_{2}.png'.format(i,self.counter,1))
+            fig = plt.figure(figsize=(10, 5))
+            #ax = fig.add_subplot(111)
+            toplot = image_in_NN[2,::,::,0]
+            plt.imshow(toplot)
+            plt.savefig('./predictions/{0}_{1}_{2}.png'.format(i,self.counter,2))
+
+            self.counter +=1
+
         image_out_NN = np.array(image_out_NN)
+
+            
+
 
         if not self.delta:
             scan_filtered /= 4.0
