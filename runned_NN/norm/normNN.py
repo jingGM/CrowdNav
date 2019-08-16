@@ -4,8 +4,7 @@ from tensorflow.keras.callbacks import ModelCheckpoint
 import numpy as np
 import pylab as plt
 import os
-
-
+import tensorflow as tf
 
 
 # Artificial data generation:
@@ -15,7 +14,7 @@ import os
 # For convenience we first create movies with bigger width and height (80x80)
 # and at the end we select a 40x40 window.
 
-def generate_movies(n_samples=2200, n_frames=15):
+def generate_movies(n_samples=1500, n_frames=7):
     row = 100
     col = 120
     noisy_movies = np.zeros((n_samples, n_frames, row, col,1), dtype=np.float)
@@ -36,7 +35,7 @@ def generate_movies(n_samples=2200, n_frames=15):
             # Size of the square
             w = np.random.randint(2, 10)
 
-            pix_val = np.random.randint(0,1)
+            pix_val = np.random.random_sample()
             for t in range(n_frames):
                 x_shift = xstart + directionx * t
                 y_shift = ystart + directiony * t
@@ -63,7 +62,10 @@ def generate_movies(n_samples=2200, n_frames=15):
     # Cut to a 40x40 window
     noisy_movies = noisy_movies[::, ::, 20:80, 20:100,::]
     shifted_movies = shifted_movies[::, ::, 20:80, 20:100,::]
-  
+    noisy_movies[noisy_movies >= 1] = 1
+    noisy_movies[noisy_movies <= 0] = 0
+    shifted_movies[shifted_movies >= 1] = 1
+    shifted_movies[shifted_movies <= 0] = 0
     return noisy_movies, shifted_movies
 
 def create_module():
@@ -80,60 +82,82 @@ def create_module():
 
     seq.add(ConvLSTM2D(filters=60, kernel_size=(3, 3),padding='same', return_sequences=True))
     seq.add(BatchNormalization())
-
+    seq.add(ConvLSTM2D(filters=60, kernel_size=(3, 3),padding='same', return_sequences=True))
+    seq.add(BatchNormalization())
     seq.add(Conv3D(filters=1, kernel_size=(3, 3, 3),activation='sigmoid', padding='same', 
                    data_format='channels_last'))
-    seq.compile(loss='binary_crossentropy', optimizer='adadelta')
+    seq.compile(loss='mean_squared_error', optimizer='adadelta')
     seq.summary()
     return seq
     
-# Train the network
-noisy_movies, shifted_movies = generate_movies(n_samples=2200)
-#noisy_movies.shape
-seq = create_module()
-seq.fit(noisy_movies[:2000], shifted_movies[:2000], batch_size=10, epochs=300, validation_split=0.05)
+class ImageNN(object):
+    def __init__(self):
+        self.imagemodule = load_model("norm.h5")
+        # self.imagemodule._make_predict_function()
+        # self.graph = tf.get_default_graph()
+
+    def predict_image(self,inputimage):
+        # graph = tf.get_default_graph()
+        
+        # inputimageextract.astype('float64')     
+        # print(inputimageextract.shape)
+        # self.imagemodule._make_predict_function()
+        # #print(inputimageextract.dtype)
+        # with self.graph.as_default():
+        inputimageextract = inputimage[np.newaxis,::,::,::,::]
+        predicted_image = self.imagemodule.predict(inputimageextract)
+        return predicted_image
 
 
-checkpoint_path = "cp.ckpt"
-checkpoint_dir = os.path.dirname(checkpoint_path)
-cp_callback = ModelCheckpoint(checkpoint_path,verbose=1)
 
-save_path = "training_norm.h5"
-save_model(seq, save_path)
+if __name__ == "__main__":
 
-#seq=load_model(save_path)
+    # Train the network
+    noisy_movies, shifted_movies = generate_movies(n_samples=1500)
+    #noisy_movies.shape
+    seq = create_module()
+    seq.fit(noisy_movies[:1400], shifted_movies[:1400], batch_size=10, epochs=300, validation_split=0.05)
+
+
+    checkpoint_path = "cp.ckpt"
+    checkpoint_dir = os.path.dirname(checkpoint_path)
+    cp_callback = ModelCheckpoint(checkpoint_path,verbose=1)
+
+    save_path = "norm.h5"
+    save_model(seq, save_path)
+
+    #seq=load_model(save_path)
 
 
 
-which = 2004
-track = noisy_movies[which][:3, ::, ::, ::]
+    which = 1450
+    track = noisy_movies[which][:3, ::, ::, ::]
 
-for j in range(16):
-    new_pos = seq.predict(track[np.newaxis, ::, ::, ::, ::])
-    new = new_pos[::, -1, ::, ::, ::]
-    track = np.concatenate((track, new), axis=0)
+    for j in range(16):
+        new_pos = seq.predict(track[np.newaxis, ::, ::, ::, ::])
+        new = new_pos[::, -1, ::, ::, ::]
+        track = np.concatenate((track, new), axis=0)
 
-track2 = noisy_movies[which][::, ::, ::, ::]
-for i in range(6):
-    fig = plt.figure(figsize=(10, 5))
+    track2 = noisy_movies[which][::, ::, ::, ::]
+    for i in range(6):
+        fig = plt.figure(figsize=(10, 5))
 
-    ax = fig.add_subplot(121)
+        ax = fig.add_subplot(121)
 
-    if i >= 3:
-        ax.text(1, 3, 'Predictions !', fontsize=20, color='w')
-    else:
-        ax.text(1, 3, 'Initial trajectory', fontsize=20)
+        if i >= 3:
+            ax.text(1, 3, 'Predictions !', fontsize=20, color='w')
+        else:
+            ax.text(1, 3, 'Initial trajectory', fontsize=20)
 
-    toplot = track[i, ::, ::, 0]
+        toplot = track[i, ::, ::, 0]
 
-    plt.imshow(toplot)
-    ax = fig.add_subplot(122)
-    plt.text(1, 3, 'Ground truth', fontsize=20)
+        plt.imshow(toplot)
+        ax = fig.add_subplot(122)
+        plt.text(1, 3, 'Ground truth', fontsize=20)
 
-    toplot = track2[i, ::, ::, 0]
-    if i >= 2:
-        toplot = shifted_movies[which][i - 1, ::, ::, 0]
+        toplot = track2[i, ::, ::, 0]
+        if i >= 2:
+            toplot = shifted_movies[which][i - 1, ::, ::, 0]
 
-    plt.imshow(toplot)
-    plt.savefig('%i_animate.png' % (i + 1))
-
+        plt.imshow(toplot)
+        plt.savefig('%i_animate.png' % (i + 1))
