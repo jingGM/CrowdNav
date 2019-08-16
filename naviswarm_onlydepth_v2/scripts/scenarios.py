@@ -69,11 +69,6 @@ class Scenarios(object):
       return self.starts, self.goals 
         
 
-self.starts.append([sx, sy, sa])
-self.goals.append([-sx, -sy, sa])
-
-return self.starts, self.goals
-
 
 
 

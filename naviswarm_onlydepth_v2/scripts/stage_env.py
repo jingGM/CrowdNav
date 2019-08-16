@@ -50,9 +50,7 @@ class StageEnv(object):
     Wrapped Stage simulator using gym's API.
     """
 
-    def __init__(self, num_agents=10, num_obstacles=5,
-                 agent_radius=0.12, env_size=4.0,
-                 max_vx=1.0, key=42, options=2):
+    def __init__(self, num_agents=10, num_obstacles=5,agent_radius=0.12, env_size=4.0,max_vx=0.5, key=42, options=2):
         self.num_agents = num_agents
         self.num_obstacles = num_obstacles
         self.agent_size = agent_radius
@@ -166,7 +164,7 @@ class StageEnv(object):
         actions = np.array(actions)
         for action in actions:
             action[0] = np.clip(action[0], 0.0, self.max_vx)
-            action[1] = np.clip(action[1], -1., 1.)
+            action[1] = np.clip(action[1], -0.5, 0.5)
             # action = self.vel_smoother.step(action[0], action[1], 0.1)
 
         self.agent_actions = actions

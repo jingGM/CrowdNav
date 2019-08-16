@@ -713,7 +713,7 @@ int GazeboTrain::train(){
               }
             }
             std::cout<<"robot"<<j<<":   "<<action.linear.x<<"|"<<action.angular.z<<std::endl;
-            usleep(300000);
+            usleep(100000);
             //std::cout<<"-"; 
             last_states.actionObsBatch[j].ac_pprev = last_states.actionObsBatch[j].ac_prev;
             last_states.actionObsBatch[j].ac_prev = actions.data[j];

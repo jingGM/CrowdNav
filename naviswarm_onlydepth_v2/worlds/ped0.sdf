@@ -9,14 +9,102 @@
          <uri>model://sun</uri>
       </include>
 
+      <!--actor name="actor">
+        <skin>
+          <filename>walk.dae</filename>
+        </skin>
 
+        <script>
+          <loop>true</loop>
+          <delay_start>0.000000</delay_start>
+          <auto_start>true</auto_start>
+          <trajectory id="0" type="square">
+             <waypoint>
+                <time>1</time>
+                <pose>-1 -1 0 0 0 0</pose>
+             </waypoint>
+             <waypoint>
+                <time>2.0</time>
+                <pose>-1 1 0 0 0 0</pose>
+             </waypoint>
+             <waypoint>
+                <time>3.0</time>
+                <pose>1 1 0 0 0 0</pose>
+             </waypoint>
+             <waypoint>
+                <time>4.0</time>
+                <pose>1 -1 0 0 0 0</pose>
+             </waypoint>
+             <waypoint>
+                <time>5.0</time>
+                <pose>-1 -1 0 0 0 0</pose>
+             </waypoint>
+          </trajectory>
+        </script>
+      </actor-->
+
+      <!--actor name="actor1">
+        <skin>
+          <filename>walk.dae</filename>
+        </skin>
+        <animation name="animation">
+          <filename>moonwalk.dae</filename>
+        </animation>
+      </actor>
+
+      <actor name="actor2">
+        <skin>
+          <filename>moonwalk.dae</filename>
+        </skin>
+        <animation name="animation">
+          <filename>walk.dae</filename>
+        </animation>
+      </actor-->
+    <!--actor name="actor">
+      <skin>
+        <filename>walk.dae</filename>
+      </skin>
+      <animation name="walking">
+        <filename>walk.dae</filename>
+        <interpolate_x>true</interpolate_x>
+      </animation>
+      <script>
+        <trajectory id="0" type="walking">
+          <waypoint>
+            <time>0</time>
+            <pose>0 2 0 0 0 -1.57</pose>
+          </waypoint>
+          <waypoint>
+            <time>2</time>
+            <pose>0 -2 0 0 0 -1.57</pose>
+          </waypoint>
+          <waypoint>
+            <time>2.5</time>
+            <pose>0 -2 0 0 0 1.57</pose>
+          </waypoint>
+          <waypoint>
+            <time>7</time>
+            <pose>0 2 0 0 0 1.57</pose>
+          </waypoint>
+          <waypoint>
+            <time>7.5</time>
+            <pose>0 2 0 0 0 -1.57</pose>
+          </waypoint>
+        </trajectory>
+      </script>
+    </actor-->
 
     <actor name="actor1">
       <pose>0 1 0 0 0 0</pose>
       <!--skin>
         <filename>moonwalk.dae</filename>
         <scale>1.0</scale>
-      </skin-->
+      </skin>
+      <animation name="walking">
+        <filename>walk.dae</filename>
+        <scale>1.000000</scale>
+        <interpolate_x>true</interpolate_x>
+      </animation-->
 
       <skin>
         <filename>walk.dae</filename>
@@ -92,6 +180,7 @@
         <obstacle_weight>1.8</obstacle_weight>
         <animation_factor>5.1</animation_factor>
         <ignore_obstacles>
+          <model>cafe</model>
           <model>ground_plane</model>
         </ignore_obstacles>
       </plugin>

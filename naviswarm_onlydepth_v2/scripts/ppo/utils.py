@@ -200,7 +200,7 @@ class RunningAverageFilter(object):
                     if self.delta:
                         data = np.stack((image_now - image_p2rev,image_now - image_p1rev,image_now),axis=0)
                     else:
-                        data = np.stack((image_now,image_p1rev,image_p2rev),axis=0)
+                        data = np.stack((image_p2rev,image_p1rev,image_now),axis=0)
                         #print(data.shape)
                         #print('==========image shape======================')
                         
@@ -280,7 +280,7 @@ class RunningAverageFilter(object):
                             image_p2rev[k][j] = CAMMAXDISTANCE
                 image_p2rev = np.expand_dims(image_p2rev,axis=2)
 
-                data = np.stack((image_now,image_p1rev,image_p2rev),axis=0)
+                data = np.stack((image_p2rev,image_p1rev,image_now),axis=0)
             elif self.obstype == "goal":
                     data = np.array([x[0].goal_now.goal_dist, x[0].goal_now.goal_theta])
             elif self.obstype == "action":

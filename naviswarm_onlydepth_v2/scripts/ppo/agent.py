@@ -51,8 +51,26 @@ class Agent(object):
         image_out_NN = []
         for i in range(len(image_filtered)):
             image_in_NN = image_filtered[i]
+            image_in_NN = image_in_NN* (1/image_in_NN.max())
             output = self.imagenetwork.predict_image(image_in_NN)
-            image_out_NN.append(output)
+            image_out_NN.append(output[0,0,::,::,::])
+
+            fig = plt.figure(figsize=(10, 5))
+            ax = fig.add_subplot(221)
+            toplot = image_in_NN[0,::,::,0]
+            plt.imshow(toplot)
+            ax = fig.add_subplot(222)
+            toplot = image_in_NN[1,::,::,0]
+            plt.imshow(toplot)
+            ax = fig.add_subplot(223)
+            toplot = image_in_NN[2,::,::,0]
+            plt.imshow(toplot)
+            ax = fig.add_subplot(224)
+            toplot = output[0,0,::,::,0]
+            toplot = toplot* (1/toplot.max())
+            plt.imshow(toplot)
+            plt.savefig('predictions_{0:06d}.png'.format(i))
+
         image_out_NN = np.array(image_out_NN)
         print(image_out_NN.shape)
         #print('-------- NN output ---------')
