@@ -4,8 +4,8 @@ from tensorflow.keras.callbacks import ModelCheckpoint
 import numpy as np
 import pylab as plt
 import os
-import tensorflow as tf
-graph = tf.get_default_graph()
+
+
 
 
 # Artificial data generation:
@@ -91,13 +91,10 @@ def create_module():
 class ImageNN(object):
     def __init__(self):
         self.imagemodule = load_model("training_depth.h5")
-        # self.imagemodule._make_predict_function()
-        # self.graph = tf.get_default_graph()
 
     def predict_image(self,inputimage):
-        inputimageextract = inputimage[np.newaxis,::,::,::,::]
-        predicted_image = self.imagemodule.predict(inputimageextract)
-        return predicted_image
+        predicted_image = self.imagemodule.predict(inputimage[np.newaxis,::,::,::,::])
+        return predicted_image[0,2,::,::,::]
 
 
 

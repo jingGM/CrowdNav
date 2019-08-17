@@ -158,6 +158,7 @@ class RunningAverageFilter(object):
                         #print(data.shape)
                         #print('==========scan shape======================')
                 elif self.obstype == "image":
+                    #print(x[0].image_now.data)
                     bridge = CvBridge()
                     try:
                       image_now_cv = bridge.imgmsg_to_cv2(x[i].image_now.data, "32FC1")
@@ -243,6 +244,7 @@ class RunningAverageFilter(object):
                              x[0].scan_now.ranges),
                             axis=1)
             elif self.obstype == "image":
+                #print(x[0].image_now.data)
                 bridge = CvBridge()
                 try:
                   image_now_cv = bridge.imgmsg_to_cv2(x[0].image_now.data, "32FC1")

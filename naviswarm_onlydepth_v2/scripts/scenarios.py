@@ -62,12 +62,12 @@ class Scenarios(object):
 
       for i in range(self.num_agents):
         self.starts.append([sx, sy, sa])
-        self.goals.append([halfdis, -sy, sa])
+        self.goals.append([sx-halfdis, -sy, sa])
         halfdis -= distance
         sx -= distance
 
       return self.starts, self.goals 
-        
+
 
 
 

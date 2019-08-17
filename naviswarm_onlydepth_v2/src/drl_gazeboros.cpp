@@ -49,7 +49,10 @@
  #include <naviswarm/Velocities.h>
  #include <naviswarm/Action.h>
  #include <naviswarm/Actions.h>
-#include <naviswarm/ActionObs.h>
+ #include <naviswarm/ActionObs.h>
+ #include <naviswarm/ScanObs.h>
+ #include <naviswarm/CameraImageObs.h>
+ 
  #include <naviswarm/Goal.h>
  #include <naviswarm/Scan.h>
  #include <naviswarm/State.h>
@@ -285,8 +288,22 @@ void GazeboTrain::image_Callback(const sensor_msgs::ImageConstPtr& image, int i)
 	img_data[i].data= *image;
 	img_header[i]   = image->header;
 
+  
+  if (last_states.ImageObsBatch.size() == 0) {
+      last_states.ImageObsBatch[i].image_p1rev.data = img_data[i].data;
+      last_states.ImageObsBatch[i].image_p2rev.data = img_data[i].data;
+  }
+  else {
+      last_states.ImageObsBatch[i].image_p2rev.data = last_states.ImageObsBatch[i].image_p1rev.data;
+      last_states.ImageObsBatch[i].image_p1rev.data = last_states.ImageObsBatch[i].image_now.data;
+  }
+  last_states.ImageObsBatch[i].image_now.data = img_data[i].data;
+
+  //if (i==0){ROS_INFO(" ");}
+
   if (img_data[i].data.data.size()>0){substatus[0] =1;}
   //ROS_INFO("running image callback");
+  usleep(100000);
 }
 
 void GazeboTrain::scan_Callback(const sensor_msgs::LaserScanConstPtr& scan, int i){
@@ -295,6 +312,18 @@ void GazeboTrain::scan_Callback(const sensor_msgs::LaserScanConstPtr& scan, int 
 
   scan_data[i].ranges = scan->ranges;
   scan_header[i]  = scan->header;
+
+  
+  if (last_states.scanObsBatch.size() == 0) {
+      last_states.scanObsBatch[i].scan_pprev.ranges = scan_data[i].ranges;
+      last_states.scanObsBatch[i].scan_prev.ranges = scan_data[i].ranges;
+  }
+  else {
+      last_states.scanObsBatch[i].scan_pprev = last_states.scanObsBatch[i].scan_prev;
+      last_states.scanObsBatch[i].scan_prev = last_states.scanObsBatch[i].scan_now;
+  }
+  last_states.scanObsBatch[i].scan_now.ranges = scan_data[i].ranges;
+
 
   if (scan_data[i].ranges.size()>0){substatus[1] =1;}
 
@@ -312,6 +341,7 @@ void GazeboTrain::scan_Callback(const sensor_msgs::LaserScanConstPtr& scan, int 
     collision_status[i] = true;
   }
   //ROS_INFO("running scan callback");
+  usleep(100000);
 }
 
 // Bumper CallBack
@@ -344,7 +374,7 @@ bool GazeboTrain::cb_update_srv(naviswarm::UpdateModelRequest& request, naviswar
     ROS_INFO("Updatting Gazebo!");
 
     std::cout << "Request goal size: " << request.points.size() << std::endl;
-	usleep(3000000);
+	  usleep(1000000);
     if (request.points.size() != num_robots) {
         ROS_WARN("Robot Number and number of goals don't match!");
         response.success = false;
@@ -365,6 +395,8 @@ bool GazeboTrain::cb_update_srv(naviswarm::UpdateModelRequest& request, naviswar
         last_states.goalObsBatch.clear();
         last_states.scanObsBatch.clear();
         last_states.velObsBatch.clear();
+        last_states.ImageObsBatch.clear();
+
         executed_actions.data.clear();
 
         current_steps = 0;
@@ -390,6 +422,11 @@ bool GazeboTrain::cb_update_srv(naviswarm::UpdateModelRequest& request, naviswar
         std_msgs::Header scanh_;
         std_msgs::Header odomh_;
         gpose_.orientation.w=1;
+        naviswarm::ScanObs scanobs_;
+        naviswarm::CameraImageObs imageobs_;
+        naviswarm::GoalObs goalobs_;
+        naviswarm::ActionObs actionobs_;
+        naviswarm::VelocityObs velobs_;
 
         for(int i=0;i<num_robots;i++){
             collision_status.push_back(collision_);
@@ -400,19 +437,30 @@ bool GazeboTrain::cb_update_srv(naviswarm::UpdateModelRequest& request, naviswar
             img_header.push_back(imgh_);
             odom_header.push_back(odomh_);
             scan_header.push_back(scanh_);
+            last_states.scanObsBatch.push_back(scanobs_);
+            last_states.ImageObsBatch.push_back(imageobs_);
+            last_states.goalObsBatch.push_back(goalobs_);
+            last_states.actionObsBatch.push_back(actionobs_);
+            last_states.velObsBatch.push_back(velobs_);
           }
 
         response.success = true;
     }
 
-    std::cout<<"collision status: "<<collision_status.size()<<"/"<<collision_status[0]<<"/"<<collision_status[1]<<"/"<<collision_status[2]<<"/"<<collision_status[3]<<"/"<<std::endl;
-    std::cout<<gpose.size()<<"/"<<scan_data.size()<<"/"<<img_data.size()<<std::endl;
-
+    //std::cout<<"collision status: "<<collision_status.size()<<"/"<<collision_status[0]<<"/"<<collision_status[1]<<"/"<<collision_status[2]<<"/"<<collision_status[3]<<"/"<<std::endl;
+    //std::cout<<gpose.size()<<"/"<<scan_data.size()<<"/"<<img_data.size()<<std::endl;
+    usleep(1000000);
     
     return true;
 }
 
 int GazeboTrain::create_sharedmemory(){
+
+  naviswarm::ScanObs scanobs_;
+  naviswarm::CameraImageObs imageobs_;
+  naviswarm::GoalObs goalobs_;
+  naviswarm::ActionObs actionobs_;
+  naviswarm::VelocityObs velobs_;
 
   for (int i = 0; i < num_robots; ++i)
     {
@@ -425,7 +473,11 @@ int GazeboTrain::create_sharedmemory(){
       actionobs_data.ac_pprev.vz = 0; 
       last_states.actionObsBatch.push_back(actionobs_data);
 
-      //naviswarm::Action 
+      last_states.scanObsBatch.push_back(scanobs_);
+      last_states.ImageObsBatch.push_back(imageobs_);
+      last_states.goalObsBatch.push_back(goalobs_);
+      last_states.actionObsBatch.push_back(actionobs_);
+      last_states.velObsBatch.push_back(velobs_);
 
       vec2 temp_goal;
       temp_goal.x = 0.;
@@ -436,7 +488,7 @@ int GazeboTrain::create_sharedmemory(){
 
       new_robot->image_sub   = nh.subscribe<sensor_msgs::Image>(name_space + "/camera/depth/image_raw", 1, boost::bind(&GazeboTrain::image_Callback, this, _1, i)); //"/camera/depth/image_raw"
     	new_robot->scan_sub    = nh.subscribe<sensor_msgs::LaserScan>(name_space + "/scan_filtered", 1, boost::bind(&GazeboTrain::scan_Callback, this, _1, i));
-      new_robot->bumper_sub    = nh.subscribe<kobuki_msgs::BumperEvent>(name_space + "/mobile_base/events/bumper", 1, boost::bind(&GazeboTrain::bumper_Callback, this, _1, i));
+      new_robot->bumper_sub  = nh.subscribe<kobuki_msgs::BumperEvent>(name_space + "/mobile_base/events/bumper", 1, boost::bind(&GazeboTrain::bumper_Callback, this, _1, i));
 
       robots_info.push_back(new_robot);
     }
@@ -514,7 +566,7 @@ int GazeboTrain::train(){
       state.goalObs.goal_now.goal_theta = atan2(local_goal.y, local_goal.x);
 
 
-// std::cout<<"goal"<<i<<":	"<< state.goalObs.goal_now.goal_theta << std::endl;
+ std::cout<<"goal"<<i<<":	"<< state.goalObs.goal_now.goal_theta << std::endl;
 
 
       state.velObs.vel_now.vx = last_states.actionObsBatch[i].ac_prev.vx;
@@ -531,26 +583,26 @@ int GazeboTrain::train(){
       }
 
 
-      state.scanObs.scan_now.ranges = scan_data[i].ranges;
+      state.scanObs.scan_now = last_states.scanObsBatch[i].scan_now;
       if (last_states.goalObsBatch.size() == 0) {
           state.scanObs.scan_pprev = state.scanObs.scan_now;
           state.scanObs.scan_prev = state.scanObs.scan_now;
       }
       else {
-          state.scanObs.scan_pprev = last_states.scanObsBatch[i].scan_prev;
-          state.scanObs.scan_prev = last_states.scanObsBatch[i].scan_now;
+          state.scanObs.scan_pprev = last_states.scanObsBatch[i].scan_pprev;
+          state.scanObs.scan_prev = last_states.scanObsBatch[i].scan_prev;
       }
 
 //std::cout<<"scan"<<i<<":	"<< state.scanObs.scan_pprev.ranges.size()<<"/"<<state.scanObs.scan_prev.ranges.size()<<"/"<<state.scanObs.scan_now.ranges.size()<<"/"<<std::endl;
 
-      state.ImageObs.image_now.data = img_data[i].data;
+      state.ImageObs.image_now.data = last_states.ImageObsBatch[i].image_now.data;
       if (last_states.goalObsBatch.size() == 0) {
           state.ImageObs.image_p1rev.data = state.ImageObs.image_now.data;
           state.ImageObs.image_p2rev.data = state.ImageObs.image_now.data;
       }
       else {
-          state.ImageObs.image_p2rev.data = last_states.ImageObsBatch[i].image_p1rev.data;
-          state.ImageObs.image_p1rev.data = last_states.ImageObsBatch[i].image_now.data;
+          state.ImageObs.image_p2rev.data = last_states.ImageObsBatch[i].image_p2rev.data;
+          state.ImageObs.image_p1rev.data = last_states.ImageObsBatch[i].image_p1rev.data;
 //std::cout<<state.ImageObs.image_now.data.header.frame_id<<":  "<<state.ImageObs.image_p2rev.data.header.stamp<<"/"<<state.ImageObs.image_p1rev.data.header.stamp<<"/"<<state.ImageObs.image_now.data.header.stamp<<std::endl;
       }
 
@@ -585,7 +637,7 @@ int GazeboTrain::train(){
           double reward_approaching_goal = 0;
           double penalty_for_bigvz = 0;
           double penalty_for_time = 0;
-
+          
           if (state.goalObs.goal_now.goal_dist < 0.5) {  // arrived the goal
               current_transition.terminal = true;
               double reched_goal_reward = 40;
@@ -606,18 +658,18 @@ int GazeboTrain::train(){
               }
               else { // Goal not reached and no collisions
                   //ROS_INFO("in else");
-                double penalty_for_deviation = 0.0;
+              		double penalty_for_deviation = 0.0;
                   
                   if (std::abs(state.goalObs.goal_now.goal_theta) > 0.785)
                   {
                       penalty_for_deviation = -0.1 * (std::abs(state.goalObs.goal_now.goal_theta) - 0.785);
                   }
+
                   
                   current_transition.terminal = false;
 
                   reward_approaching_goal = 5*(state.goalObs.goal_prev.goal_dist - state.goalObs.goal_now.goal_dist);
-
-                  penalty_for_bigvz = std::abs(state.velObs.vel_now.vz) * (-0.1);
+                  penalty_for_bigvz = std::abs(state.velObs.vel_now.vz) * (-0.01);
                   penalty_for_time = (current_steps+1) *(0);
                   
                   current_transition.reward = reward_approaching_goal + penalty_for_bigvz + penalty_for_time;
@@ -643,7 +695,31 @@ int GazeboTrain::train(){
     } // end of for loop
 
     last_states = current_states;
-
+    /*
+    ROS_INFO("++++++++state+++++++");
+    std::cout<<current_transitions.data[0].state.velObs.vel_now.vx<<current_transitions.data[0].state.velObs.vel_now.vz<<current_transitions.data[1].state.velObs.vel_now.vx<<current_transitions.data[1].state.velObs.vel_now.vz<<std::endl;
+    int infodatasize1 = current_transitions.data[0].state.scanObs.scan_now.ranges.size();
+    int infodatasize2 = current_transitions.data[1].state.scanObs.scan_now.ranges.size();
+    int infodatasize3 = current_transitions.data[0].state.scanObs.scan_pprev.ranges.size();
+    int infodatasize4 = current_transitions.data[1].state.scanObs.scan_pprev.ranges.size();
+    int infodatasize5 = current_transitions.data[0].state.scanObs.scan_prev.ranges.size();
+    int infodatasize6 = current_transitions.data[1].state.scanObs.scan_prev.ranges.size();
+    std::cout<<infodatasize1<<'|'<<infodatasize2<<'|'<<infodatasize3<<'|'<<infodatasize4<<'|'<<infodatasize5<<'|'<<infodatasize6<<std::endl;
+    int infodatasiz1 = current_transitions.data[0].state.ImageObs.image_now.data.data.size();
+    int infodatasiz2 = current_transitions.data[1].state.ImageObs.image_now.data.data.size();
+    int infodatasiz3 = current_transitions.data[0].state.ImageObs.image_p1rev.data.data.size();
+    int infodatasiz4 = current_transitions.data[1].state.ImageObs.image_p1rev.data.data.size();
+    int infodatasiz5 = current_transitions.data[0].state.ImageObs.image_p2rev.data.data.size();
+    int infodatasiz6 = current_transitions.data[1].state.ImageObs.image_p2rev.data.data.size();
+    int infodatasiz7 = current_transitions.data[0].state.ImageObs.image_p3rev.data.data.size();
+    int infodatasiz8 = current_transitions.data[1].state.ImageObs.image_p3rev.data.data.size();
+    int infodatasiz9 = current_transitions.data[0].state.ImageObs.image_p4rev.data.data.size();
+    int infodatasiz0 = current_transitions.data[1].state.ImageObs.image_p4rev.data.data.size();
+    std::cout<<infodatasiz1<<'|'<<infodatasiz2<<'|'<<infodatasiz3<<'|'<<infodatasiz4<<'|'<<infodatasiz5<<'|'<<infodatasiz6<<'|'<<infodatasiz7<<'|'<<infodatasiz8<<'|'<<infodatasiz9<<'|'<<infodatasiz0<<std::endl;
+    std::cout<<current_transitions.data[0].state.goalObs.goal_now.goal_dist<<'|'<<current_transitions.data[0].state.goalObs.goal_now.goal_theta<<'/'<<current_transitions.data[0].state.goalObs.goal_prev.goal_dist<<'|'<<current_transitions.data[0].state.goalObs.goal_prev.goal_theta<<'/'<<current_transitions.data[0].state.goalObs.goal_pprev.goal_dist<<'|'<<current_transitions.data[0].state.goalObs.goal_pprev.goal_theta<<std::endl;
+    std::cout<<current_transitions.data[1].state.goalObs.goal_now.goal_dist<<'|'<<current_transitions.data[1].state.goalObs.goal_now.goal_theta<<'/'<<current_transitions.data[1].state.goalObs.goal_prev.goal_dist<<'|'<<current_transitions.data[1].state.goalObs.goal_prev.goal_theta<<'/'<<current_transitions.data[1].state.goalObs.goal_pprev.goal_dist<<'|'<<current_transitions.data[1].state.goalObs.goal_pprev.goal_theta<<std::endl;
+    std::cout<<current_transitions.data[0].state.actionObs.ac_prev.vx<<'|'<<current_transitions.data[0].state.actionObs.ac_prev.vz<<'|'<<current_transitions.data[0].state.actionObs.ac_pprev.vx<<'|'<<current_transitions.data[0].state.actionObs.ac_pprev.vz<<'/'<<current_transitions.data[1].state.actionObs.ac_prev.vx<<'|'<<current_transitions.data[1].state.actionObs.ac_prev.vz<<'|'<<current_transitions.data[1].state.actionObs.ac_pprev.vx<<'|'<<current_transitions.data[1].state.actionObs.ac_pprev.vz<<std::endl;
+	*/
 
 	
     //ROS_INFO("lock memory");
@@ -713,7 +789,7 @@ int GazeboTrain::train(){
               }
             }
             std::cout<<"robot"<<j<<":   "<<action.linear.x<<"|"<<action.angular.z<<std::endl;
-            usleep(100000);
+            //usleep(100000);
             //std::cout<<"-"; 
             last_states.actionObsBatch[j].ac_pprev = last_states.actionObsBatch[j].ac_prev;
             last_states.actionObsBatch[j].ac_prev = actions.data[j];
@@ -733,7 +809,9 @@ int GazeboTrain::train(){
 
 int main(int argc, char **argv){
   ros::init(argc, argv, "drl_gazeboros");
-  GazeboTrain gazeboc(2);
+  //ros::Rate r(10);
+
+  GazeboTrain gazeboc(1);
 
   if(gazeboc.create_sharedmemory() != 0)
         exit(-1);

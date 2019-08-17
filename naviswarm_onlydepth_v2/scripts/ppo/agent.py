@@ -48,31 +48,15 @@ class Agent(object):
         goal_filtered  = self.goal_filter(obs.goalObsBatch)
         vel_filtered   = self.vel_filter(obs.velObsBatch)
 
-        image_out_NN = []
-        for i in range(len(image_filtered)):
-            image_in_NN = image_filtered[i]
-            image_in_NN = image_in_NN* (1/image_in_NN.max())
-            output = self.imagenetwork.predict_image(image_in_NN)
-            image_out_NN.append(output[0,0,::,::,::])
-
-            fig = plt.figure(figsize=(10, 5))
-            ax = fig.add_subplot(221)
-            toplot = image_in_NN[0,::,::,0]
-            plt.imshow(toplot)
-            ax = fig.add_subplot(222)
-            toplot = image_in_NN[1,::,::,0]
-            plt.imshow(toplot)
-            ax = fig.add_subplot(223)
-            toplot = image_in_NN[2,::,::,0]
-            plt.imshow(toplot)
-            ax = fig.add_subplot(224)
-            toplot = output[0,0,::,::,0]
-            toplot = toplot* (1/toplot.max())
-            plt.imshow(toplot)
-            plt.savefig('predictions_{0:06d}.png'.format(i))
-
-        image_out_NN = np.array(image_out_NN)
-        print(image_out_NN.shape)
+        print(image_filtered.shape)
+        print("===image shape===")
+        # image_out_NN = []
+        # for i in range(len(image_filtered)):
+        #     image_in_NN = image_filtered[i]Shape must be rank 5 but is rank 4 for 'cnn3d_layer1/Conv3D' (op: 'Conv3D') with input shapes: [?,60,80,1], [1,5,5,1,32].
+        #     output = self.imagenetwork.predict_image(image_in_NN)
+        #     image_out_NN.append(output)
+        # image_out_NN = np.array(image_out_NN)
+        # print(image_out_NN.shape)
         #print('-------- NN output ---------')
 
         if not self.delta:
@@ -84,7 +68,7 @@ class Agent(object):
         # print 'shape: ', np.shape(vel_filtered)
         # print 'vel: ', vel_filtered[0]
         # print 'after shape: ', np.shape(scan_filtered)
-        return [ scan_filtered, goal_filtered, vel_filtered, image_out_NN]
+        return [ scan_filtered, goal_filtered, vel_filtered, image_filtered]
 
 
 class Policy(object):
@@ -106,7 +90,7 @@ class Policy(object):
         #scan = tf.placeholder(tf.float32, [None, self.obs_shape[1], self.obs_shape[0]],'scan_ph')
         goal = tf.placeholder(tf.float32, [None, 2], 'goal_ph')
         vel  = tf.placeholder(tf.float32, [None, 2], 'vel_ph')
-        image= tf.placeholder(tf.float32, [None, self.obs_shape[3],self.obs_shape[4],self.obs_shape[5]], 'image_ph')
+        image= tf.placeholder(tf.float32, [None, 3,self.obs_shape[3],self.obs_shape[4],self.obs_shape[5]], 'image_ph')
 
         # net = tl.layers.InputLayer(scan, name='scan_input')
         # net = tl.layers.Conv1dLayer(net, act=tf.nn.relu, shape=[5, self.obs_shape[0], 32], stride=2,name='cnn1')
@@ -116,9 +100,13 @@ class Policy(object):
         # scan_output = net.outputs
 
         imagenet = tl.layers.InputLayer(image, name='image_input')
-        imagenet = tl.layers.Conv2dLayer(imagenet,act=tf.nn.relu,shape=(5, 5, 1, 32),strides=(1,2,2,1),use_cudnn_on_gpu=True,name='Icnn1')
-        imagenet = tl.layers.Conv2dLayer(imagenet,act=tf.nn.relu,shape=(3, 3,32, 64),strides=(1,2,2,1),use_cudnn_on_gpu=True,name='Icnn2')
+        imagenet = tl.layers.Conv3dLayer(imagenet, shape=(1, 5, 5, 1, 32),  strides=(1, 1, 2, 2, 1), act=tf.nn.relu, name='cnn3d_layer1')
+        imagenet = tl.layers.Conv3dLayer(imagenet, shape=(3, 3, 3, 32, 64), strides=(1, 3, 1, 1, 1), act=tf.nn.relu, name='cnn3d_layer2')
+        imagenet = tl.layers.Conv3dLayer(imagenet, shape=(3, 3, 3, 64, 64), strides=(1, 1, 2, 2, 1), act=tf.nn.relu, name='cnn3d_layer3')
+        imagenet = tl.layers.Conv3dLayer(imagenet, shape=(3, 3, 3, 64, 64), strides=(1, 1, 1, 1, 1), act=tf.nn.relu, name='cnn3d_layer4')
+        imagenet = tl.layers.Conv3dLayer(imagenet, shape=(3, 3, 3, 64, 128),strides=(1, 1, 2, 2, 1), act=tf.nn.relu, name='cnn3d_layer5')
         imagenet = tl.layers.FlattenLayer(imagenet, name='imagefl')
+        #print(imagenet.outputs.shape)
         imagenet = tl.layers.DenseLayer(imagenet, n_units=960, act=tf.nn.relu, name='image_output')
         image_output = imagenet.outputs
 
@@ -199,7 +187,7 @@ class Value(object):
         #scan = tf.placeholder(tf.float32, [None, self.obs_shape[1], self.obs_shape[0]],'scan_value_ph')
         goal = tf.placeholder(tf.float32, [None, 2], 'goal_value_ph')
         vel  = tf.placeholder(tf.float32, [None, 2], 'vel_ph')
-        image= tf.placeholder(tf.float32, [None, self.obs_shape[3],self.obs_shape[4],self.obs_shape[5]], 'image_ph')
+        image= tf.placeholder(tf.float32, [None, 3,self.obs_shape[3],self.obs_shape[4],self.obs_shape[5]], 'image_ph')
 
         # net = tl.layers.InputLayer(scan, name='scan_input_value')
         # net = tl.layers.Conv1dLayer(net, act=tf.nn.relu, shape=[5, self.obs_shape[0], 32], stride=2,name='cnn1_value')
@@ -208,13 +196,17 @@ class Value(object):
         # net = tl.layers.DenseLayer(net, n_units=256, act=tf.nn.relu, name='cnn_output_value')
         # cnn_output = net.outputs
 
-        imagevnet = tl.layers.InputLayer(image, name='image_input_value')
-        imagevnet = tl.layers.Conv2dLayer(imagevnet,act=tf.nn.relu,shape=(5, 5, 1, 32),strides=(1,2,2,1),use_cudnn_on_gpu=True,name='Icnnv1')
-        #print(imagenet.outputs.shape)
-        imagevnet = tl.layers.Conv2dLayer(imagevnet,act=tf.nn.relu,shape=(3, 3,32, 64),strides=(1,2,2,1),use_cudnn_on_gpu=True,name='Icnnv2')
-        imagevnet = tl.layers.FlattenLayer(imagevnet, name='imageflv')
-        imagevnet = tl.layers.DenseLayer(imagevnet, n_units=960, act=tf.nn.relu, name='image_voutput')
+        imagevnet = tl.layers.InputLayer(image, name='image_input')
+        imagevnet = tl.layers.Conv3dLayer(imagevnet, shape=(1, 5, 5, 1, 32),  strides=(1, 1, 2, 2, 1), act=tf.nn.relu, name='cnn3d_layer1_value')
+        imagevnet = tl.layers.Conv3dLayer(imagevnet, shape=(3, 3, 3, 32, 64), strides=(1, 3, 1, 1, 1), act=tf.nn.relu, name='cnn3d_layer2_value')
+        imagevnet = tl.layers.Conv3dLayer(imagevnet, shape=(3, 3, 3, 64, 64), strides=(1, 1, 2, 2, 1), act=tf.nn.relu, name='cnn3d_layer3_value')
+        imagevnet = tl.layers.Conv3dLayer(imagevnet, shape=(3, 3, 3, 64, 64), strides=(1, 1, 1, 1, 1), act=tf.nn.relu, name='cnn3d_layer4_value')
+        imagevnet = tl.layers.Conv3dLayer(imagevnet, shape=(3, 3, 3, 64, 128),strides=(1, 1, 2, 2, 1), act=tf.nn.relu, name='cnn3d_layer5_value')
+        imagevnet = tl.layers.FlattenLayer(imagevnet, name='imagefl_value')
+        #print(imagevnet.outputs.shape)
+        imagevnet = tl.layers.DenseLayer(imagevnet, n_units=960, act=tf.nn.relu, name='image_output_value')
         image_voutput = imagevnet.outputs
+
 
         value_net = tl.layers.InputLayer(tf.concat([goal, vel,image_voutput], axis=1),name='goal_input_value')
         
