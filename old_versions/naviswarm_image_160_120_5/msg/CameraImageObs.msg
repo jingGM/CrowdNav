@@ -1,5 +1,0 @@
-naviswarm/CameraImage image_p4rev
-naviswarm/CameraImage image_p3rev
-naviswarm/CameraImage image_p2rev
-naviswarm/CameraImage image_p1rev
-naviswarm/CameraImage image_now
