@@ -671,7 +671,7 @@ int GazeboTrain::train(){
           {
             //ROS_INFO("----reward----");
               // rs.stalled[r] = collision;
-            //std::cout<<"collision status"<<i<<":  "<<collision_status[i]<<std::endl;
+            std::cout<<"collision status"<<i<<":  "<<collision_status[i]<<std::endl;
 
               if(collision_status[i] == true) { // stalled is obtained from an in-built function from stage. we must write a function to detect collisions
                   current_transition.terminal = true;
