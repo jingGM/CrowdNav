@@ -314,7 +314,9 @@ void GazeboTrain::image_Callback(const sensor_msgs::ImageConstPtr& image, int i)
 void GazeboTrain::scan_Callback(const sensor_msgs::LaserScanConstPtr& scan, int i){
   //ROS_INFO("running scan in");
   //std::cout<<"i= "<<i<<std::endl;
-  if (resettingflag){std::cout<<i<<"/"<<collision_status[0]<<"/"<<collision_status[1]<<"/"<<collision_status[2]<<"/"<<collision_status[3]<<std::endl;
+  if (resettingflag){
+    //std::cout<<"in reseting: "<<i<<std::endl;
+    //std::cout<<i<<"/"<<collision_status[0]<<"/"<<collision_status[1]<<"/"<<collision_status[2]<<"/"<<collision_status[3]<<std::endl;
     }
   else{
     scan_data[i].ranges = scan->ranges;
@@ -346,10 +348,10 @@ void GazeboTrain::scan_Callback(const sensor_msgs::LaserScanConstPtr& scan, int 
     //std::cout<<collision_status[0]<<collision_status[1]<<collision_status[2]<<collision_status[3]<<std::endl;
     if (min_range<LidarMinDistance){
       collision_status[i] = true;
-      std::cout<<"set collision: "<<i<<std::endl;
+      //std::cout<<"set collision: "<<i<<std::endl;
     }
-    std::cout<<"min lidar: "<<min_range<<std::endl;
-    std::cout<<i<<"/"<<collision_status[0]<<"/"<<collision_status[1]<<"/"<<collision_status[2]<<"/"<<collision_status[3]<<std::endl;
+    //std::cout<<"min lidar: "<<min_range<<std::endl;
+    //std::cout<<i<<"/"<<collision_status[0]<<"/"<<collision_status[1]<<"/"<<collision_status[2]<<"/"<<collision_status[3]<<std::endl;
     //ROS_INFO("running scan callback");
     usleep(100000);
   }
@@ -467,7 +469,7 @@ bool GazeboTrain::cb_update_srv(naviswarm::UpdateModelRequest& request, naviswar
         response.success = true;
     }
 
-    std::cout<<"collision status: "<<collision_status.size()<<"/"<<collision_status[0]<<"/"<<collision_status[1]<<"/"<<collision_status[2]<<"/"<<collision_status[3]<<"/"<<std::endl;
+    //std::cout<<"collision status: "<<collision_status.size()<<"/"<<collision_status[0]<<"/"<<collision_status[1]<<"/"<<collision_status[2]<<"/"<<collision_status[3]<<"/"<<std::endl;
     //std::cout<<gpose.size()<<"/"<<scan_data.size()<<"/"<<img_data.size()<<std::endl;
     usleep(1000000);
     //std::cout<<"collision status: "<<collision_status.size()<<"/"<<collision_status[0]<<"/"<<collision_status[1]<<"/"<<collision_status[2]<<"/"<<collision_status[3]<<"/"<<std::endl;
@@ -587,7 +589,7 @@ int GazeboTrain::train(){
       state.goalObs.goal_now.goal_theta = atan2(local_goal.y, local_goal.x);
 
 
- std::cout<<"goal"<<i<<": "<< state.goalObs.goal_now.goal_theta << std::endl;
+ //std::cout<<"goal"<<i<<": "<< state.goalObs.goal_now.goal_theta << std::endl;
 
 
       state.velObs.vel_now.vx = last_states.actionObsBatch[i].ac_prev.vx;
