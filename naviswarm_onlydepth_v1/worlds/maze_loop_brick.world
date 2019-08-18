@@ -124,7 +124,7 @@
         <kinematic>0</kinematic>
         <gravity>1</gravity>
       </link>
-      <pose frame=''>0 -1.25 0 0 0 0</pose>
+      <pose frame=''>0 -3.25 0 0 0 0</pose>
     </model>
 
     <model name='brick_box_3x1x3_3'>
@@ -134,7 +134,7 @@
         <collision name='collision'>
           <geometry>
             <box>
-              <size>6 1 1.5</size>
+              <size>10 1 1.5</size>
             </box>
           </geometry>
           <max_contacts>10</max_contacts>
@@ -155,7 +155,7 @@
           <geometry>
             <mesh>
               <uri>model://brick_box_3x1x3/meshes/simple_box.dae</uri>
-              <scale>6 1 1.5</scale>
+              <scale>10 1 1.5</scale>
             </mesh>
           </geometry>
           <material>
@@ -170,7 +170,7 @@
         <kinematic>0</kinematic>
         <gravity>1</gravity>
       </link>
-      <pose frame=''>3 2.25 0 0 0 1.57</pose>
+      <pose frame=''>4 2.25 0 0 0 1.57</pose>
     </model>
     
     <model name='brick_box_3x1x3_5'>
@@ -216,7 +216,7 @@
         <kinematic>0</kinematic>
         <gravity>1</gravity>
       </link>
-      <pose frame=''>0 5.75 0 0 -0 0</pose>
+      <pose frame=''>0 7.75 0 0 -0 0</pose>
     </model>
     
     
@@ -227,7 +227,7 @@
         <collision name='collision'>
           <geometry>
             <box>
-              <size>6 1 1.5</size>
+              <size>10 1 1.5</size>
             </box>
           </geometry>
           <max_contacts>10</max_contacts>
@@ -248,7 +248,7 @@
           <geometry>
             <mesh>
               <uri>model://brick_box_3x1x3/meshes/simple_box.dae</uri>
-              <scale>6 1 1.5</scale>
+              <scale>10 1 1.5</scale>
             </mesh>
           </geometry>
           <material>
@@ -263,7 +263,7 @@
         <kinematic>0</kinematic>
         <gravity>1</gravity>
       </link>
-      <pose frame=''>-3 2.25 0 0 -0 1.57</pose>
+      <pose frame=''>-4 2.25 0 0 -0 1.57</pose>
     </model>
     
     
@@ -274,7 +274,7 @@
         <collision name='collision'>
           <geometry>
             <box>
-              <size>2 3 1.5</size>
+              <size>2 7 1.5</size>
             </box>
           </geometry>
           <max_contacts>10</max_contacts>
@@ -295,7 +295,7 @@
           <geometry>
             <mesh>
               <uri>model://brick_box_3x1x3/meshes/simple_box.dae</uri>
-              <scale>2 3 1.5</scale>
+              <scale>2 7 1.5</scale>
             </mesh>
           </geometry>
           <material>

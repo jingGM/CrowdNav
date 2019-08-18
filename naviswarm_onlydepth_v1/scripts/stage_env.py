@@ -317,9 +317,9 @@ class StageEnv(object):
         # self.starts, self.goals = self.scenarios.cross_road_scene()
         # self.starts, self.goals = self.scenarios.random_scene()
         # self.starts, self.goals = self.scenarios.random_obstacles_scene()
-        self.starts, self.goals = self.scenarios.circle_scene_uniform()
+        # self.starts, self.goals = self.scenarios.circle_scene_uniform()
         # self.starts, self.goals = self.scenarios.circle_scene_with_obstacles()
-        # self.starts, self.goals = self.scenarios.corridor_ped()
+        self.starts, self.goals = self.scenarios.corridor_ped()
         # self.starts, self.goals = self.scenarios.crossing_scene(6)
         # self.starts, self.goals = self.scenarios.ten_cross_scene(0.8, 6)
         # self.starts, self.goals = self.scenarios.crossing_with_obstacle_scene(6)
@@ -517,7 +517,7 @@ class StageEnv(object):
             self.goal_markers_id += 1
         if ns == "usv":
             marker.type = marker.MESH_RESOURCE
-            marker.mesh_resource = "file:///home/utsavp/Documents/catkin_ws/src/naviswarm_onlydepth_v1/rviz/usv.dae"
+            marker.mesh_resource = "file:///home/adarshjs/catkin_ws/src/naviswarm_onlydepth_v1/rviz/usv.dae"
             marker.id = self.agent_markers_id
             self.agent_markers.markers.append(marker)
             self.agent_markers_id += 1

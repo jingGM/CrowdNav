@@ -22,6 +22,8 @@ import tensorflow as tf
 import tensorlayer as tl
 from utils import RunningAverageFilter
 from vel_smoother import VelocitySmoother
+import pylab as plt
+
 
 
 class Agent(object):
@@ -53,6 +55,13 @@ class Agent(object):
             scan_filtered /= 4.0
 
         image_filtered = np.array(image_filtered,dtype=float)/5
+
+        # fig = plt.figure(figsize=(10, 5))
+        # ax = fig.add_subplot(111)
+        # toplot = image_filtered[0,::,::,2]
+        # plt.imshow(toplot)
+        # plt.savefig('predictions_{0}.png'.format(0))
+
         # scan_filtered = np.asarray(scan_filtered)
         # goal_filtered = np.asarray(goal_filtered)
         # print 'shape: ', np.shape(vel_filtered)
@@ -92,10 +101,10 @@ class Policy(object):
         imagenet = tl.layers.InputLayer(image, name='image_input')
         imagenet = tl.layers.Conv2dLayer(imagenet,act=tf.nn.relu,shape=(5, 5, self.obs_shape[3], 64), strides=(1,2,2,1),use_cudnn_on_gpu=True,name='Icnn1')
         imagenet = tl.layers.Conv2dLayer(imagenet,act=tf.nn.relu,shape=(5, 5, 64, 64), strides=(1,1,1,1),use_cudnn_on_gpu=True,name='Icnn2')
-        imagenet = tl.layers.Conv2dLayer(imagenet,act=tf.nn.relu,shape=(3, 3, 64, 128), strides=(1,2,2,1),use_cudnn_on_gpu=True,name='Icnn3')
+        imagenet = tl.layers.Conv2dLayer(imagenet,act=tf.nn.relu,shape=(3, 3, 64, 32), strides=(1,2,2,1),use_cudnn_on_gpu=True,name='Icnn3')
         #imagenet = tl.layers.Conv2dLayer(imagenet,act=tf.nn.relu,shape=(3, 3, 128, 128), strides=(1,1,1,1),use_cudnn_on_gpu=True,name='Icnn4')
         imagenet = tl.layers.FlattenLayer(imagenet, name='imagefl')
-        imagenet = tl.layers.DenseLayer(imagenet, n_units=1024, act=tf.nn.relu, name='Idense1')
+        imagenet = tl.layers.DenseLayer(imagenet, n_units=512, act=tf.nn.relu, name='Idense1')
         imagenet = tl.layers.DenseLayer(imagenet, n_units=256, act=tf.math.sigmoid, name='Idense2')
         image_output = imagenet.outputs
         #print(image_output.shape)

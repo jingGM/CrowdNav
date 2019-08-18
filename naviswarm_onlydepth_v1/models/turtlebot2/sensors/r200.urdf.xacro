@@ -22,7 +22,7 @@
 
   <xacro:property name="r200_cam_offset_px" value="-0.017" /> <!--  -0.017  -->
   <xacro:property name="r200_cam_offset_py" value="0.024" /><!--  0.024  -->
-  <xacro:property name="r200_cam_offset_pz" value="0.3" />
+  <xacro:property name="r200_cam_offset_pz" value="0.35" />
 
   <xacro:property name="r200_cam_rgb_px" value="0.005"/>
   <xacro:property name="r200_cam_rgb_py" value="0.018"/>
