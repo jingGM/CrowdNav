@@ -68,6 +68,17 @@ class Scenarios(object):
 
       return self.starts, self.goals 
 
+    def gray_wall(self):
+        sx, sy, sa = 2., 0., 3.14
+
+        self.starts.append([2, 0, sa])
+        self.goals.append([-2, 0, sa])
+
+        # self.starts.append([-2.5, sy, sa])
+        # self.goals.append([-2.5, 3, sa])
+
+        return self.starts, self.goals
+
 
 
 

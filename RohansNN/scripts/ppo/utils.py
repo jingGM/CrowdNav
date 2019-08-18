@@ -231,6 +231,8 @@ class RunningAverageFilter(object):
                             axis=1)
                     
             elif self.obstype == "image":
+                #tempimage = np.array(x[0].image_now.data)
+                #print(tempimage.shape)
                 bridge = CvBridge()
                 try:
                   image_now_cv = bridge.imgmsg_to_cv2(x[0].image_now.data, "bgr8")

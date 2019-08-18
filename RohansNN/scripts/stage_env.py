@@ -50,7 +50,7 @@ class StageEnv(object):
     Wrapped Stage simulator using gym's API.
     """
 
-    def __init__(self, num_agents=10, num_obstacles=5,
+    def __init__(self, num_agents=1, num_obstacles=5,
                  agent_radius=0.12, env_size=4.0,
                  max_vx=0.5, key=42, options=2):
         self.num_agents = num_agents
@@ -70,7 +70,7 @@ class StageEnv(object):
             low=np.array([0., -1.0]), high=np.array([1., 1.]))
         self.scan_space = spaces.Box(low=0., high=4., shape=(512, ))
         #image_size = 480*640*3        depth_size = 480*640
-        self.image_space = spaces.Box(low=0., high=255., shape=(360,400,1,)) 
+        self.image_space = spaces.Box(low=0., high=5, shape=(60,80,1,)) 
         self.goal_space = spaces.Box(
             low=np.array([0., -np.pi]), high=np.array([np.inf, np.pi]))
 
@@ -317,10 +317,9 @@ class StageEnv(object):
         # self.starts, self.goals = self.scenarios.cross_road_scene()
         # self.starts, self.goals = self.scenarios.random_scene()
         # self.starts, self.goals = self.scenarios.random_obstacles_scene()
-        # self.starts, self.goals = self.scenarios.circle_scene()
+        # self.starts, self.goals = self.scenarios.circle_scene_uniform()
         # self.starts, self.goals = self.scenarios.circle_scene_with_obstacles()
-        #self.starts, self.goals = self.scenarios.circle_scene_uniform()
-        self.starts, self.goals = self.scenarios.corridor_ped()
+        self.starts, self.goals = self.scenarios.gray_wall()
         # self.starts, self.goals = self.scenarios.crossing_scene(6)
         # self.starts, self.goals = self.scenarios.ten_cross_scene(0.8, 6)
         # self.starts, self.goals = self.scenarios.crossing_with_obstacle_scene(6)
@@ -329,7 +328,7 @@ class StageEnv(object):
 
         self.perfect_distance = self.get_perfect_distance()
 
-        self.resetenvironment()
+        #self.resetenvironment()
 
         update_goal_request = UpdateModelRequest()
         i = 0
@@ -518,7 +517,7 @@ class StageEnv(object):
             self.goal_markers_id += 1
         if ns == "usv":
             marker.type = marker.MESH_RESOURCE
-            marker.mesh_resource = "file:///home/adarshjs/catkin_ws/src/naviswarm_rgb_v2/rviz/usv.dae"
+            marker.mesh_resource = "file:///home/adarshjs/catkin_ws/src/naviswarm_onlydepth_v1/rviz/usv.dae"
             marker.id = self.agent_markers_id
             self.agent_markers.markers.append(marker)
             self.agent_markers_id += 1

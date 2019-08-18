@@ -68,9 +68,9 @@
  #include <naviswarm/UpdateModel.h>
 
  // for the IPC (Inter-Process Communication) part
- #include <sys/ipc.h>		/* for system's IPC_xxx definitions */
- #include <sys/shm.h>		/* for shmget, shmat, shmdt, shmctl */
- #include <sys/sem.h>		/* for semget, semctl, semop */
+ #include <sys/ipc.h>   /* for system's IPC_xxx definitions */
+ #include <sys/shm.h>   /* for shmget, shmat, shmdt, shmctl */
+ #include <sys/sem.h>   /* for semget, semctl, semop */
  #include <errno.h>
  #include <semaphore.h>
  #include <unistd.h>
@@ -106,6 +106,7 @@ using namespace message_filters;
 //Class definition
 class GazeboTrain {
   private:
+    bool resettingflag=false;
     ros::NodeHandle nh;
 
     boost::mutex msg_lock;
@@ -126,7 +127,7 @@ class GazeboTrain {
 
     ros::Publisher reward_pub;
 
-	// Defining vec3 = {x, y, theta}
+  // Defining vec3 = {x, y, theta}
     typedef struct {
         double x, y, theta;
     } vec3;
@@ -229,7 +230,7 @@ class GazeboTrain {
 
 // Constructor for the class
 GazeboTrain::GazeboTrain(int n){
-	bool collision_ = false;
+  
   geometry_msgs::Pose gpose_;
   naviswarm::Velocity odom_;
   naviswarm::Scan scan_;
@@ -240,15 +241,15 @@ GazeboTrain::GazeboTrain(int n){
   gpose_.orientation.w=1;
 
   for(int i=0;i<n;i++){
-		collision_status.push_back(collision_);
-		gpose.push_back(gpose_);
-		odom_data.push_back(odom_);
-		scan_data.push_back(scan_);
-		img_data.push_back(img_);
-		img_header.push_back(imgh_);
-		odom_header.push_back(odomh_);
-		scan_header.push_back(scanh_);
-	}
+    
+    gpose.push_back(gpose_);
+    odom_data.push_back(odom_);
+    scan_data.push_back(scan_);
+    img_data.push_back(img_);
+    img_header.push_back(imgh_);
+    odom_header.push_back(odomh_);
+    scan_header.push_back(scanh_);
+  }
 //std::cout<<"robots number: "<<collision_status.size()<<"/"<<gpose.size()<<std::endl;
 
   num_robots = n;
@@ -283,71 +284,84 @@ void GazeboTrain::release_semaphore()
 }
 
 void GazeboTrain::image_Callback(const sensor_msgs::ImageConstPtr& image, int i){
-	//ROS_INFO("running image in");
-	//std::cout<<"i= "<<i<<std::endl;
-	img_data[i].data= *image;
-	img_header[i]   = image->header;
+  //ROS_INFO("running image in");
+  //std::cout<<"i= "<<i<<std::endl;
+  if (resettingflag){}
+  else{
+    img_data[i].data= *image;
+    img_header[i]   = image->header;
 
+    
+    if (last_states.ImageObsBatch.size() == 0) {
+        last_states.ImageObsBatch[i].image_p1rev.data = img_data[i].data;
+        last_states.ImageObsBatch[i].image_p2rev.data = img_data[i].data;
+    }
+    else {
+        last_states.ImageObsBatch[i].image_p2rev.data = last_states.ImageObsBatch[i].image_p1rev.data;
+        last_states.ImageObsBatch[i].image_p1rev.data = last_states.ImageObsBatch[i].image_now.data;
+    }
+    last_states.ImageObsBatch[i].image_now.data = img_data[i].data;
+
+    //if (i==0){ROS_INFO(" ");}
+
+    if (img_data[i].data.data.size()>0){substatus[0] =1;}
+    //ROS_INFO("running image callback");
+    usleep(100000);
+  }
   
-  if (last_states.ImageObsBatch.size() == 0) {
-      last_states.ImageObsBatch[i].image_p1rev.data = img_data[i].data;
-      last_states.ImageObsBatch[i].image_p2rev.data = img_data[i].data;
-  }
-  else {
-      last_states.ImageObsBatch[i].image_p2rev.data = last_states.ImageObsBatch[i].image_p1rev.data;
-      last_states.ImageObsBatch[i].image_p1rev.data = last_states.ImageObsBatch[i].image_now.data;
-  }
-  last_states.ImageObsBatch[i].image_now.data = img_data[i].data;
-
-  //if (i==0){ROS_INFO(" ");}
-
-  if (img_data[i].data.data.size()>0){substatus[0] =1;}
-  //ROS_INFO("running image callback");
-  usleep(100000);
 }
 
 void GazeboTrain::scan_Callback(const sensor_msgs::LaserScanConstPtr& scan, int i){
   //ROS_INFO("running scan in");
   //std::cout<<"i= "<<i<<std::endl;
+  if (resettingflag){
+    //std::cout<<"in reseting: "<<i<<std::endl;
+    //std::cout<<i<<"/"<<collision_status[0]<<"/"<<collision_status[1]<<"/"<<collision_status[2]<<"/"<<collision_status[3]<<std::endl;
+    }
+  else{
+    scan_data[i].ranges = scan->ranges;
+    scan_header[i]  = scan->header;
 
-  scan_data[i].ranges = scan->ranges;
-  scan_header[i]  = scan->header;
+    
+    if (last_states.scanObsBatch.size() == 0) {
+        last_states.scanObsBatch[i].scan_pprev.ranges = scan_data[i].ranges;
+        last_states.scanObsBatch[i].scan_prev.ranges = scan_data[i].ranges;
+    }
+    else {
+        last_states.scanObsBatch[i].scan_pprev = last_states.scanObsBatch[i].scan_prev;
+        last_states.scanObsBatch[i].scan_prev = last_states.scanObsBatch[i].scan_now;
+    }
+    last_states.scanObsBatch[i].scan_now.ranges = scan_data[i].ranges;
 
-  
-  if (last_states.scanObsBatch.size() == 0) {
-      last_states.scanObsBatch[i].scan_pprev.ranges = scan_data[i].ranges;
-      last_states.scanObsBatch[i].scan_prev.ranges = scan_data[i].ranges;
+
+    if (scan_data[i].ranges.size()>0){substatus[1] =1;}
+
+    float min_range = 5;
+    //collision_status[current_robot] = false; // NOTE: collision status for robot 0 is stored in collision_status[0].
+    for (int j = 0; j < scan->ranges.size(); j++) {
+        if (scan->ranges[j] < min_range) {
+          min_range = scan->ranges[j];
+        }
+    }
+
+    //std::cout<<collision_status.size()<<std::endl;
+    //std::cout<<collision_status[0]<<collision_status[1]<<collision_status[2]<<collision_status[3]<<std::endl;
+    if (min_range<LidarMinDistance){
+      collision_status[i] = true;
+      //std::cout<<"set collision: "<<i<<std::endl;
+    }
+    //std::cout<<"min lidar: "<<min_range<<std::endl;
+    //std::cout<<i<<"/"<<collision_status[0]<<"/"<<collision_status[1]<<"/"<<collision_status[2]<<"/"<<collision_status[3]<<std::endl;
+    //ROS_INFO("running scan callback");
+    usleep(100000);
   }
-  else {
-      last_states.scanObsBatch[i].scan_pprev = last_states.scanObsBatch[i].scan_prev;
-      last_states.scanObsBatch[i].scan_prev = last_states.scanObsBatch[i].scan_now;
-  }
-  last_states.scanObsBatch[i].scan_now.ranges = scan_data[i].ranges;
 
-
-  if (scan_data[i].ranges.size()>0){substatus[1] =1;}
-
-  float min_range = 5;
-  //collision_status[current_robot] = false; // NOTE: collision status for robot 0 is stored in collision_status[0].
-  for (int j = 0; j < scan->ranges.size(); j++) {
-      if (scan->ranges[j] < min_range) {
-        min_range = scan->ranges[j];
-      }
-  }
-
-  //std::cout<<collision_status.size()<<std::endl;
-  //std::cout<<collision_status[0]<<collision_status[1]<<collision_status[2]<<collision_status[3]<<std::endl;
-  if (min_range<LidarMinDistance){
-    collision_status[i] = true;
-  }
-  //ROS_INFO("running scan callback");
-  usleep(100000);
 }
 
 // Bumper CallBack
 void GazeboTrain::bumper_Callback(const kobuki_msgs::BumperEventConstPtr& bumper_msg, int i) {
-	if (bumper_msg->bumper == 1)
-		collision_status[i] = true;
+  if (bumper_msg->bumper == 1)
+    collision_status[i] = true;
   //ROS_INFO("running bumper callback");
 }
 
@@ -355,16 +369,18 @@ void GazeboTrain::bumper_Callback(const kobuki_msgs::BumperEventConstPtr& bumper
 // Ground Truth callback
 void GazeboTrain::gt_Callback(const gazebo_msgs::ModelStates gt){
 // ROS_INFO("running frame_trans in"); 
-	
-  for (int j=0; j< num_robots;j++){
-    for (int i = 0; i < gt.name.size(); i++){
-      std::string current_robot_name ="turtlebot"+std::to_string(j);
-      if(gt.name[i]== current_robot_name)
-        gpose[j] = gt.pose[i];
+  if (resettingflag){}
+  else{
+    for (int j=0; j< num_robots;j++){
+      for (int i = 0; i < gt.name.size(); i++){
+        std::string current_robot_name ="turtlebot"+std::to_string(j);
+        if(gt.name[i]== current_robot_name)
+          gpose[j] = gt.pose[i];
+      }
     }
-	}
-  substatus[3] =1;
-  // ROS_INFO("running frame_trans callback");
+    substatus[3] =1;
+    // ROS_INFO("running frame_trans callback");
+  }
 }
 
 // Update Goal service CallBack
@@ -372,9 +388,13 @@ bool GazeboTrain::cb_update_srv(naviswarm::UpdateModelRequest& request, naviswar
 {
 
     ROS_INFO("Updatting Gazebo!");
+    resettingflag = true;
 
     std::cout << "Request goal size: " << request.points.size() << std::endl;
-	usleep(3000000);
+    usleep(2000000);
+    resettingflag = false;
+    std::cout<<"resetted"<<std::endl;
+
     if (request.points.size() != num_robots) {
         ROS_WARN("Robot Number and number of goals don't match!");
         response.success = false;
@@ -395,6 +415,8 @@ bool GazeboTrain::cb_update_srv(naviswarm::UpdateModelRequest& request, naviswar
         last_states.goalObsBatch.clear();
         last_states.scanObsBatch.clear();
         last_states.velObsBatch.clear();
+        last_states.ImageObsBatch.clear();
+
         executed_actions.data.clear();
 
         current_steps = 0;
@@ -420,46 +442,66 @@ bool GazeboTrain::cb_update_srv(naviswarm::UpdateModelRequest& request, naviswar
         std_msgs::Header scanh_;
         std_msgs::Header odomh_;
         gpose_.orientation.w=1;
-
+        
         for(int i=0;i<num_robots;i++){
-            collision_status.push_back(collision_);
-            gpose.push_back(gpose_);
-            odom_data.push_back(odom_);
-            scan_data.push_back(scan_);
-            img_data.push_back(img_);
-            img_header.push_back(imgh_);
-            odom_header.push_back(odomh_);
-            scan_header.push_back(scanh_);
-          }
+
+          naviswarm::ScanObs scanobs_;
+          naviswarm::CameraImageObs imageobs_;
+          //naviswarm::GoalObs goalobs_;
+          naviswarm::ActionObs actionobs_;
+          naviswarm::VelocityObs velobs_;
+
+          collision_status.push_back(collision_);
+          gpose.push_back(gpose_);
+          odom_data.push_back(odom_);
+          scan_data.push_back(scan_);
+          img_data.push_back(img_);
+          img_header.push_back(imgh_);
+          odom_header.push_back(odomh_);
+          scan_header.push_back(scanh_);
+          last_states.scanObsBatch.push_back(scanobs_);
+          last_states.ImageObsBatch.push_back(imageobs_);
+          //last_states.goalObsBatch.push_back(goalobs_);
+          last_states.actionObsBatch.push_back(actionobs_);
+          last_states.velObsBatch.push_back(velobs_);
+        }
 
         response.success = true;
     }
 
-    std::cout<<"collision status: "<<collision_status.size()<<"/"<<collision_status[0]<<"/"<<collision_status[1]<<"/"<<collision_status[2]<<"/"<<collision_status[3]<<"/"<<std::endl;
-    std::cout<<gpose.size()<<"/"<<scan_data.size()<<"/"<<img_data.size()<<std::endl;
+    //std::cout<<"collision status: "<<collision_status.size()<<"/"<<collision_status[0]<<"/"<<collision_status[1]<<"/"<<collision_status[2]<<"/"<<collision_status[3]<<"/"<<std::endl;
+    //std::cout<<gpose.size()<<"/"<<scan_data.size()<<"/"<<img_data.size()<<std::endl;
+    usleep(1000000);
+    //std::cout<<"collision status: "<<collision_status.size()<<"/"<<collision_status[0]<<"/"<<collision_status[1]<<"/"<<collision_status[2]<<"/"<<collision_status[3]<<"/"<<std::endl;
 
-    
     return true;
 }
 
 int GazeboTrain::create_sharedmemory(){
 
+
+
   for (int i = 0; i < num_robots; ++i)
     {
       std::string name_space = "/turtlebot" + std::to_string(i);
 
+      naviswarm::ScanObs scanobs_;
+      naviswarm::CameraImageObs imageobs_;
+      //naviswarm::GoalObs goalobs_;
+      naviswarm::VelocityObs velobs_;
       naviswarm::ActionObs actionobs_data;
       actionobs_data.ac_prev.vx = 0; 
       actionobs_data.ac_prev.vz = 0; 
       actionobs_data.ac_pprev.vx = 0; 
-      actionobs_data.ac_pprev.vz = 0; 
+      actionobs_data.ac_pprev.vz = 0;
+      bool collision_ = false;
+      
+      collision_status.push_back(collision_);
       last_states.actionObsBatch.push_back(actionobs_data);
-
-      naviswarm::ScanObs scan_temp;
-      last_states.scanObsBatch.push_back(scan_temp);
-
-      naviswarm::CameraImageObs image_temp;
-      last_states.ImageObsBatch.push_back(image_temp);
+      last_states.scanObsBatch.push_back(scanobs_);
+      last_states.ImageObsBatch.push_back(imageobs_);
+      //last_states.goalObsBatch.push_back(goalobs_);
+      last_states.velObsBatch.push_back(velobs_);
 
       vec2 temp_goal;
       temp_goal.x = 0.;
@@ -469,7 +511,7 @@ int GazeboTrain::create_sharedmemory(){
       Robotinfo* new_robot = new Robotinfo;
 
       new_robot->image_sub   = nh.subscribe<sensor_msgs::Image>(name_space + "/camera/image_raw", 1, boost::bind(&GazeboTrain::image_Callback, this, _1, i)); //"/camera/depth/image_raw"
-    	new_robot->scan_sub    = nh.subscribe<sensor_msgs::LaserScan>(name_space + "/scan_filtered", 1, boost::bind(&GazeboTrain::scan_Callback, this, _1, i));
+      new_robot->scan_sub    = nh.subscribe<sensor_msgs::LaserScan>(name_space + "/scan_filtered", 1, boost::bind(&GazeboTrain::scan_Callback, this, _1, i));
       new_robot->bumper_sub  = nh.subscribe<kobuki_msgs::BumperEvent>(name_space + "/mobile_base/events/bumper", 1, boost::bind(&GazeboTrain::bumper_Callback, this, _1, i));
 
       robots_info.push_back(new_robot);
@@ -479,7 +521,6 @@ int GazeboTrain::create_sharedmemory(){
     time_elapsed.resize(num_robots, 0.0);
 
   reward_pub = nh.advertise<naviswarm::Reward>("/reward", 1000);
-
 
   share_id = shmget(KEY, SIZE, IPC_CREAT | IPC_EXCL | PERMISSION);
     ROS_INFO("share_id: %d", share_id);
@@ -522,11 +563,11 @@ int GazeboTrain::train(){
 
 
     //std::cout<<substatus[0]<<"/"<<substatus[1]<<"/"<<substatus[2]<<"/"<<substatus[3]<<std::endl;
-	   int checkstatus[4] = {1,1,0,1};
+     int checkstatus[4] = {1,1,0,1};
      bool condition=(substatus[0]!=checkstatus[0])||(substatus[1]!=checkstatus[1])||(substatus[3]!=checkstatus[3])||(substatus[2]!=checkstatus[2]);
-	   while(condition){
+     while(condition){
       condition=(substatus[0]!=checkstatus[0])||(substatus[1]!=checkstatus[1])||(substatus[3]!=checkstatus[3])||(substatus[2]!=checkstatus[2]);}
-	   for(int ind=0;ind<4;ind++){substatus[ind]=0;}
+     for(int ind=0;ind<4;ind++){substatus[ind]=0;}
 
 
       naviswarm::Transition current_transition;
@@ -548,7 +589,7 @@ int GazeboTrain::train(){
       state.goalObs.goal_now.goal_theta = atan2(local_goal.y, local_goal.x);
 
 
-// std::cout<<"goal"<<i<<":	"<< state.goalObs.goal_now.goal_theta << std::endl;
+ //std::cout<<"goal"<<i<<": "<< state.goalObs.goal_now.goal_theta << std::endl;
 
 
       state.velObs.vel_now.vx = last_states.actionObsBatch[i].ac_prev.vx;
@@ -575,7 +616,7 @@ int GazeboTrain::train(){
           state.scanObs.scan_prev = last_states.scanObsBatch[i].scan_prev;
       }
 
-//std::cout<<"scan"<<i<<":	"<< state.scanObs.scan_pprev.ranges.size()<<"/"<<state.scanObs.scan_prev.ranges.size()<<"/"<<state.scanObs.scan_now.ranges.size()<<"/"<<std::endl;
+//std::cout<<"scan"<<i<<":  "<< state.scanObs.scan_pprev.ranges.size()<<"/"<<state.scanObs.scan_prev.ranges.size()<<"/"<<state.scanObs.scan_now.ranges.size()<<"/"<<std::endl;
 
       state.ImageObs.image_now.data = last_states.ImageObsBatch[i].image_now.data;
       if (last_states.goalObsBatch.size() == 0) {
@@ -622,7 +663,7 @@ int GazeboTrain::train(){
           
           if (state.goalObs.goal_now.goal_dist < 0.5) {  // arrived the goal
               current_transition.terminal = true;
-              double reched_goal_reward = 40;
+              double reched_goal_reward = 20;
               current_transition.reward = reched_goal_reward;
               reward.reached_goal = reched_goal_reward;
           }
@@ -630,17 +671,17 @@ int GazeboTrain::train(){
           {
             //ROS_INFO("----reward----");
               // rs.stalled[r] = collision;
-            //std::cout<<"collision status"<<i<<":  "<<collision_status[i]<<std::endl;
+            std::cout<<"collision status"<<i<<":  "<<collision_status[i]<<std::endl;
 
               if(collision_status[i] == true) { // stalled is obtained from an in-built function from stage. we must write a function to detect collisions
                   current_transition.terminal = true;
-                  double collision_penalty =-40;
+                  double collision_penalty =-20;
                   current_transition.reward = collision_penalty;
                   reward.collision = collision_penalty;
               }
               else { // Goal not reached and no collisions
                   //ROS_INFO("in else");
-              		double penalty_for_deviation = 0.0;
+                  double penalty_for_deviation = 0.0;
                   
                   if (std::abs(state.goalObs.goal_now.goal_theta) > 0.785)
                   {
@@ -650,8 +691,8 @@ int GazeboTrain::train(){
                   
                   current_transition.terminal = false;
 
-                  reward_approaching_goal = 5*(state.goalObs.goal_prev.goal_dist - state.goalObs.goal_now.goal_dist);
-                  penalty_for_bigvz = std::abs(state.velObs.vel_now.vz) * (-0.01);
+                  reward_approaching_goal = 2.5*(state.goalObs.goal_prev.goal_dist - state.goalObs.goal_now.goal_dist);
+                  penalty_for_bigvz = std::abs(state.velObs.vel_now.vz) * (-0.1);
                   penalty_for_time = (current_steps+1) *(0);
                   
                   current_transition.reward = reward_approaching_goal + penalty_for_bigvz + penalty_for_time;
@@ -701,9 +742,9 @@ int GazeboTrain::train(){
     std::cout<<current_transitions.data[0].state.goalObs.goal_now.goal_dist<<'|'<<current_transitions.data[0].state.goalObs.goal_now.goal_theta<<'/'<<current_transitions.data[0].state.goalObs.goal_prev.goal_dist<<'|'<<current_transitions.data[0].state.goalObs.goal_prev.goal_theta<<'/'<<current_transitions.data[0].state.goalObs.goal_pprev.goal_dist<<'|'<<current_transitions.data[0].state.goalObs.goal_pprev.goal_theta<<std::endl;
     std::cout<<current_transitions.data[1].state.goalObs.goal_now.goal_dist<<'|'<<current_transitions.data[1].state.goalObs.goal_now.goal_theta<<'/'<<current_transitions.data[1].state.goalObs.goal_prev.goal_dist<<'|'<<current_transitions.data[1].state.goalObs.goal_prev.goal_theta<<'/'<<current_transitions.data[1].state.goalObs.goal_pprev.goal_dist<<'|'<<current_transitions.data[1].state.goalObs.goal_pprev.goal_theta<<std::endl;
     std::cout<<current_transitions.data[0].state.actionObs.ac_prev.vx<<'|'<<current_transitions.data[0].state.actionObs.ac_prev.vz<<'|'<<current_transitions.data[0].state.actionObs.ac_pprev.vx<<'|'<<current_transitions.data[0].state.actionObs.ac_pprev.vz<<'/'<<current_transitions.data[1].state.actionObs.ac_prev.vx<<'|'<<current_transitions.data[1].state.actionObs.ac_prev.vz<<'|'<<current_transitions.data[1].state.actionObs.ac_pprev.vx<<'|'<<current_transitions.data[1].state.actionObs.ac_pprev.vz<<std::endl;
-	*/
+  */
 
-	
+  
     //ROS_INFO("lock memory");
     acquire_semaphore();
     uint32_t length = ros::serialization::serializationLength(current_transitions);
@@ -771,7 +812,7 @@ int GazeboTrain::train(){
               }
             }
             std::cout<<"robot"<<j<<":   "<<action.linear.x<<"|"<<action.angular.z<<std::endl;
-            //usleep(100000);
+            usleep(100000);
             //std::cout<<"-"; 
             last_states.actionObsBatch[j].ac_pprev = last_states.actionObsBatch[j].ac_prev;
             last_states.actionObsBatch[j].ac_prev = actions.data[j];
