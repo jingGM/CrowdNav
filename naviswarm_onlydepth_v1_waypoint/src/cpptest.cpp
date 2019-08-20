@@ -66,7 +66,7 @@
  #include <errno.h>
  #include <semaphore.h>
  #include <unistd.h>
-
+#include <cmath>       /* isnan, sqrt */
 #include <message_filters/subscriber.h>
 #include <message_filters/time_synchronizer.h>
 using namespace message_filters;
@@ -161,19 +161,26 @@ class GazeboTrain {
 	    void camera_Callback(const sensor_msgs::ImageConstPtr& img_msg) {
 		  cv_bridge::CvImagePtr cvPtr;
 		  try {
-		    cvPtr = cv_bridge::toCvCopy(img_msg, sensor_msgs::image_encodings::BGR8);
+		    cvPtr = cv_bridge::toCvCopy(img_msg, "32FC1");
 		  } catch (cv_bridge::Exception& e) {
 		    ROS_ERROR("cv_bridge exception: %s", e.what());
 		    return;
 		  }
 		  cam_data = cvPtr->image;
+		  cam_data.setTo(5, cam_data!=cam_data );  
+		  double min, max;
+		  cv::minMaxLoc(cam_data, &min, &max);
+		  
+
+		  std::cout<<"min:"<<min<<",  max:"<<max<<std::endl;
+		  //std::cout<<cam_data<<std::endl;
 		  //img_data=cam_data
 		  //std::cout<<image_data<<std::endl;
 		  //ROS_INFO("=================================================");
 		}
 	    
 	    void subscribecamera(){
-	    	image_sub		= nh.subscribe<sensor_msgs::Image>("turtlebot0/camera/image_raw", 1, &GazeboTrain::camera_Callback, this);
+	    	image_sub		= nh.subscribe<sensor_msgs::Image>("turtlebot0/camera/depth/image_raw", 1, &GazeboTrain::camera_Callback, this);
 	    	ros::spin();
 	    }
 
@@ -205,19 +212,20 @@ class GazeboTrain {
 				*/
 
 				image_sub		= nh.subscribe<sensor_msgs::Image>(name_space + "/camera/image_raw", 1, &GazeboTrain::image_Callback, this); //"/camera/depth/image_raw"
-				scan_sub		= nh.subscribe<sensor_msgs::LaserScan>(name_space + "/scan", 1, &GazeboTrain::scan_Callback, this);
-				velocity_sub	= nh.subscribe<nav_msgs::Odometry>(name_space + "/odom", 1, &GazeboTrain::velocity_Callback, this);
-				groundtruth_sub = nh.subscribe<gazebo_msgs::ModelStates>("/gazebo/model_states", 1, &GazeboTrain::gt_Callback, this);
-				bumper_sub 		= nh.subscribe<kobuki_msgs::BumperEvent>(name_space + "/mobile_base/events/bumper", 1, boost::bind(&GazeboTrain::bumper_Callback, this, _1, i));
+				// scan_sub		= nh.subscribe<sensor_msgs::LaserScan>(name_space + "/scan", 1, &GazeboTrain::scan_Callback, this);
+				// velocity_sub	= nh.subscribe<nav_msgs::Odometry>(name_space + "/odom", 1, &GazeboTrain::velocity_Callback, this);
+				// groundtruth_sub = nh.subscribe<gazebo_msgs::ModelStates>("/gazebo/model_states", 1, &GazeboTrain::gt_Callback, this);
+				// bumper_sub 		= nh.subscribe<kobuki_msgs::BumperEvent>(name_space + "/mobile_base/events/bumper", 1, boost::bind(&GazeboTrain::bumper_Callback, this, _1, i));
 
-				int checkstatus[5] = {0,0,0,0,0};
-				for(int i=0;i<5;i++){checkstatus[i]=1;}
-				checkstatus[3] = 0;
-				while(substatus!=checkstatus){
-					ros::spinOnce();
-				}
-				for(int i=0;i<5;i++){substatus[i]=0;}
-				ROS_INFO("out of while");
+				// int checkstatus[5] = {0,0,0,0,0};
+				// for(int i=0;i<5;i++){checkstatus[i]=1;}
+				// checkstatus[3] = 0;
+				// while(substatus!=checkstatus){
+				// 	ros::spinOnce();
+				// }
+				// for(int i=0;i<5;i++){substatus[i]=0;}
+				// ROS_INFO("out of while");
+				ros::spin();
 			}
 	    }
 
@@ -266,6 +274,8 @@ void GazeboTrain::image_Callback(const sensor_msgs::ImageConstPtr& image){
 	img_data.data 	 = *image;
 	img_header   = image->header;
 	std::cout<<img_header.stamp<<std::endl;
+
+
 }
 
 void GazeboTrain::scan_Callback(const sensor_msgs::LaserScanConstPtr& scan){
@@ -316,6 +326,7 @@ int main(int argc, char **argv){
   //train.runvelocity();
   
   train.runvelocity();
+  train.subscribecamera();
   //train.subscribedata();
   return 0;
 }

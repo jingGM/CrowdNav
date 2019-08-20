@@ -198,10 +198,10 @@ class Value(object):
         imagevnet = tl.layers.InputLayer(image, name='image_input_value')
         imagevnet = tl.layers.Conv2dLayer(imagevnet,act=tf.nn.relu,shape=(5, 5, self.obs_shape[3], 64), strides=(1,2,2,1),use_cudnn_on_gpu=True,name='Icnn1_value')
         imagevnet = tl.layers.Conv2dLayer(imagevnet,act=tf.nn.relu,shape=(5, 5, 64, 64), strides=(1,1,1,1),use_cudnn_on_gpu=True,name='Icnn2_value')
-        imagevnet = tl.layers.Conv2dLayer(imagevnet,act=tf.nn.relu,shape=(3, 3, 64, 128), strides=(1,2,2,1),use_cudnn_on_gpu=True,name='Icnn3_value')
+        imagevnet = tl.layers.Conv2dLayer(imagevnet,act=tf.nn.relu,shape=(3, 3, 64, 32), strides=(1,2,2,1),use_cudnn_on_gpu=True,name='Icnn3_value')
         # imagevnet = tl.layers.Conv2dLayer(imagevnet,act=tf.nn.relu,shape=(3, 3, 128, 128), strides=(1,1,1,1),use_cudnn_on_gpu=True,name='Icnn4_value')
         imagevnet = tl.layers.FlattenLayer(imagevnet, name='imagefl_value')
-        imagevnet = tl.layers.DenseLayer(imagevnet, n_units=1024, act=tf.nn.relu, name='Idense1_value')
+        imagevnet = tl.layers.DenseLayer(imagevnet, n_units=512, act=tf.nn.relu, name='Idense1_value')
         imagevnet = tl.layers.DenseLayer(imagevnet, n_units=256, act=tf.math.sigmoid, name='Idense2_value')
         image_voutput = imagevnet.outputs
         #print(image_output.shape)

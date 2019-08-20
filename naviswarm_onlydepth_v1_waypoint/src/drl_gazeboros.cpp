@@ -62,6 +62,7 @@
  #include <naviswarm/RobotStatus.h>
  #include <naviswarm/Reward.h>
  #include <naviswarm/SCtoCP.h>
+ #include <naviswarm/waypoint.h>
 
 
  // Service header
@@ -102,32 +103,12 @@ using namespace message_filters;
  //#define MIN_DIST_BETWEEN_AGENTS ROBOT_RADIUS*2
 
  #define LidarMinDistance 0.5
+ #define LidarMaxDistance 5
 
 //Class definition
 class GazeboTrain {
   private:
-    bool resettingflag=false;
-    ros::NodeHandle nh;
-
-    boost::mutex msg_lock;
-    // for shared memory (sem -> semaphore)
-    int share_id, sem_id;
-    uint8_t *share_addr;
-
-    int num_robots = 1; // The actual value is assigned in the Constructor. By default it is 1.
-    std::vector<bool> collision_status;
-    std::vector<geometry_msgs::Pose> gpose;
-    std::vector<naviswarm::Velocity> odom_data;
-    std::vector<naviswarm::Scan> scan_data;
-    std::vector<naviswarm::CameraImage> img_data;
-
-    std::vector<std_msgs::Header> img_header;
-    std::vector<std_msgs::Header> scan_header;
-    std::vector<std_msgs::Header> odom_header;
-
-    ros::Publisher reward_pub;
-
-  // Defining vec3 = {x, y, theta}
+    // Defining vec3 = {x, y, theta}
     typedef struct {
         double x, y, theta;
     } vec3;
@@ -146,6 +127,31 @@ class GazeboTrain {
         ros::Subscriber velocity_sub;
     };
     std::vector<Robotinfo *> robots_info;
+
+
+    bool resettingflag=false;
+    ros::NodeHandle nh;
+
+    boost::mutex msg_lock;
+    // for shared memory (sem -> semaphore)
+    int share_id, sem_id;
+    uint8_t *share_addr;
+
+    int num_robots = 1; // The actual value is assigned in the Constructor. By default it is 1.
+    std::vector<bool> collision_status;
+    std::vector<geometry_msgs::Pose> gpose;
+    std::vector<naviswarm::Velocity> odom_data;
+    std::vector<naviswarm::Scan> scan_data;
+    std::vector<naviswarm::CameraImage> img_data;
+    std::vector<naviswarm::waypoints> waypoint_data;
+
+    std::vector<std_msgs::Header> img_header;
+    std::vector<std_msgs::Header> scan_header;
+    std::vector<std_msgs::Header> odom_header;
+
+    ros::Publisher reward_pub;
+
+  
 
     int current_steps = 0;
     
@@ -239,6 +245,8 @@ GazeboTrain::GazeboTrain(int n){
   std_msgs::Header scanh_;
   std_msgs::Header odomh_;
   gpose_.orientation.w=1;
+  naviswarm::waypoints waypoint_;
+
 
   for(int i=0;i<n;i++){
     
@@ -249,6 +257,7 @@ GazeboTrain::GazeboTrain(int n){
     img_header.push_back(imgh_);
     odom_header.push_back(odomh_);
     scan_header.push_back(scanh_);
+    waypoint_data.push_back(waypoint_);
   }
 //std::cout<<"robots number: "<<collision_status.size()<<"/"<<gpose.size()<<std::endl;
 
@@ -400,14 +409,6 @@ bool GazeboTrain::cb_update_srv(naviswarm::UpdateModelRequest& request, naviswar
         response.success = false;
     }
     else { // no. of poses and no. of robots match (no problem)
-        // Setting the new goals
-        for (size_t r = 0; r < request.points.size(); r++) {
-            vec2 goal;
-            goal.x = request.points[r].x;
-            goal.y = request.points[r].y;
-            current_goal[r] = goal;
-            ROS_INFO("Goal_%d: %.3f, %.3f", int(r), goal.x, goal.y);
-        }
 
         // WARNING: IT MAY NOT FREE THE MEMORY SPACE
         // NOTE: last_states is a private datamember of the stage_node class.
@@ -432,6 +433,8 @@ bool GazeboTrain::cb_update_srv(naviswarm::UpdateModelRequest& request, naviswar
         img_header.clear();
         scan_header.clear();
         odom_header.clear();
+        waypoint_data.clear();
+
 
         bool collision_ = false;
         geometry_msgs::Pose gpose_;
@@ -442,6 +445,7 @@ bool GazeboTrain::cb_update_srv(naviswarm::UpdateModelRequest& request, naviswar
         std_msgs::Header scanh_;
         std_msgs::Header odomh_;
         gpose_.orientation.w=1;
+        naviswarm::waypoints waypoint_;
         
         for(int i=0;i<num_robots;i++){
 
@@ -464,7 +468,31 @@ bool GazeboTrain::cb_update_srv(naviswarm::UpdateModelRequest& request, naviswar
           //last_states.goalObsBatch.push_back(goalobs_);
           last_states.actionObsBatch.push_back(actionobs_);
           last_states.velObsBatch.push_back(velobs_);
+
+          waypoint_data.push_back(waypoint_);
         }
+
+        // Setting the new goals
+        for (size_t r = 0; r < request.points.size(); r++) {
+            vec2 goal;
+            goal.x = request.points[r].x;
+            goal.y = request.points[r].y;
+            current_goal[r] = goal;
+            ROS_INFO("Goal_%d: %.3f, %.3f", int(r), goal.x, goal.y);
+
+            // naviswarm::waypoint waypoint_;
+            // for(size_t NoWP=0; NoWP<request.waypoints[r].size(); NoWP++){
+            //   geometry_msgs::Point position;
+            //   position.x = request.waypoints[r].data[NoWP].x;
+            //   position.y = request.waypoints[r].data[NoWP].y;
+            //   waypoint_.push_back(position);
+            // }
+            waypoint_data[r].data=request.waypoints[r].data;
+        }
+        std::cout<<waypoint_data[0].data[0].x<<"/"<<waypoint_data[0].data[0].y<<std::endl;
+        std::cout<<waypoint_data[0].data[1].x<<"/"<<waypoint_data[0].data[1].y<<std::endl;
+        std::cout<<waypoint_data[1].data[0].x<<"/"<<waypoint_data[1].data[0].y<<std::endl;
+        std::cout<<waypoint_data[1].data[1].x<<"/"<<waypoint_data[1].data[1].y<<std::endl;
 
         response.success = true;
     }
@@ -550,7 +578,7 @@ int GazeboTrain::create_sharedmemory(){
 }
 // Infinite loop function
 int GazeboTrain::train(){
-    ROS_INFO("time");
+    // ROS_INFO("time");
     // This loop is equivalent to the for loop inside
     //StageNode::WorldCallback in drl_stageros.cpp
     naviswarm::States current_states;
@@ -628,6 +656,8 @@ int GazeboTrain::train(){
           state.ImageObs.image_p1rev.data = last_states.ImageObsBatch[i].image_p1rev.data;
 //std::cout<<state.ImageObs.image_now.data.header.frame_id<<":  "<<state.ImageObs.image_p2rev.data.header.stamp<<"/"<<state.ImageObs.image_p1rev.data.header.stamp<<"/"<<state.ImageObs.image_now.data.header.stamp<<std::endl;
       }
+      
+
 
       //
       if (last_states.goalObsBatch.size() == 0) {
@@ -660,6 +690,8 @@ int GazeboTrain::train(){
           double reward_approaching_goal = 0;
           double penalty_for_bigvz = 0;
           double penalty_for_time = 0;
+          double distance_to_obstacle = 0;
+          double reached_way_point = 0;
           
           if (state.goalObs.goal_now.goal_dist < 0.5) {  // arrived the goal
               current_transition.terminal = true;
@@ -688,21 +720,45 @@ int GazeboTrain::train(){
                       penalty_for_deviation = -0.1 * (std::abs(state.goalObs.goal_now.goal_theta) - 0.785);
                   }
 
+                  cv_bridge::CvImagePtr cvPtr;
+                  try {
+                    cvPtr = cv_bridge::toCvCopy(state.ImageObs.image_now.data, "32FC1");
+                  } 
+                  catch (cv_bridge::Exception& e) {
+                    ROS_ERROR("cv_bridge exception: %s", e.what());
+                  }
+                  cv::Mat cam_data = cvPtr->image;
+                  cam_data.setTo(5, cam_data!=cam_data );  
+                  double depthmin, depthmax;
+                  cv::minMaxLoc(cam_data, &depthmin, &depthmax);
+                  std::cout<<"min:"<<depthmin<<",  max:"<<depthmax<<std::endl;
                   
+
+                  for (int waypoint_index =0;waypoint_index<waypoint_data[i].data.size();waypoint_index++){
+                    double distx = std::abs(gpose[i].position.x - waypoint_data[i].data[waypoint_index].x);
+                    double disty = std::abs(gpose[i].position.y - waypoint_data[i].data[waypoint_index].y); 
+                    double distance_to_waypoint = GetDistance(distx,disty);
+                    if (distance_to_waypoint<0.4){reached_way_point +=10;}
+                  }
+                  
+                  
+
+
                   current_transition.terminal = false;
 
-                  reward_approaching_goal = 2.5*(state.goalObs.goal_prev.goal_dist - state.goalObs.goal_now.goal_dist);
+                  reward_approaching_goal = 5*(state.goalObs.goal_prev.goal_dist - state.goalObs.goal_now.goal_dist);
                   penalty_for_bigvz = std::abs(state.velObs.vel_now.vz) * (-0.1);
                   penalty_for_time = (current_steps+1) *(0);
+                  distance_to_obstacle = -(LidarMaxDistance-depthmin)*0.1;
                   
-                  current_transition.reward = reward_approaching_goal + penalty_for_bigvz + penalty_for_time;
+                  current_transition.reward = reward_approaching_goal + penalty_for_bigvz + penalty_for_time+distance_to_obstacle+reached_way_point;
                   reward.reward_approaching_goal = reward_approaching_goal;
                   reward.penalty_for_deviation = penalty_for_deviation;
                   
               }
           }
 
-        std::cout<<"Robot:"<<i<<" Rew: "<<current_transition.reward<<"  AG: "<<reward_approaching_goal<<" CurrSt: "<<penalty_for_time<<" Osc:"<<penalty_for_bigvz<<"  GDist: "<<state.goalObs.goal_now.goal_dist<<" CollStat: "<<std::to_string(collision_status[i])<<std::endl;
+        std::cout<<"Robot:"<<i<<" Rew: "<<current_transition.reward<<"  AG: "<<reward_approaching_goal<<" CurrSt: "<<penalty_for_time<<" Osc:"<<penalty_for_bigvz<<"  DtO: "<<distance_to_obstacle<<" RW:"<<reached_way_point<<"  GDist: "<<state.goalObs.goal_now.goal_dist<<" CollStat: "<<std::to_string(collision_status[i])<<std::endl;
         reward.sum = reward.collision + reward.reached_goal + reward.reward_approaching_goal + reward.penalty_for_deviation;
         reward_pub.publish(reward); // We need a publisher for reward
       }

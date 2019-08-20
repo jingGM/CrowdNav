@@ -33,6 +33,7 @@ class Scenarios(object):
     def reset(self):
         self.starts = []
         self.goals = []
+        self.waypoints = []
 
     def circle_scene_uniform(self):
         for i in range(self.num_agents):
@@ -56,15 +57,21 @@ class Scenarios(object):
         return self.starts, self.goals
 
     def corridor_ped(self):
-        sx, sy, sa = 2., -1., 1.57
+        sx, sy, sa = 3., -1., 1.57
+        gx, gy, ga = 3., 4., 1.57
+        waypoint = [[4, 1.5],[gx,gy]]
+        self.starts.append([sx, sy, sa])
+        self.goals.append([gx, gy, ga])
+        self.waypoints.append(waypoint)
 
-        self.starts.append([2, sy, sa])
-        self.goals.append([2, 3, sa])
+        sx, sy, sa = -3., -1., 1.57
+        gx, gy, ga = -3., 4., 1.57
+        waypoint = [[-4, 1.5],[gx,gy]]
+        self.starts.append([sx, sy, sa])
+        self.goals.append([gx, gy, ga])
+        self.waypoints.append(waypoint)
 
-        self.starts.append([-2.5, sy, sa])
-        self.goals.append([-2.5, 3, sa])
-
-        return self.starts, self.goals
+        return self.starts, self.goals, self.waypoints
 
 
 
