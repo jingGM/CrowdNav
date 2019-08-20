@@ -62,7 +62,7 @@
  #include <naviswarm/RobotStatus.h>
  #include <naviswarm/Reward.h>
  #include <naviswarm/SCtoCP.h>
- #include <naviswarm/waypoint.h>
+ #include <naviswarm/waypoints.h>
 
 
  // Service header
