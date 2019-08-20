@@ -37,7 +37,7 @@ parser = argparse.ArgumentParser(
 parser.add_argument(
     '--train', default=True, type=bool, help='train or test')
 parser.add_argument(
-    '--num_agents', default=2, type=int, help='number of robots')
+    '--num_agents', default=6, type=int, help='number of robots')
 parser.add_argument(
     '--num_obstacles', default=0, type=int, help='number of obstacles')
 parser.add_argument(
@@ -45,7 +45,7 @@ parser.add_argument(
 parser.add_argument(
     '--max_vx', default=0.5, type=float, help='max vx')
 parser.add_argument(
-    '--env_size', default=2, type=float, help='size of environment')
+    '--env_size', default=4, type=float, help='size of environment')
 
 
 parser.add_argument(
@@ -83,12 +83,12 @@ parser.add_argument(
     help='max timesteps of the whole training')
 parser.add_argument(
     '--batch_max_steps',
-    default=100, #8000,
+    default=200, #8000,
     type=int,
     help='max timesteps of a batch for updating')
 parser.add_argument(
     '--episode_max_steps',
-    default=50, #400,
+    default=100, #400,
     type=int,
     help='max timesteps of an episode')
 parser.add_argument(
@@ -98,7 +98,7 @@ parser.add_argument(
     help='maximum training iterations')
 parser.add_argument(
     '--load_network',
-    default=False,
+    default=True,
     type=bool,
     help='whether to load pretrained networks')
 
@@ -112,8 +112,8 @@ class MultiRobotDRL(object):
         self.alg = alg
 
         if args.load_network:
-            self.agent.value.load_network( 'last')
-            self.agent.policy.load_network('last')
+            self.agent.value.load_network( 'best')
+            self.agent.policy.load_network('best')
 
         self.reward_pub = rospy.Publisher('/drl/reward', numpy_msg(Floats), queue_size=1)
 

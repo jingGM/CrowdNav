@@ -39,11 +39,16 @@ class Scenarios(object):
         for i in range(self.num_agents):
             succ = False
             sx, sy, sa = 0., 0., 0.
+            gx, gy, ga = 0., 0., 0.
+            waypoint = [[4, 1.5],[gx,gy]]
             while not succ:
                 angle = i*2*np.pi / self.num_agents
                 sx = self.env_size * np.cos(angle)
                 sy = self.env_size * np.sin(angle)
                 sa = np.arctan2(-sy, -sx)
+                gx = -sx
+                gy = -sy
+                ga = sa
                 succ = True
 
                 if self.starts:
@@ -52,9 +57,10 @@ class Scenarios(object):
                             succ = False
 
             self.starts.append([sx, sy, sa])
-            self.goals.append([-sx, -sy, sa])
+            self.goals.append([gx, gy, ga])
+            self.waypoints.append([[gx,gy]])
 
-        return self.starts, self.goals
+        return self.starts, self.goals, self.waypoints
 
     def corridor_ped(self):
         sx, sy, sa = 3., -1., 1.57

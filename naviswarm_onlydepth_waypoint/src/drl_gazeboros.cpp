@@ -489,10 +489,10 @@ bool GazeboTrain::cb_update_srv(naviswarm::UpdateModelRequest& request, naviswar
             // }
             waypoint_data[r].data=request.waypoints[r].data;
         }
-        std::cout<<waypoint_data[0].data[0].x<<"/"<<waypoint_data[0].data[0].y<<std::endl;
-        std::cout<<waypoint_data[0].data[1].x<<"/"<<waypoint_data[0].data[1].y<<std::endl;
-        std::cout<<waypoint_data[1].data[0].x<<"/"<<waypoint_data[1].data[0].y<<std::endl;
-        std::cout<<waypoint_data[1].data[1].x<<"/"<<waypoint_data[1].data[1].y<<std::endl;
+        std::cout<<waypoint_data[0].data[0].x<<std::endl;
+        std::cout<<waypoint_data[0].data[1].x<<std::endl;
+        std::cout<<waypoint_data[1].data[0].x<<std::endl;
+        std::cout<<waypoint_data[1].data[1].x<<std::endl;
 
         response.success = true;
     }
@@ -890,7 +890,7 @@ int main(int argc, char **argv){
   ros::init(argc, argv, "drl_gazeboros");
   //ros::Rate r(10);
 
-  GazeboTrain gazeboc(2);
+  GazeboTrain gazeboc(6);
 
   if(gazeboc.create_sharedmemory() != 0)
         exit(-1);
