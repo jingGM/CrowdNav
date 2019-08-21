@@ -351,6 +351,7 @@ class StageEnv(object):
             except rospy.ServiceException, e:
                 print "Service call failed: %s"%e
             i = i+1
+            # time.sleep(.2)
             # start = Pose()
             # start.position.x = s[0]
             # start.position.y = s[1]
@@ -528,7 +529,7 @@ class StageEnv(object):
             self.goal_markers_id += 1
         if ns == "usv":
             marker.type = marker.MESH_RESOURCE
-            marker.mesh_resource = "file:///home/adarshjs/catkin_ws/src/naviswarm_onlydepth_v1/rviz/usv.dae"
+            marker.mesh_resource = "file:///home/jing/Documents/catkin_workspace/catkin_CamNavi/src/naviswarm_onlydepth_waypoint/rviz/usv.dae"
             marker.id = self.agent_markers_id
             self.agent_markers.markers.append(marker)
             self.agent_markers_id += 1

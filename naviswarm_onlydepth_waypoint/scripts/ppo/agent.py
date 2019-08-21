@@ -56,11 +56,20 @@ class Agent(object):
 
         image_filtered = np.array(image_filtered,dtype=float)/5
 
-        # fig = plt.figure(figsize=(10, 5))
-        # ax = fig.add_subplot(111)
-        # toplot = image_filtered[0,::,::,2]
-        # plt.imshow(toplot)
-        # plt.savefig('predictions_{0}.png'.format(0))
+        fig = plt.figure(figsize=(10, 5))
+        ax = fig.add_subplot(221)
+        toplot = image_filtered[0,::,::,2]
+        plt.imshow(toplot)
+        ax = fig.add_subplot(222)
+        toplot = image_filtered[1,::,::,2]
+        plt.imshow(toplot)
+        ax = fig.add_subplot(223)
+        toplot = image_filtered[2,::,::,2]
+        plt.imshow(toplot)
+        ax = fig.add_subplot(224)
+        toplot = image_filtered[3,::,::,2]
+        plt.imshow(toplot)
+        plt.savefig('predictions_{0}.png'.format(0))
 
         # scan_filtered = np.asarray(scan_filtered)
         # goal_filtered = np.asarray(goal_filtered)
