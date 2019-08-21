@@ -83,12 +83,12 @@ parser.add_argument(
     help='max timesteps of the whole training')
 parser.add_argument(
     '--batch_max_steps',
-    default=100, #8000,
+    default=400, #8000,
     type=int,
     help='max timesteps of a batch for updating')
 parser.add_argument(
     '--episode_max_steps',
-    default=50, #400,
+    default=200, #400,
     type=int,
     help='max timesteps of an episode')
 parser.add_argument(

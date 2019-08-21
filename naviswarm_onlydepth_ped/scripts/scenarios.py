@@ -80,7 +80,7 @@ class Scenarios(object):
         return self.starts, self.goals, self.waypoints
 
     def narrow_ped(self):
-        sx, sy, sa = 11, 0., 3.14
+        sx, sy, sa = 11.5, 0., 3.14
         gx, gy, ga = 3., 0., 3.14
         waypoint = [[gx,gy]]
         self.starts.append([sx, sy, sa])
