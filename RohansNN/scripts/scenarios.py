@@ -33,16 +33,22 @@ class Scenarios(object):
     def reset(self):
         self.starts = []
         self.goals = []
+        self.waypoints = []
 
     def circle_scene_uniform(self):
         for i in range(self.num_agents):
             succ = False
             sx, sy, sa = 0., 0., 0.
+            gx, gy, ga = 0., 0., 0.
+            waypoint = [[4, 1.5],[gx,gy]]
             while not succ:
                 angle = i*2*np.pi / self.num_agents
                 sx = self.env_size * np.cos(angle)
                 sy = self.env_size * np.sin(angle)
                 sa = np.arctan2(-sy, -sx)
+                gx = -sx
+                gy = -sy
+                ga = sa
                 succ = True
 
                 if self.starts:
@@ -51,34 +57,37 @@ class Scenarios(object):
                             succ = False
 
             self.starts.append([sx, sy, sa])
-            self.goals.append([-sx, -sy, sa])
+            self.goals.append([gx, gy, ga])
+            self.waypoints.append([[gx,gy]])
 
-        return self.starts, self.goals
+        return self.starts, self.goals, self.waypoints
 
-    def corridor_ped(self):
-      distance = self.env_size/self.num_agents
-      halfdis = self.env_size/2
-      sx, sy, sa = 11., 0., 3.14
-
-      for i in range(self.num_agents):
+    def corridor_static(self):
+        sx, sy, sa = 2., -3., 1.57
+        gx, gy, ga = 2., 3., 1.57
+        waypoint = [[3., 0],[gx,gy]]
         self.starts.append([sx, sy, sa])
-        self.goals.append([halfdis, sy, sa])
-        halfdis -= distance
-        sx -= distance
+        self.goals.append([gx, gy, ga])
+        self.waypoints.append(waypoint)
 
-      return self.starts, self.goals 
+        sx, sy, sa = -2., -3., 1.57
+        gx, gy, ga = -2., 3., 1.57
+        waypoint = [[-3, 0],[gx,gy]]
+        self.starts.append([sx, sy, sa])
+        self.goals.append([gx, gy, ga])
+        self.waypoints.append(waypoint)
 
-    def gray_wall(self):
-        sx, sy, sa = 2., 0., 3.14
+        return self.starts, self.goals, self.waypoints
 
-        self.starts.append([2, 0, sa])
-        self.goals.append([-2, 0, sa])
+    def narrow_ped(self):
+        sx, sy, sa = 11.5, 0., 3.14
+        gx, gy, ga = 3., 0., 3.14
+        waypoint = [[gx,gy]]
+        self.starts.append([sx, sy, sa])
+        self.goals.append([gx, gy, ga])
+        self.waypoints.append(waypoint)
 
-        # self.starts.append([-2.5, sy, sa])
-        # self.goals.append([-2.5, 3, sa])
-
-        return self.starts, self.goals
-
+        return self.starts, self.goals, self.waypoints
 
 
 

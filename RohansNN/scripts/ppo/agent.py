@@ -54,8 +54,8 @@ class Agent(object):
         self.counter =0
 
     def obs_filter(self, obs):
-        #temp_imagebatch = np.array(obs.ImageObsBatch)
-        #print(temp_imagebatch.shape)
+        # temp_imagebatch = np.array(obs.ImageObsBatch)
+        # print(temp_imagebatch.shape)
 
         image_filtered = self.image_filter(obs.ImageObsBatch)
         scan_filtered  = self.scan_filter(obs.scanObsBatch)
@@ -73,37 +73,38 @@ class Agent(object):
             image_in_NN2 = image_filtered[i,2,::,::,::]
             #print(image_in_NN2.shape)
             output = self.imagenetwork.predict(image_in_NN2)
-            #print(output.shape)
+            # print(output.shape)
             self.imagenetwork.reset()
 
             output = np.array(cv2.resize(output,(80,60)),dtype=float)
             output = rgb2gray(output)
 
-            #print(output.shape)
+            # print(output.shape)
             image_out_NN.append(np.expand_dims(output, axis=3))
-            # image_out_NN.append(output)
+            #image_out_NN.append(output)
+            # print(image_out_NN)
+            # print("out prediction")
 
 
-
-            fig = plt.figure(figsize=(10, 5))
-            ax = fig.add_subplot(231)
-            toplot = image_in_NN0
-            plt.imshow(toplot)
-            ax = fig.add_subplot(232)
-            toplot = image_in_NN1
-            plt.imshow(toplot)
-            ax = fig.add_subplot(233)
-            toplot = image_in_NN2
-            plt.imshow(toplot)
-            ax = fig.add_subplot(234)
-            toplot = output
-            toplot = toplot
-            plt.imshow(toplot)
-            ax = fig.add_subplot(235)
-            toplot = output* (1/output.max())
-            plt.imshow(toplot)
-            plt.savefig('./predictions/{0}_{1}.png'.format(i,self.counter))
-            self.counter +=1
+            # fig = plt.figure(figsize=(10, 5))
+            # ax = fig.add_subplot(231)
+            # toplot = image_in_NN0
+            # plt.imshow(toplot)
+            # ax = fig.add_subplot(232)
+            # toplot = image_in_NN1
+            # plt.imshow(toplot)
+            # ax = fig.add_subplot(233)
+            # toplot = image_in_NN2
+            # plt.imshow(toplot)
+            # ax = fig.add_subplot(234)
+            # toplot = output
+            # toplot = toplot
+            # plt.imshow(toplot)
+            # ax = fig.add_subplot(235)
+            # toplot = output* (1/output.max())
+            # plt.imshow(toplot)
+            # plt.savefig('./predictions/{0}_{1}.png'.format(i,self.counter))
+            # self.counter +=1
 
             #print(output.shape)
             #print('--------------')
@@ -154,7 +155,8 @@ class Policy(object):
         imagenet = tl.layers.Conv2dLayer(imagenet,act=tf.nn.relu,shape=(5, 5, 1, 32),strides=(1,2,2,1),use_cudnn_on_gpu=True,name='Icnn1')
         imagenet = tl.layers.Conv2dLayer(imagenet,act=tf.nn.relu,shape=(3, 3,32, 32),strides=(1,2,2,1),use_cudnn_on_gpu=True,name='Icnn2')
         imagenet = tl.layers.FlattenLayer(imagenet, name='imagefl')
-        imagenet = tl.layers.DenseLayer(imagenet, n_units=960, act=tf.nn.relu, name='image_output')
+        imagenet = tl.layers.DenseLayer(imagenet, n_units=960, act=tf.nn.relu, name='image_dense')
+        imagenet = tl.layers.DenseLayer(imagenet, n_units=256, act=tf.nn.relu, name='image_output')
         image_output = imagenet.outputs
         #print(image_output.shape)
         
@@ -257,7 +259,8 @@ class Value(object):
         #print(imagenet.outputs.shape)
         imagevnet = tl.layers.Conv2dLayer(imagevnet,act=tf.nn.relu,shape=(3, 3,32, 64),strides=(1,2,2,1),use_cudnn_on_gpu=True,name='Icnnv2')
         imagevnet = tl.layers.FlattenLayer(imagevnet, name='imageflv')
-        imagevnet = tl.layers.DenseLayer(imagevnet, n_units=960, act=tf.nn.relu, name='image_voutput')
+        imagevnet = tl.layers.DenseLayer(imagevnet, n_units=960, act=tf.nn.relu, name='image_densev')
+        imagevnet = tl.layers.DenseLayer(imagevnet, n_units=256, act=tf.nn.relu, name='image_voutput')
         image_voutput = imagevnet.outputs
 
 

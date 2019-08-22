@@ -30,7 +30,7 @@ import numpy as np
 import rospy
 import sysv_ipc
 from geometry_msgs.msg import Point, Pose
-from naviswarm.msg import Action, Actions, States, Transitions,SCtoCP
+from naviswarm.msg import Action, Actions, States, Transitions, SCtoCP, waypoints
 from naviswarm.srv import UpdateModel, UpdateModelRequest
 from gazebo_msgs.msg import ModelState
 from gazebo_msgs.srv import SetModelState
@@ -52,7 +52,7 @@ class StageEnv(object):
 
     def __init__(self, num_agents=1, num_obstacles=5,
                  agent_radius=0.12, env_size=4.0,
-                 max_vx=0.5, key=42, options=2):
+                 max_vx=0.3, key=42, options=2):
         self.num_agents = num_agents
         self.num_obstacles = num_obstacles
         self.agent_size = agent_radius
@@ -307,6 +307,7 @@ class StageEnv(object):
     def _update_stage(self):
         self.starts = []
         self.goals = []
+        self.waypoints = []
 
         self.scenarios.reset()
         # self.starts, self.goals = self.scenarios.multi_scenes()
@@ -317,9 +318,9 @@ class StageEnv(object):
         # self.starts, self.goals = self.scenarios.cross_road_scene()
         # self.starts, self.goals = self.scenarios.random_scene()
         # self.starts, self.goals = self.scenarios.random_obstacles_scene()
-        # self.starts, self.goals = self.scenarios.circle_scene_uniform()
+        # self.starts, self.goals, self.waypoints = self.scenarios.circle_scene_uniform()
         # self.starts, self.goals = self.scenarios.circle_scene_with_obstacles()
-        self.starts, self.goals = self.scenarios.gray_wall()
+        self.starts, self.goals, self.waypoints = self.scenarios.corridor_static()
         # self.starts, self.goals = self.scenarios.crossing_scene(6)
         # self.starts, self.goals = self.scenarios.ten_cross_scene(0.8, 6)
         # self.starts, self.goals = self.scenarios.crossing_with_obstacle_scene(6)
@@ -332,7 +333,7 @@ class StageEnv(object):
 
         update_goal_request = UpdateModelRequest()
         i = 0
-        for s, g in zip(self.starts, self.goals):
+        for s, g, wps in zip(self.starts, self.goals, self.waypoints):
             state_msg = ModelState()
             state_msg.model_name = "turtlebot%d"%i
             state_msg.pose.position.x = s[0]
@@ -361,6 +362,16 @@ class StageEnv(object):
             goal.x = g[0]
             goal.y = g[1]
             update_goal_request.points.append(goal)
+
+            #print(wps)
+            waypoint_ = waypoints()
+            for wp in zip(wps):
+                wayp_ = Point()
+                wayp_.x = wp[0][0]
+                wayp_.y = wp[0][1]
+                waypoint_.data.append(wayp_)
+            #print(len(waypoint_.data))
+            update_goal_request.waypoints.append(waypoint_)
 
         rospy.wait_for_service('/update_goals')
         try:
@@ -517,7 +528,7 @@ class StageEnv(object):
             self.goal_markers_id += 1
         if ns == "usv":
             marker.type = marker.MESH_RESOURCE
-            marker.mesh_resource = "file:///home/adarshjs/catkin_ws/src/naviswarm_onlydepth_v1/rviz/usv.dae"
+            marker.mesh_resource = "file:///home/jingl/Documents/catkin_ws/src/naviswarm_onlydepth_waypoint/rviz/usv.dae"
             marker.id = self.agent_markers_id
             self.agent_markers.markers.append(marker)
             self.agent_markers_id += 1

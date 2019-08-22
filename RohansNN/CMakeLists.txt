@@ -48,6 +48,7 @@ add_message_files(
     CameraImage.msg
     CameraImageObs.msg
     SCtoCP.msg
+    waypoints.msg
 )
 
 add_service_files(

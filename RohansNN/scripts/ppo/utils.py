@@ -163,32 +163,35 @@ class RunningAverageFilter(object):
                         #print(data.shape)
                         #print('==========scan shape======================')
                 elif self.obstype == "image":
+                    # print("in image: ")
                     bridge = CvBridge()
                     try:
                       image_now_cv = bridge.imgmsg_to_cv2(x[i].image_now.data, "bgr8")
+                      # print("0")
                     except CvBridgeError as e:
                       print(e)
                     image_now = np.array(image_now_cv)
 
                     try:
                       image_p1rev_cv = bridge.imgmsg_to_cv2(x[i].image_p1rev.data, "bgr8")
+                      # print("1")
                     except CvBridgeError as e:
                       print(e)
                     image_p1rev = np.array(image_p1rev_cv)
 
                     try:
                       image_p2rev_cv = bridge.imgmsg_to_cv2(x[i].image_p2rev.data, "bgr8")
+                      # print("2")
                     except CvBridgeError as e:
                       print(e)
                     image_p2rev = np.array(image_p2rev_cv)
-
 
 
                     if self.delta:
                         data = np.stack((image_now - image_p2rev,image_now - image_p1rev,image_now),axis=0)
                     else:
                         data = np.stack((image_p2rev,image_p1rev,image_now),axis=0)
-                        #print(data.shape)
+                        # print(data.shape)
                         #print('==========image shape======================')
                         
                 elif self.obstype == "goal":
@@ -236,17 +239,20 @@ class RunningAverageFilter(object):
                 bridge = CvBridge()
                 try:
                   image_now_cv = bridge.imgmsg_to_cv2(x[0].image_now.data, "bgr8")
+                  # print("0")
                 except CvBridgeError as e:
                   print(e)
                 image_now = np.array(image_now_cv)
 
                 try:
                   image_p1rev_cv = bridge.imgmsg_to_cv2(x[0].image_p1rev.data, "bgr8")
+                  # print("1")
                 except CvBridgeError as e:
                   print(e)
                 image_p1rev = np.array(image_p1rev_cv)
 
                 try:
+                  # print("2")
                   image_p2rev_cv = bridge.imgmsg_to_cv2(x[0].image_p2rev.data, "bgr8")
                 except CvBridgeError as e:
                   print(e)
