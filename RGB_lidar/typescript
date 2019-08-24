@@ -1,0 +1,624 @@
+Script started on Fri 16 Aug 2019 01:41:51 PM EDT
+ls
+]0;jingl@tqyselfsupport-Precision-5820-Tower: ~/Documents/catkin_ws/src/RohansNN[01;32mjingl@tqyselfsupport-Precision-5820-Tower[00m:[01;34m~/Documents/catkin_ws/src/RohansNN[00m$ ls
+CMakeLists.txt  [0m[01;34mlaunch[0m  [01;34mmsg[0m          [01;34mrviz[0m     [01;34msrc[0m  typescript
+[01;34minclude[0m         [01;34mmodels[0m  package.xml  [01;34mscripts[0m  [01;34msrv[0m  [01;34mworlds[0m
+]0;jingl@tqyselfsupport-Precision-5820-Tower: ~/Documents/catkin_ws/src/RohansNN[01;32mjingl@tqyselfsupport-Precision-5820-Tower[00m:[01;34m~/Documents/catkin_ws/src/RohansNN[00m$ cd scripts/
+]0;jingl@tqyselfsupport-Precision-5820-Tower: ~/Documents/catkin_ws/src/RohansNN/scripts[01;32mjingl@tqyselfsupport-Precision-5820-Tower[00m:[01;34m~/Documents/catkin_ws/src/RohansNN/scripts[00m$ ls
+__init__.py         [0m[01;34mppo[0m          [01;34mresources[0m     scenarios.pyc  stage_env.pyc  test.py
+multi_robot_ppo.py  [01;34mpredictions[0m  scenarios.py  stage_env.py   [01;34mtest[0m
+]0;jingl@tqyselfsupport-Precision-5820-Tower: ~/Documents/catkin_ws/src/RohansNN/scripts[01;32mjingl@tqyselfsupport-Precision-5820-Tower[00m:[01;34m~/Documents/catkin_ws/src/RohansNN/scripts[00m$ cd [K[K[Kconda activae [K[Kte  swarm
+(swarm) ]0;jingl@tqyselfsupport-Precision-5820-Tower: ~/Documents/catkin_ws/src/RohansNN/scripts[01;32mjingl@tqyselfsupport-Precision-5820-Tower[00m:[01;34m~/Documents/catkin_ws/src/RohansNN/scripts[00m$ python  muti[K[K[K[K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[K
+[K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C
+python             python2.7-config   python3.5          python3.5m-config  python3m-config
+python2            python2-config     python3.5-config   python3-config     python-config
+python2.7          python3            python3.5m         python3m           
+(swarm) ]0;jingl@tqyselfsupport-Precision-5820-Tower: ~/Documents/catkin_ws/src/RohansNN/scripts[01;32mjingl@tqyselfsupport-Precision-5820-Tower[00m:[01;34m~/Documents/catkin_ws/src/RohansNN/scripts[00m$ python
+python             python2.7-config   python3.5          python3.5m-config  python3m-config
+python2            python2-config     python3.5-config   python3-config     python-config
+python2.7          python3            python3.5m         python3m           
+(swarm) ]0;jingl@tqyselfsupport-Precision-5820-Tower: ~/Documents/catkin_ws/src/RohansNN/scripts[01;32mjingl@tqyselfsupport-Precision-5820-Tower[00m:[01;34m~/Documents/catkin_ws/src/RohansNN/scripts[00m$ python  
+__init__.py         predictions/        scenarios.pyc       test/               
+multi_robot_ppo.py  resources/          stage_env.py        test.py             
+ppo/                scenarios.py        stage_env.pyc       
+(swarm) ]0;jingl@tqyselfsupport-Precision-5820-Tower: ~/Documents/catkin_ws/src/RohansNN/scripts[01;32mjingl@tqyselfsupport-Precision-5820-Tower[00m:[01;34m~/Documents/catkin_ws/src/RohansNN/scripts[00m$ python  
+__init__.py         predictions/        scenarios.pyc       test/               
+multi_robot_ppo.py  resources/          stage_env.py        test.py             
+ppo/                scenarios.py        stage_env.pyc       
+(swarm) ]0;jingl@tqyselfsupport-Precision-5820-Tower: ~/Documents/catkin_ws/src/RohansNN/scripts[01;32mjingl@tqyselfsupport-Precision-5820-Tower[00m:[01;34m~/Documents/catkin_ws/src/RohansNN/scripts[00m$ python  
+__init__.py         predictions/        scenarios.pyc       test/               
+multi_robot_ppo.py  resources/          stage_env.py        test.py             
+ppo/                scenarios.py        stage_env.pyc       
+(swarm) ]0;jingl@tqyselfsupport-Precision-5820-Tower: ~/Documents/catkin_ws/src/RohansNN/scripts[01;32mjingl@tqyselfsupport-Precision-5820-Tower[00m:[01;34m~/Documents/catkin_ws/src/RohansNN/scripts[00m$ python  multi_robot_ppo.py 
+WARNING: Logging before flag parsing goes to stderr.
+W0816 13:43:19.670016 140002690451200 deprecation_wrapper.py:119] From /home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/tensorlayer/layers/core.py:39: The name tf.GraphKeys is deprecated. Please use tf.compat.v1.GraphKeys instead.
+
+W0816 13:43:19.682694 140002690451200 deprecation_wrapper.py:119] From /home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/tensorlayer/layers/pooling.py:66: The name tf.nn.max_pool is deprecated. Please use tf.nn.max_pool2d instead.
+
+2019-08-16 13:43:21.229863: I tensorflow/core/platform/cpu_feature_guard.cc:142] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 AVX512F FMA
+2019-08-16 13:43:21.251157: I tensorflow/core/platform/profile_utils/cpu_utils.cc:94] CPU Frequency: 3600000000 Hz
+2019-08-16 13:43:21.251657: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x562343859520 executing computations on platform Host. Devices:
+2019-08-16 13:43:21.251692: I tensorflow/compiler/xla/service/service.cc:175]   StreamExecutor device (0): <undefined>, <undefined>
+2019-08-16 13:43:21.998571: W tensorflow/compiler/jit/mark_for_compilation_pass.cc:1412] (One-time warning): Not using XLA:CPU for cluster because envvar TF_XLA_FLAGS=--tf_xla_cpu_global_jit was not set.  If you want XLA:CPU, either set that envvar, or use experimental_jit_scope to enable XLA:CPU.  To confirm that XLA is active, pass --vmodule=xla_compilation_cache=1 (as a proper command-line flag, not via TF_XLA_FLAGS) or set the envvar XLA_FLAGS=--xla_hlo_profile.
+	 + Starting on #0 sequence 
+***** Episode 1 *****
+	 + Update finished on #0 frame, inference time: 0:00:00.600628
+	 + Update finished on #1 frame, inference time: 0:00:00.458726
+	 + Update finished on #2 frame, inference time: 0:00:00.444398
+	 + Starting on #1 sequence 
+(360, 400, 4)
+/home/jingl/Documents/catkin_ws/src/RohansNN/scripts/ppo/agent.py:93: RuntimeWarning: divide by zero encountered in double_scalars
+  toplot = output* (1/output.max())
+/home/jingl/Documents/catkin_ws/src/RohansNN/scripts/ppo/agent.py:93: RuntimeWarning: invalid value encountered in multiply
+  toplot = output* (1/output.max())
+/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/matplotlib/image.py:405: UserWarning: Warning: converting a masked element to nan.
+  dv = (np.float64(self.norm.vmax) -
+/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/matplotlib/image.py:406: UserWarning: Warning: converting a masked element to nan.
+  np.float64(self.norm.vmin))
+/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/matplotlib/image.py:413: UserWarning: Warning: converting a masked element to nan.
+  a_min = np.float64(newmin)
+/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/matplotlib/image.py:418: UserWarning: Warning: converting a masked element to nan.
+  a_max = np.float64(newmax)
+/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/matplotlib/colors.py:916: UserWarning: Warning: converting a masked element to nan.
+  dtype = np.min_scalar_type(value)
+/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/numpy/ma/core.py:718: UserWarning: Warning: converting a masked element to nan.
+  data = np.array(a, copy=False, subok=subok)
+Traceback (most recent call last):
+  File "multi_robot_ppo.py", line 285, in <module>
+    learner.run()
+  File "multi_robot_ppo.py", line 240, in run
+    paths = self._get_paths(seed_iter)
+  File "multi_robot_ppo.py", line 216, in _get_paths
+    path_agents = self._rollout(env)
+  File "multi_robot_ppo.py", line 164, in _rollout
+    action_agents = self.agent.policy.act([scan_input,goal_input, vel_input, image_input], terminateds)
+  File "/home/jingl/Documents/catkin_ws/src/RohansNN/scripts/ppo/agent.py", line 178, in act
+    self.obs[3]: obs[3]
+  File "/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/tensorflow/python/client/session.py", line 950, in run
+    run_metadata_ptr)
+  File "/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/tensorflow/python/client/session.py", line 1149, in _run
+    str(subfeed_t.get_shape())))
+ValueError: Cannot feed value of shape (1, 1, 2) for Tensor u'goal_ph:0', which has shape '(?, 2)'
+(swarm) ]0;jingl@tqyselfsupport-Precision-5820-Tower: ~/Documents/catkin_ws/src/RohansNN/scripts[01;32mjingl@tqyselfsupport-Precision-5820-Tower[00m:[01;34m~/Documents/catkin_ws/src/RohansNN/scripts[00m$ python mmulti_robot_ppo.py 
+WARNING: Logging before flag parsing goes to stderr.
+W0816 13:47:26.660492 140101728483072 deprecation_wrapper.py:119] From /home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/tensorlayer/layers/core.py:39: The name tf.GraphKeys is deprecated. Please use tf.compat.v1.GraphKeys instead.
+
+W0816 13:47:26.669967 140101728483072 deprecation_wrapper.py:119] From /home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/tensorlayer/layers/pooling.py:66: The name tf.nn.max_pool is deprecated. Please use tf.nn.max_pool2d instead.
+
+2019-08-16 13:47:27.517855: I tensorflow/core/platform/cpu_feature_guard.cc:142] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 AVX512F FMA
+2019-08-16 13:47:27.525175: I tensorflow/core/platform/profile_utils/cpu_utils.cc:94] CPU Frequency: 3600000000 Hz
+2019-08-16 13:47:27.525434: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x5594b0f51560 executing computations on platform Host. Devices:
+2019-08-16 13:47:27.525450: I tensorflow/compiler/xla/service/service.cc:175]   StreamExecutor device (0): <undefined>, <undefined>
+2019-08-16 13:47:28.226033: W tensorflow/compiler/jit/mark_for_compilation_pass.cc:1412] (One-time warning): Not using XLA:CPU for cluster because envvar TF_XLA_FLAGS=--tf_xla_cpu_global_jit was not set.  If you want XLA:CPU, either set that envvar, or use experimental_jit_scope to enable XLA:CPU.  To confirm that XLA is active, pass --vmodule=xla_compilation_cache=1 (as a proper command-line flag, not via TF_XLA_FLAGS) or set the envvar XLA_FLAGS=--xla_hlo_profile.
+^Z
+[1]+  Stopped                 python multi_robot_ppo.py
+(swarm) ]0;jingl@tqyselfsupport-Precision-5820-Tower: ~/Documents/catkin_ws/src/RohansNN/scripts[01;32mjingl@tqyselfsupport-Precision-5820-Tower[00m:[01;34m~/Documents/catkin_ws/src/RohansNN/scripts[00m$ python mmulti_robot_ppo.py 
+WARNING: Logging before flag parsing goes to stderr.
+W0816 13:48:07.653614 140338403686144 deprecation_wrapper.py:119] From /home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/tensorlayer/layers/core.py:39: The name tf.GraphKeys is deprecated. Please use tf.compat.v1.GraphKeys instead.
+
+W0816 13:48:07.662869 140338403686144 deprecation_wrapper.py:119] From /home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/tensorlayer/layers/pooling.py:66: The name tf.nn.max_pool is deprecated. Please use tf.nn.max_pool2d instead.
+
+2019-08-16 13:48:08.547024: I tensorflow/core/platform/cpu_feature_guard.cc:142] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 AVX512F FMA
+2019-08-16 13:48:08.554815: I tensorflow/core/platform/profile_utils/cpu_utils.cc:94] CPU Frequency: 3600000000 Hz
+2019-08-16 13:48:08.555171: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x55c545d873e0 executing computations on platform Host. Devices:
+2019-08-16 13:48:08.555193: I tensorflow/compiler/xla/service/service.cc:175]   StreamExecutor device (0): <undefined>, <undefined>
+2019-08-16 13:48:09.277616: W tensorflow/compiler/jit/mark_for_compilation_pass.cc:1412] (One-time warning): Not using XLA:CPU for cluster because envvar TF_XLA_FLAGS=--tf_xla_cpu_global_jit was not set.  If you want XLA:CPU, either set that envvar, or use experimental_jit_scope to enable XLA:CPU.  To confirm that XLA is active, pass --vmodule=xla_compilation_cache=1 (as a proper command-line flag, not via TF_XLA_FLAGS) or set the envvar XLA_FLAGS=--xla_hlo_profile.
+	 + Starting on #0 sequence 
+***** Episode 1 *****
+	 + Update finished on #0 frame, inference time: 0:00:00.579949
+	 + Update finished on #1 frame, inference time: 0:00:00.478134
+	 + Update finished on #2 frame, inference time: 0:00:00.464922
+	 + Starting on #1 sequence 
+(360, 400, 4)
+/home/jingl/Documents/catkin_ws/src/RohansNN/scripts/ppo/agent.py:93: RuntimeWarning: divide by zero encountered in double_scalars
+  toplot = output* (1/output.max())
+/home/jingl/Documents/catkin_ws/src/RohansNN/scripts/ppo/agent.py:93: RuntimeWarning: invalid value encountered in multiply
+  toplot = output* (1/output.max())
+/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/matplotlib/image.py:405: UserWarning: Warning: converting a masked element to nan.
+  dv = (np.float64(self.norm.vmax) -
+/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/matplotlib/image.py:406: UserWarning: Warning: converting a masked element to nan.
+  np.float64(self.norm.vmin))
+/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/matplotlib/image.py:413: UserWarning: Warning: converting a masked element to nan.
+  a_min = np.float64(newmin)
+/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/matplotlib/image.py:418: UserWarning: Warning: converting a masked element to nan.
+  a_max = np.float64(newmax)
+/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/matplotlib/colors.py:916: UserWarning: Warning: converting a masked element to nan.
+  dtype = np.min_scalar_type(value)
+/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/numpy/ma/core.py:718: UserWarning: Warning: converting a masked element to nan.
+  data = np.array(a, copy=False, subok=subok)
+Traceback (most recent call last):
+  File "multi_robot_ppo.py", line 285, in <module>
+    learner.run()
+  File "multi_robot_ppo.py", line 240, in run
+    paths = self._get_paths(seed_iter)
+  File "multi_robot_ppo.py", line 216, in _get_paths
+    path_agents = self._rollout(env)
+  File "multi_robot_ppo.py", line 164, in _rollout
+    action_agents = self.agent.policy.act([scan_input,goal_input, vel_input, image_input], terminateds)
+  File "/home/jingl/Documents/catkin_ws/src/RohansNN/scripts/ppo/agent.py", line 178, in act
+    self.obs[3]: obs[3]
+  File "/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/tensorflow/python/client/session.py", line 950, in run
+    run_metadata_ptr)
+  File "/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/tensorflow/python/client/session.py", line 1149, in _run
+    str(subfeed_t.get_shape())))
+ValueError: Cannot feed value of shape (1, 1, 2) for Tensor u'goal_ph:0', which has shape '(?, 2)'
+(swarm) ]0;jingl@tqyselfsupport-Precision-5820-Tower: ~/Documents/catkin_ws/src/RohansNN/scripts[01;32mjingl@tqyselfsupport-Precision-5820-Tower[00m:[01;34m~/Documents/catkin_ws/src/RohansNN/scripts[00m$ python mmulti_robot_ppo.py [A(swarm) ]0;jingl@tqyselfsupport-Precision-5820-Tower: ~/Documents/catkin_ws/src/RohansNN/scripts[01;32mjingl@tqyselfsupport-Precision-5820-Tower[00m:[01;34m~/Documents/catkin_ws/src/RohansNN/scripts[00m$ [K
+[K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cpython mmulti_robot_ppo.py 
+WARNING: Logging before flag parsing goes to stderr.
+W0816 13:52:25.424999 140668056585984 deprecation_wrapper.py:119] From /home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/tensorlayer/layers/core.py:39: The name tf.GraphKeys is deprecated. Please use tf.compat.v1.GraphKeys instead.
+
+W0816 13:52:25.432230 140668056585984 deprecation_wrapper.py:119] From /home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/tensorlayer/layers/pooling.py:66: The name tf.nn.max_pool is deprecated. Please use tf.nn.max_pool2d instead.
+
+2019-08-16 13:52:26.294805: I tensorflow/core/platform/cpu_feature_guard.cc:142] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 AVX512F FMA
+2019-08-16 13:52:26.305640: I tensorflow/core/platform/profile_utils/cpu_utils.cc:94] CPU Frequency: 3600000000 Hz
+2019-08-16 13:52:26.305953: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x55fe2a40f3f0 executing computations on platform Host. Devices:
+2019-08-16 13:52:26.306021: I tensorflow/compiler/xla/service/service.cc:175]   StreamExecutor device (0): <undefined>, <undefined>
+2019-08-16 13:52:27.043957: W tensorflow/compiler/jit/mark_for_compilation_pass.cc:1412] (One-time warning): Not using XLA:CPU for cluster because envvar TF_XLA_FLAGS=--tf_xla_cpu_global_jit was not set.  If you want XLA:CPU, either set that envvar, or use experimental_jit_scope to enable XLA:CPU.  To confirm that XLA is active, pass --vmodule=xla_compilation_cache=1 (as a proper command-line flag, not via TF_XLA_FLAGS) or set the envvar XLA_FLAGS=--xla_hlo_profile.
+	 + Starting on #0 sequence 
+***** Episode 1 *****
+	 + Update finished on #0 frame, inference time: 0:00:00.536560
+	 + Update finished on #1 frame, inference time: 0:00:00.435140
+	 + Update finished on #2 frame, inference time: 0:00:00.432053
+	 + Starting on #1 sequence 
+(360, 400, 4)
+/home/jingl/Documents/catkin_ws/src/RohansNN/scripts/ppo/agent.py:94: RuntimeWarning: divide by zero encountered in double_scalars
+  toplot = output* (1/output.max())
+/home/jingl/Documents/catkin_ws/src/RohansNN/scripts/ppo/agent.py:94: RuntimeWarning: invalid value encountered in multiply
+  toplot = output* (1/output.max())
+/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/matplotlib/image.py:405: UserWarning: Warning: converting a masked element to nan.
+  dv = (np.float64(self.norm.vmax) -
+/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/matplotlib/image.py:406: UserWarning: Warning: converting a masked element to nan.
+  np.float64(self.norm.vmin))
+/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/matplotlib/image.py:413: UserWarning: Warning: converting a masked element to nan.
+  a_min = np.float64(newmin)
+/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/matplotlib/image.py:418: UserWarning: Warning: converting a masked element to nan.
+  a_max = np.float64(newmax)
+/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/matplotlib/colors.py:916: UserWarning: Warning: converting a masked element to nan.
+  dtype = np.min_scalar_type(value)
+/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/numpy/ma/core.py:718: UserWarning: Warning: converting a masked element to nan.
+  data = np.array(a, copy=False, subok=subok)
+Traceback (most recent call last):
+  File "multi_robot_ppo.py", line 285, in <module>
+    learner.run()
+  File "multi_robot_ppo.py", line 240, in run
+    paths = self._get_paths(seed_iter)
+  File "multi_robot_ppo.py", line 216, in _get_paths
+    path_agents = self._rollout(env)
+  File "multi_robot_ppo.py", line 164, in _rollout
+    action_agents = self.agent.policy.act([scan_input,goal_input, vel_input, image_input], terminateds)
+  File "/home/jingl/Documents/catkin_ws/src/RohansNN/scripts/ppo/agent.py", line 179, in act
+    self.obs[3]: obs[3]
+  File "/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/tensorflow/python/client/session.py", line 950, in run
+    run_metadata_ptr)
+  File "/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/tensorflow/python/client/session.py", line 1149, in _run
+    str(subfeed_t.get_shape())))
+ValueError: Cannot feed value of shape (1, 1, 2) for Tensor u'goal_ph:0', which has shape '(?, 2)'
+(swarm) ]0;jingl@tqyselfsupport-Precision-5820-Tower: ~/Documents/catkin_ws/src/RohansNN/scripts[01;32mjingl@tqyselfsupport-Precision-5820-Tower[00m:[01;34m~/Documents/catkin_ws/src/RohansNN/scripts[00m$ python mmulti_robot_ppo.py 
+WARNING: Logging before flag parsing goes to stderr.
+W0816 13:54:36.018203 139930367547136 deprecation_wrapper.py:119] From /home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/tensorlayer/layers/core.py:39: The name tf.GraphKeys is deprecated. Please use tf.compat.v1.GraphKeys instead.
+
+W0816 13:54:36.027781 139930367547136 deprecation_wrapper.py:119] From /home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/tensorlayer/layers/pooling.py:66: The name tf.nn.max_pool is deprecated. Please use tf.nn.max_pool2d instead.
+
+2019-08-16 13:54:36.952422: I tensorflow/core/platform/cpu_feature_guard.cc:142] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 AVX512F FMA
+2019-08-16 13:54:36.961683: I tensorflow/core/platform/profile_utils/cpu_utils.cc:94] CPU Frequency: 3600000000 Hz
+2019-08-16 13:54:36.962267: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x55eca6876780 executing computations on platform Host. Devices:
+2019-08-16 13:54:36.962326: I tensorflow/compiler/xla/service/service.cc:175]   StreamExecutor device (0): <undefined>, <undefined>
+2019-08-16 13:54:37.661807: W tensorflow/compiler/jit/mark_for_compilation_pass.cc:1412] (One-time warning): Not using XLA:CPU for cluster because envvar TF_XLA_FLAGS=--tf_xla_cpu_global_jit was not set.  If you want XLA:CPU, either set that envvar, or use experimental_jit_scope to enable XLA:CPU.  To confirm that XLA is active, pass --vmodule=xla_compilation_cache=1 (as a proper command-line flag, not via TF_XLA_FLAGS) or set the envvar XLA_FLAGS=--xla_hlo_profile.
+	 + Starting on #0 sequence 
+***** Episode 1 *****
+	 + Update finished on #0 frame, inference time: 0:00:00.527927
+	 + Update finished on #1 frame, inference time: 0:00:00.427177
+	 + Update finished on #2 frame, inference time: 0:00:00.436048
+	 + Starting on #1 sequence 
+(360, 400, 4)
+/home/jingl/Documents/catkin_ws/src/RohansNN/scripts/ppo/agent.py:94: RuntimeWarning: divide by zero encountered in double_scalars
+  toplot = output* (1/output.max())
+/home/jingl/Documents/catkin_ws/src/RohansNN/scripts/ppo/agent.py:94: RuntimeWarning: invalid value encountered in multiply
+  toplot = output* (1/output.max())
+/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/matplotlib/image.py:405: UserWarning: Warning: converting a masked element to nan.
+  dv = (np.float64(self.norm.vmax) -
+/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/matplotlib/image.py:406: UserWarning: Warning: converting a masked element to nan.
+  np.float64(self.norm.vmin))
+/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/matplotlib/image.py:413: UserWarning: Warning: converting a masked element to nan.
+  a_min = np.float64(newmin)
+/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/matplotlib/image.py:418: UserWarning: Warning: converting a masked element to nan.
+  a_max = np.float64(newmax)
+/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/matplotlib/colors.py:916: UserWarning: Warning: converting a masked element to nan.
+  dtype = np.min_scalar_type(value)
+/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/numpy/ma/core.py:718: UserWarning: Warning: converting a masked element to nan.
+  data = np.array(a, copy=False, subok=subok)
+Traceback (most recent call last):
+  File "multi_robot_ppo.py", line 285, in <module>
+    learner.run()
+  File "multi_robot_ppo.py", line 240, in run
+    paths = self._get_paths(seed_iter)
+  File "multi_robot_ppo.py", line 216, in _get_paths
+    path_agents = self._rollout(env)
+  File "multi_robot_ppo.py", line 164, in _rollout
+    action_agents = self.agent.policy.act([scan_input,goal_input, vel_input, image_input], terminateds)
+  File "/home/jingl/Documents/catkin_ws/src/RohansNN/scripts/ppo/agent.py", line 179, in act
+    self.obs[3]: obs[3]
+  File "/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/tensorflow/python/client/session.py", line 950, in run
+    run_metadata_ptr)
+  File "/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/tensorflow/python/client/session.py", line 1149, in _run
+    str(subfeed_t.get_shape())))
+ValueError: Cannot feed value of shape (1, 360, 400) for Tensor u'image_ph:0', which has shape '(?, 360, 400, 1)'
+(swarm) ]0;jingl@tqyselfsupport-Precision-5820-Tower: ~/Documents/catkin_ws/src/RohansNN/scripts[01;32mjingl@tqyselfsupport-Precision-5820-Tower[00m:[01;34m~/Documents/catkin_ws/src/RohansNN/scripts[00m$ python mmulti_robot_ppo.py 
+WARNING: Logging before flag parsing goes to stderr.
+W0816 13:56:29.388952 139973844322048 deprecation_wrapper.py:119] From /home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/tensorlayer/layers/core.py:39: The name tf.GraphKeys is deprecated. Please use tf.compat.v1.GraphKeys instead.
+
+W0816 13:56:29.396275 139973844322048 deprecation_wrapper.py:119] From /home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/tensorlayer/layers/pooling.py:66: The name tf.nn.max_pool is deprecated. Please use tf.nn.max_pool2d instead.
+
+2019-08-16 13:56:30.242701: I tensorflow/core/platform/cpu_feature_guard.cc:142] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 AVX512F FMA
+2019-08-16 13:56:30.255201: I tensorflow/core/platform/profile_utils/cpu_utils.cc:94] CPU Frequency: 3600000000 Hz
+2019-08-16 13:56:30.255487: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x55e419616810 executing computations on platform Host. Devices:
+2019-08-16 13:56:30.255508: I tensorflow/compiler/xla/service/service.cc:175]   StreamExecutor device (0): <undefined>, <undefined>
+2019-08-16 13:56:30.920927: W tensorflow/compiler/jit/mark_for_compilation_pass.cc:1412] (One-time warning): Not using XLA:CPU for cluster because envvar TF_XLA_FLAGS=--tf_xla_cpu_global_jit was not set.  If you want XLA:CPU, either set that envvar, or use experimental_jit_scope to enable XLA:CPU.  To confirm that XLA is active, pass --vmodule=xla_compilation_cache=1 (as a proper command-line flag, not via TF_XLA_FLAGS) or set the envvar XLA_FLAGS=--xla_hlo_profile.
+	 + Starting on #0 sequence 
+***** Episode 1 *****
+	 + Update finished on #0 frame, inference time: 0:00:00.572675
+	 + Update finished on #1 frame, inference time: 0:00:00.471794
+	 + Update finished on #2 frame, inference time: 0:00:00.470362
+	 + Starting on #1 sequence 
+(360, 400, 4)
+/home/jingl/Documents/catkin_ws/src/RohansNN/scripts/ppo/agent.py:94: RuntimeWarning: divide by zero encountered in double_scalars
+  toplot = output* (1/output.max())
+/home/jingl/Documents/catkin_ws/src/RohansNN/scripts/ppo/agent.py:94: RuntimeWarning: invalid value encountered in multiply
+  toplot = output* (1/output.max())
+/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/matplotlib/image.py:405: UserWarning: Warning: converting a masked element to nan.
+  dv = (np.float64(self.norm.vmax) -
+/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/matplotlib/image.py:406: UserWarning: Warning: converting a masked element to nan.
+  np.float64(self.norm.vmin))
+/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/matplotlib/image.py:413: UserWarning: Warning: converting a masked element to nan.
+  a_min = np.float64(newmin)
+/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/matplotlib/image.py:418: UserWarning: Warning: converting a masked element to nan.
+  a_max = np.float64(newmax)
+/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/matplotlib/colors.py:916: UserWarning: Warning: converting a masked element to nan.
+  dtype = np.min_scalar_type(value)
+/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/numpy/ma/core.py:718: UserWarning: Warning: converting a masked element to nan.
+  data = np.array(a, copy=False, subok=subok)
+	 + Update finished on #0 frame, inference time: 0:00:00.826319
+	 + Update finished on #1 frame, inference time: 0:00:00.470328
+	 + Update finished on #2 frame, inference time: 0:00:00.515986
+	 + Starting on #2 sequence 
+(360, 400, 4)
+	 + Update finished on #0 frame, inference time: 0:00:00.571519
+	 + Update finished on #1 frame, inference time: 0:00:00.469054
+	 + Update finished on #2 frame, inference time: 0:00:00.467730
+	 + Starting on #3 sequence 
+(360, 400, 4)
+	 + Update finished on #0 frame, inference time: 0:00:00.514686
+	 + Update finished on #1 frame, inference time: 0:00:00.466220
+	 + Update finished on #2 frame, inference time: 0:00:00.494322
+	 + Starting on #4 sequence 
+(360, 400, 4)
+	 + Update finished on #0 frame, inference time: 0:00:00.452372
+	 + Update finished on #1 frame, inference time: 0:00:00.481201
+	 + Update finished on #2 frame, inference time: 0:00:00.503292
+	 + Starting on #5 sequence 
+(360, 400, 4)
+	 + Update finished on #0 frame, inference time: 0:00:00.474995
+	 + Update finished on #1 frame, inference time: 0:00:00.511572
+	 + Update finished on #2 frame, inference time: 0:00:00.508627
+	 + Starting on #6 sequence 
+(360, 400, 4)
+	 + Update finished on #0 frame, inference time: 0:00:00.484384
+	 + Update finished on #1 frame, inference time: 0:00:00.498118
+	 + Update finished on #2 frame, inference time: 0:00:00.508610
+	 + Starting on #7 sequence 
+(360, 400, 4)
+***** Episode 2 *****
+	 + Update finished on #0 frame, inference time: 0:00:00.507254
+	 + Update finished on #1 frame, inference time: 0:00:00.494885
+	 + Update finished on #2 frame, inference time: 0:00:00.530208
+	 + Starting on #8 sequence 
+(360, 400, 4)
+	 + Update finished on #0 frame, inference time: 0:00:00.532367
+	 + Update finished on #1 frame, inference time: 0:00:00.503023
+	 + Update finished on #2 frame, inference time: 0:00:00.488213
+	 + Starting on #9 sequence 
+(360, 400, 4)
+	 + Update finished on #0 frame, inference time: 0:00:00.481275
+	 + Update finished on #1 frame, inference time: 0:00:00.519338
+	 + Update finished on #2 frame, inference time: 0:00:00.488567
+	 + Starting on #10 sequence 
+(360, 400, 4)
+	 + Update finished on #0 frame, inference time: 0:00:00.476025
+	 + Update finished on #1 frame, inference time: 0:00:00.530124
+	 + Update finished on #2 frame, inference time: 0:00:00.532045
+	 + Starting on #11 sequence 
+(360, 400, 4)
+	 + Update finished on #0 frame, inference time: 0:00:00.498475
+	 + Update finished on #1 frame, inference time: 0:00:00.481548
+	 + Update finished on #2 frame, inference time: 0:00:00.574589
+	 + Starting on #12 sequence 
+(360, 400, 4)
+	 + Update finished on #0 frame, inference time: 0:00:00.524267
+	 + Update finished on #1 frame, inference time: 0:00:00.459047
+	 + Update finished on #2 frame, inference time: 0:00:00.519768
+	 + Starting on #13 sequence 
+(360, 400, 4)
+	 + Update finished on #0 frame, inference time: 0:00:00.501260
+	 + Update finished on #1 frame, inference time: 0:00:00.490522
+	 + Update finished on #2 frame, inference time: 0:00:00.475843
+	 + Starting on #14 sequence 
+(360, 400, 4)
+	 + Update finished on #0 frame, inference time: 0:00:00.491996
+	 + Update finished on #1 frame, inference time: 0:00:00.531027
+	 + Update finished on #2 frame, inference time: 0:00:00.516138
+	 + Starting on #15 sequence 
+(360, 400, 4)
+Traceback (most recent call last):
+  File "multi_robot_ppo.py", line 285, in <module>
+    learner.run()
+  File "multi_robot_ppo.py", line 244, in run
+    stats = self.alg.update(paths)
+  File "/home/jingl/Documents/catkin_ws/src/RohansNN/scripts/ppo/ppo.py", line 204, in update
+    self.actor.save_network('last')
+  File "/home/jingl/Documents/catkin_ws/src/RohansNN/scripts/ppo/agent.py", line 206, in save_network
+    sess=self.sess)
+  File "/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/tensorlayer/files/utils.py", line 1614, in save_npz
+    np.savez(name, params=save_list_var)
+  File "/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/numpy/lib/npyio.py", line 603, in savez
+    _savez(file, args, kwds, False)
+  File "/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/numpy/lib/npyio.py", line 724, in _savez
+    pickle_kwargs=pickle_kwargs)
+  File "/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/numpy/lib/format.py", line 593, in write_array
+    pickle.dump(array, fp, protocol=2, **pickle_kwargs)
+OverflowError: cannot serialize a string larger than 2 GiB
+(swarm) ]0;jingl@tqyselfsupport-Precision-5820-Tower: ~/Documents/catkin_ws/src/RohansNN/scripts[01;32mjingl@tqyselfsupport-Precision-5820-Tower[00m:[01;34m~/Documents/catkin_ws/src/RohansNN/scripts[00m$ python mmulti_robot_ppo.py [A(swarm) ]0;jingl@tqyselfsupport-Precision-5820-Tower: ~/Documents/catkin_ws/src/RohansNN/scripts[01;32mjingl@tqyselfsupport-Precision-5820-Tower[00m:[01;34m~/Documents/catkin_ws/src/RohansNN/scripts[00m$ conda ac[6Ptivate swarm[A(swarm) ]0;jingl@tqyselfsupport-Precision-5820-Tower: ~/Documents/catkin_ws/src/RohansNN/scripts[01;32mjingl@tqyselfsupport-Precision-5820-Tower[00m:[01;34m~/Documents/catkin_ws/src/RohansNN/scripts[00m$ ls[K
+[K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Ccd scrippts/[A(swarm) ]0;jingl@tqyselfsupport-Precision-5820-Tower: ~/Documents/catkin_ws/src/RohansNN/scripts[01;32mjingl@tqyselfsupport-Precision-5820-Tower[00m:[01;34m~/Documents/catkin_ws/src/RohansNN/scripts[00m$ ls[K
+[K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cconda acctivate swarm[A(swarm) ]0;jingl@tqyselfsupport-Precision-5820-Tower: ~/Documents/catkin_ws/src/RohansNN/scripts[01;32mjingl@tqyselfsupport-Precision-5820-Tower[00m:[01;34m~/Documents/catkin_ws/src/RohansNN/scripts[00m$ python multi_robot_ppo.py [A(swarm) ]0;jingl@tqyselfsupport-Precision-5820-Tower: ~/Documents/catkin_ws/src/RohansNN/scripts[01;32mjingl@tqyselfsupport-Precision-5820-Tower[00m:[01;34m~/Documents/catkin_ws/src/RohansNN/scripts[00m$ [K
+[K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cpython  stage_env.py
+finish
+(swarm) ]0;jingl@tqyselfsupport-Precision-5820-Tower: ~/Documents/catkin_ws/src/RohansNN/scripts[01;32mjingl@tqyselfsupport-Precision-5820-Tower[00m:[01;34m~/Documents/catkin_ws/src/RohansNN/scripts[00m$ python sstage_env.pymulti_robot_ppo.py 
+WARNING: Logging before flag parsing goes to stderr.
+W0816 14:14:03.713577 140463623149312 deprecation_wrapper.py:119] From /home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/tensorlayer/layers/core.py:39: The name tf.GraphKeys is deprecated. Please use tf.compat.v1.GraphKeys instead.
+
+W0816 14:14:03.720413 140463623149312 deprecation_wrapper.py:119] From /home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/tensorlayer/layers/pooling.py:66: The name tf.nn.max_pool is deprecated. Please use tf.nn.max_pool2d instead.
+
+2019-08-16 14:14:04.630355: I tensorflow/core/platform/cpu_feature_guard.cc:142] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 AVX512F FMA
+2019-08-16 14:14:04.639566: I tensorflow/core/platform/profile_utils/cpu_utils.cc:94] CPU Frequency: 3600000000 Hz
+2019-08-16 14:14:04.639883: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x55bc2d273260 executing computations on platform Host. Devices:
+2019-08-16 14:14:04.639905: I tensorflow/compiler/xla/service/service.cc:175]   StreamExecutor device (0): <undefined>, <undefined>
+2019-08-16 14:14:05.325174: W tensorflow/compiler/jit/mark_for_compilation_pass.cc:1412] (One-time warning): Not using XLA:CPU for cluster because envvar TF_XLA_FLAGS=--tf_xla_cpu_global_jit was not set.  If you want XLA:CPU, either set that envvar, or use experimental_jit_scope to enable XLA:CPU.  To confirm that XLA is active, pass --vmodule=xla_compilation_cache=1 (as a proper command-line flag, not via TF_XLA_FLAGS) or set the envvar XLA_FLAGS=--xla_hlo_profile.
+	 + Starting on #0 sequence 
+***** Episode 1 *****
+	 + Update finished on #0 frame, inference time: 0:00:00.578959
+	 + Update finished on #1 frame, inference time: 0:00:00.451525
+	 + Update finished on #2 frame, inference time: 0:00:00.452656
+	 + Starting on #1 sequence 
+(360, 400, 4)
+/home/jingl/Documents/catkin_ws/src/RohansNN/scripts/ppo/agent.py:94: RuntimeWarning: divide by zero encountered in double_scalars
+  toplot = output* (1/output.max())
+/home/jingl/Documents/catkin_ws/src/RohansNN/scripts/ppo/agent.py:94: RuntimeWarning: invalid value encountered in multiply
+  toplot = output* (1/output.max())
+/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/matplotlib/image.py:405: UserWarning: Warning: converting a masked element to nan.
+  dv = (np.float64(self.norm.vmax) -
+/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/matplotlib/image.py:406: UserWarning: Warning: converting a masked element to nan.
+  np.float64(self.norm.vmin))
+/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/matplotlib/image.py:413: UserWarning: Warning: converting a masked element to nan.
+  a_min = np.float64(newmin)
+/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/matplotlib/image.py:418: UserWarning: Warning: converting a masked element to nan.
+  a_max = np.float64(newmax)
+/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/matplotlib/colors.py:916: UserWarning: Warning: converting a masked element to nan.
+  dtype = np.min_scalar_type(value)
+/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/numpy/ma/core.py:718: UserWarning: Warning: converting a masked element to nan.
+  data = np.array(a, copy=False, subok=subok)
+	 + Update finished on #0 frame, inference time: 0:00:00.656966
+	 + Update finished on #1 frame, inference time: 0:00:00.577036
+	 + Update finished on #2 frame, inference time: 0:00:00.459283
+	 + Starting on #2 sequence 
+(360, 400, 4)
+	 + Update finished on #0 frame, inference time: 0:00:00.584692
+	 + Update finished on #1 frame, inference time: 0:00:00.471267
+	 + Update finished on #2 frame, inference time: 0:00:00.476983
+	 + Starting on #3 sequence 
+(360, 400, 4)
+	 + Update finished on #0 frame, inference time: 0:00:00.457905
+	 + Update finished on #1 frame, inference time: 0:00:00.473588
+	 + Update finished on #2 frame, inference time: 0:00:00.534882
+	 + Starting on #4 sequence 
+(360, 400, 4)
+	 + Update finished on #0 frame, inference time: 0:00:00.501789
+	 + Update finished on #1 frame, inference time: 0:00:00.509511
+	 + Update finished on #2 frame, inference time: 0:00:00.486338
+	 + Starting on #5 sequence 
+(360, 400, 4)
+***** Episode 2 *****
+	 + Update finished on #0 frame, inference time: 0:00:00.504014
+	 + Update finished on #1 frame, inference time: 0:00:00.487539
+	 + Update finished on #2 frame, inference time: 0:00:00.473707
+	 + Starting on #6 sequence 
+(360, 400, 4)
+	 + Update finished on #0 frame, inference time: 0:00:00.462534
+	 + Update finished on #1 frame, inference time: 0:00:00.470219
+	 + Update finished on #2 frame, inference time: 0:00:00.510187
+	 + Starting on #7 sequence 
+(360, 400, 4)
+	 + Update finished on #0 frame, inference time: 0:00:00.484603
+	 + Update finished on #1 frame, inference time: 0:00:00.464424
+	 + Update finished on #2 frame, inference time: 0:00:00.479664
+	 + Starting on #8 sequence 
+(360, 400, 4)
+	 + Update finished on #0 frame, inference time: 0:00:00.454686
+	 + Update finished on #1 frame, inference time: 0:00:00.483201
+	 + Update finished on #2 frame, inference time: 0:00:00.473417
+	 + Starting on #9 sequence 
+(360, 400, 4)
+	 + Update finished on #0 frame, inference time: 0:00:00.487049
+	 + Update finished on #1 frame, inference time: 0:00:00.523198
+	 + Update finished on #2 frame, inference time: 0:00:00.450500
+	 + Starting on #10 sequence 
+(360, 400, 4)
+	 + Update finished on #0 frame, inference time: 0:00:00.471264
+	 + Update finished on #1 frame, inference time: 0:00:00.467677
+	 + Update finished on #2 frame, inference time: 0:00:00.506880
+	 + Starting on #11 sequence 
+(360, 400, 4)
+	 + Update finished on #0 frame, inference time: 0:00:00.508021
+	 + Update finished on #1 frame, inference time: 0:00:00.494568
+	 + Update finished on #2 frame, inference time: 0:00:00.518555
+	 + Starting on #12 sequence 
+(360, 400, 4)
+	 + Update finished on #0 frame, inference time: 0:00:00.489125
+	 + Update finished on #1 frame, inference time: 0:00:00.435487
+	 + Update finished on #2 frame, inference time: 0:00:00.469084
+	 + Starting on #13 sequence 
+(360, 400, 4)
+	 + Update finished on #0 frame, inference time: 0:00:00.480717
+	 + Update finished on #1 frame, inference time: 0:00:00.434406
+	 + Update finished on #2 frame, inference time: 0:00:00.447987
+	 + Starting on #14 sequence 
+(360, 400, 4)
+	 + Update finished on #0 frame, inference time: 0:00:00.508411
+	 + Update finished on #1 frame, inference time: 0:00:00.467359
+	 + Update finished on #2 frame, inference time: 0:00:00.453119
+	 + Starting on #15 sequence 
+(360, 400, 4)
+^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^C^CTraceback (most recent call last):
+  File "multi_robot_ppo.py", line 285, in <module>
+    learner.run()
+  File "multi_robot_ppo.py", line 244, in run
+    stats = self.alg.update(paths)
+  File "/home/jingl/Documents/catkin_ws/src/RohansNN/scripts/ppo/ppo.py", line 204, in update
+    self.actor.save_network('last')
+  File "/home/jingl/Documents/catkin_ws/src/RohansNN/scripts/ppo/agent.py", line 206, in save_network
+    sess=self.sess)
+  File "/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/tensorlayer/files/utils.py", line 1614, in save_npz
+    np.savez(name, params=save_list_var)
+  File "/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/numpy/lib/npyio.py", line 603, in savez
+    _savez(file, args, kwds, False)
+  File "/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/numpy/lib/npyio.py", line 724, in _savez
+    pickle_kwargs=pickle_kwargs)
+  File "/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/numpy/lib/format.py", line 593, in write_array
+    pickle.dump(array, fp, protocol=2, **pickle_kwargs)
+OverflowError: cannot serialize a string larger than 2 GiB
+(swarm) ]0;jingl@tqyselfsupport-Precision-5820-Tower: ~/Documents/catkin_ws/src/RohansNN/scripts[01;32mjingl@tqyselfsupport-Precision-5820-Tower[00m:[01;34m~/Documents/catkin_ws/src/RohansNN/scripts[00m$ python  stage_env.py
+finish
+(swarm) ]0;jingl@tqyselfsupport-Precision-5820-Tower: ~/Documents/catkin_ws/src/RohansNN/scripts[01;32mjingl@tqyselfsupport-Precision-5820-Tower[00m:[01;34m~/Documents/catkin_ws/src/RohansNN/scripts[00m$ python[K[K[K[K[K[Kpython sstage_env.pymulti_robot_ppo.py [7Pstage_env.py
+finish
+(swarm) ]0;jingl@tqyselfsupport-Precision-5820-Tower: ~/Documents/catkin_ws/src/RohansNN/scripts[01;32mjingl@tqyselfsupport-Precision-5820-Tower[00m:[01;34m~/Documents/catkin_ws/src/RohansNN/scripts[00m$ python sstage_env.pymulti_robot_ppo.py 
+WARNING: Logging before flag parsing goes to stderr.
+W0816 14:24:03.100676 140687936542464 deprecation_wrapper.py:119] From /home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/tensorlayer/layers/core.py:39: The name tf.GraphKeys is deprecated. Please use tf.compat.v1.GraphKeys instead.
+
+W0816 14:24:03.107660 140687936542464 deprecation_wrapper.py:119] From /home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/tensorlayer/layers/pooling.py:66: The name tf.nn.max_pool is deprecated. Please use tf.nn.max_pool2d instead.
+
+2019-08-16 14:24:03.970535: I tensorflow/core/platform/cpu_feature_guard.cc:142] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 AVX512F FMA
+2019-08-16 14:24:03.980953: I tensorflow/core/platform/profile_utils/cpu_utils.cc:94] CPU Frequency: 3600000000 Hz
+2019-08-16 14:24:03.981431: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x559b24184710 executing computations on platform Host. Devices:
+2019-08-16 14:24:03.981459: I tensorflow/compiler/xla/service/service.cc:175]   StreamExecutor device (0): <undefined>, <undefined>
+2019-08-16 14:24:04.725996: W tensorflow/compiler/jit/mark_for_compilation_pass.cc:1412] (One-time warning): Not using XLA:CPU for cluster because envvar TF_XLA_FLAGS=--tf_xla_cpu_global_jit was not set.  If you want XLA:CPU, either set that envvar, or use experimental_jit_scope to enable XLA:CPU.  To confirm that XLA is active, pass --vmodule=xla_compilation_cache=1 (as a proper command-line flag, not via TF_XLA_FLAGS) or set the envvar XLA_FLAGS=--xla_hlo_profile.
+	 + Starting on #0 sequence 
+***** Episode 1 *****
+	 + Update finished on #0 frame, inference time: 0:00:00.818688
+	 + Update finished on #1 frame, inference time: 0:00:00.537720
+	 + Update finished on #2 frame, inference time: 0:00:00.584944
+	 + Starting on #1 sequence 
+(360, 400, 4)
+	 + Update finished on #0 frame, inference time: 0:00:00.604353
+	 + Update finished on #1 frame, inference time: 0:00:00.477995
+	 + Update finished on #2 frame, inference time: 0:00:00.474886
+	 + Starting on #2 sequence 
+(360, 400, 4)
+	 + Update finished on #0 frame, inference time: 0:00:00.471125
+	 + Update finished on #1 frame, inference time: 0:00:00.599228
+	 + Update finished on #2 frame, inference time: 0:00:00.489569
+	 + Starting on #3 sequence 
+(360, 400, 4)
+	 + Update finished on #0 frame, inference time: 0:00:00.560928
+	 + Update finished on #1 frame, inference time: 0:00:00.489785
+	 + Update finished on #2 frame, inference time: 0:00:00.482959
+	 + Starting on #4 sequence 
+(360, 400, 4)
+	 + Update finished on #0 frame, inference time: 0:00:00.483515
+	 + Update finished on #1 frame, inference time: 0:00:00.476236
+	 + Update finished on #2 frame, inference time: 0:00:00.470966
+	 + Starting on #5 sequence 
+(360, 400, 4)
+/home/jingl/Documents/catkin_ws/src/RohansNN/scripts/ppo/agent.py:94: RuntimeWarning: divide by zero encountered in double_scalars
+  toplot = output* (1/output.max())
+/home/jingl/Documents/catkin_ws/src/RohansNN/scripts/ppo/agent.py:94: RuntimeWarning: invalid value encountered in multiply
+  toplot = output* (1/output.max())
+/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/matplotlib/image.py:405: UserWarning: Warning: converting a masked element to nan.
+  dv = (np.float64(self.norm.vmax) -
+/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/matplotlib/image.py:406: UserWarning: Warning: converting a masked element to nan.
+  np.float64(self.norm.vmin))
+/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/matplotlib/image.py:413: UserWarning: Warning: converting a masked element to nan.
+  a_min = np.float64(newmin)
+/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/matplotlib/image.py:418: UserWarning: Warning: converting a masked element to nan.
+  a_max = np.float64(newmax)
+/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/matplotlib/colors.py:916: UserWarning: Warning: converting a masked element to nan.
+  dtype = np.min_scalar_type(value)
+/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/numpy/ma/core.py:718: UserWarning: Warning: converting a masked element to nan.
+  data = np.array(a, copy=False, subok=subok)
+	 + Update finished on #0 frame, inference time: 0:00:00.511823
+	 + Update finished on #1 frame, inference time: 0:00:00.554364
+	 + Update finished on #2 frame, inference time: 0:00:00.554879
+	 + Starting on #6 sequence 
+(360, 400, 4)
+	 + Update finished on #0 frame, inference time: 0:00:00.455386
+	 + Update finished on #1 frame, inference time: 0:00:00.486111
+	 + Update finished on #2 frame, inference time: 0:00:00.462937
+	 + Starting on #7 sequence 
+(360, 400, 4)
+	 + Update finished on #0 frame, inference time: 0:00:00.505243
+	 + Update finished on #1 frame, inference time: 0:00:00.535005
+	 + Update finished on #2 frame, inference time: 0:00:00.439308
+	 + Starting on #8 sequence 
+(360, 400, 4)
+	 + Update finished on #0 frame, inference time: 0:00:00.515938
+	 + Update finished on #1 frame, inference time: 0:00:00.466647
+	 + Update finished on #2 frame, inference time: 0:00:00.464335
+	 + Starting on #9 sequence 
+(360, 400, 4)
+***** Episode 2 *****
+	 + Update finished on #0 frame, inference time: 0:00:00.456338
+	 + Update finished on #1 frame, inference time: 0:00:00.494308
+	 + Update finished on #2 frame, inference time: 0:00:00.502422
+	 + Starting on #10 sequence 
+(360, 400, 4)
+	 + Update finished on #0 frame, inference time: 0:00:00.490663
+	 + Update finished on #1 frame, inference time: 0:00:00.473616
+	 + Update finished on #2 frame, inference time: 0:00:00.524956
+	 + Starting on #11 sequence 
+(360, 400, 4)
+	 + Update finished on #0 frame, inference time: 0:00:00.475461
+	 + Update finished on #1 frame, inference time: 0:00:00.491920
+	 + Update finished on #2 frame, inference time: 0:00:00.453935
+	 + Starting on #12 sequence 
+(360, 400, 4)
+	 + Update finished on #0 frame, inference time: 0:00:00.495698
+	 + Update finished on #1 frame, inference time: 0:00:00.505111
+	 + Update finished on #2 frame, inference time: 0:00:00.502683
+	 + Starting on #13 sequence 
+(360, 400, 4)
+Traceback (most recent call last):
+  File "multi_robot_ppo.py", line 285, in <module>
+    learner.run()
+  File "multi_robot_ppo.py", line 244, in run
+    stats = self.alg.update(paths)
+  File "/home/jingl/Documents/catkin_ws/src/RohansNN/scripts/ppo/ppo.py", line 204, in update
+    self.actor.save_network('last')
+  File "/home/jingl/Documents/catkin_ws/src/RohansNN/scripts/ppo/agent.py", line 206, in save_network
+    sess=self.sess)
+  File "/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/tensorlayer/files/utils.py", line 1614, in save_npz
+    np.savez(name, params=save_list_var)
+  File "/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/numpy/lib/npyio.py", line 603, in savez
+    _savez(file, args, kwds, False)
+  File "/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/numpy/lib/npyio.py", line 724, in _savez
+    pickle_kwargs=pickle_kwargs)
+  File "/home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/numpy/lib/format.py", line 593, in write_array
+    pickle.dump(array, fp, protocol=2, **pickle_kwargs)
+OverflowError: cannot serialize a string larger than 2 GiB
+(swarm) ]0;jingl@tqyselfsupport-Precision-5820-Tower: ~/Documents/catkin_ws/src/RohansNN/scripts[01;32mjingl@tqyselfsupport-Precision-5820-Tower[00m:[01;34m~/Documents/catkin_ws/src/RohansNN/scripts[00m$ rosrun  [A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[K
+[K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[K[K[K[K[K[Kpython mmulti_robot_ppo.py [7Pstage_env.py
+finish
+(swarm) ]0;jingl@tqyselfsupport-Precision-5820-Tower: ~/Documents/catkin_ws/src/RohansNN/scripts[01;32mjingl@tqyselfsupport-Precision-5820-Tower[00m:[01;34m~/Documents/catkin_ws/src/RohansNN/scripts[00m$ python sstage_env.pymulti_robot_ppo.py 
+WARNING: Logging before flag parsing goes to stderr.
+W0816 15:09:44.250719 140072739153664 deprecation_wrapper.py:119] From /home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/tensorlayer/layers/core.py:39: The name tf.GraphKeys is deprecated. Please use tf.compat.v1.GraphKeys instead.
+
+W0816 15:09:44.257853 140072739153664 deprecation_wrapper.py:119] From /home/jingl/.conda/envs/swarm/lib/python2.7/site-packages/tensorlayer/layers/pooling.py:66: The name tf.nn.max_pool is deprecated. Please use tf.nn.max_pool2d instead.
+
+2019-08-16 15:09:45.125962: I tensorflow/core/platform/cpu_feature_guard.cc:142] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 AVX512F FMA
+2019-08-16 15:09:45.134650: I tensorflow/core/platform/profile_utils/cpu_u
