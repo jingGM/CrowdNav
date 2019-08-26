@@ -165,7 +165,7 @@ class StageEnv(object):
         actions = np.array(actions)
         for action in actions:
             action[0] = np.clip(action[0], 0.0, self.max_vx)
-            action[1] = np.clip(action[1], -0.3, 0.3)
+            action[1] = np.clip(action[1], -0.4, 0.4)
             # action = self.vel_smoother.step(action[0], action[1], 0.1)
 
         self.agent_actions = actions
@@ -527,7 +527,7 @@ class StageEnv(object):
             self.goal_markers_id += 1
         if ns == "usv":
             marker.type = marker.MESH_RESOURCE
-            marker.mesh_resource = "file:///home/jingl/Documents/catkin_ws/src/naviswarm_onlydepth_waypoint/rviz/usv.dae"
+            marker.mesh_resource = "file:///home/utsavp/Documents/catkin_ws/src/RGB_lidar/rviz/usv.dae"
             marker.id = self.agent_markers_id
             self.agent_markers.markers.append(marker)
             self.agent_markers_id += 1

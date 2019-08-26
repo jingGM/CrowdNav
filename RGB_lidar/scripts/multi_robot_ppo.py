@@ -83,17 +83,17 @@ parser.add_argument(
     help='max timesteps of the whole training')
 parser.add_argument(
     '--batch_max_steps',
-    default=10, #8000,
+    default=400, #8000,
     type=int,
     help='max timesteps of a batch for updating')
 parser.add_argument(
     '--episode_max_steps',
-    default=10, #400,
+    default=100, #400,
     type=int,
     help='max timesteps of an episode')
 parser.add_argument(
     '--train_max_iters',
-    default=2, #4000,
+    default=500, #4000,
     type=int,
     help='maximum training iterations')
 parser.add_argument(
@@ -112,8 +112,8 @@ class MultiRobotDRL(object):
         self.alg = alg
 
         if args.load_network:
-            self.agent.value.load_network( 'last')
-            self.agent.policy.load_network('last')
+            self.agent.value.load_network( 'best')
+            self.agent.policy.load_network('best')
 
         self.reward_pub = rospy.Publisher('/drl/reward', numpy_msg(Floats), queue_size=1)
 

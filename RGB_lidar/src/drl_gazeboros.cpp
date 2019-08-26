@@ -745,7 +745,7 @@ int GazeboTrain::train(){
 
                   current_transition.terminal = false;
 
-                  reward_approaching_goal = 5*(state.goalObs.goal_prev.goal_dist - state.goalObs.goal_now.goal_dist);
+                  reward_approaching_goal = 7*(state.goalObs.goal_prev.goal_dist - state.goalObs.goal_now.goal_dist);
                   penalty_for_bigvz = std::abs(state.velObs.vel_now.vz) * (-0.1);
                   penalty_for_time = (current_steps+1) *(0);
                   distance_to_obstacle = -(LidarMaxDistance-depthmin)*0.1;
