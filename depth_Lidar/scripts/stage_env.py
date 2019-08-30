@@ -166,7 +166,7 @@ class StageEnv(object):
         actions = np.array(actions)
         for action in actions:
             action[0] = np.clip(action[0], 0.0, self.max_vx)
-            action[1] = np.clip(action[1], -0.3, 0.3)
+            action[1] = np.clip(action[1], -0.4, 0.4)
             # action = self.vel_smoother.step(action[0], action[1], 0.1)
 
         self.agent_actions = actions
@@ -320,7 +320,7 @@ class StageEnv(object):
         # self.starts, self.goals = self.scenarios.random_obstacles_scene()
         # self.starts, self.goals, self.waypoints = self.scenarios.circle_scene_uniform()
         # self.starts, self.goals = self.scenarios.circle_scene_with_obstacles()
-        self.starts, self.goals, self.waypoints = self.scenarios.corridor_static()
+        self.starts, self.goals, self.waypoints = self.scenarios.zigzag()
         # self.starts, self.goals = self.scenarios.crossing_scene(6)
         # self.starts, self.goals = self.scenarios.ten_cross_scene(0.8, 6)
         # self.starts, self.goals = self.scenarios.crossing_with_obstacle_scene(6)

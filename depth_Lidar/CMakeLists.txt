@@ -258,8 +258,8 @@ include_directories(${GAZEBO_INCLUDE_DIRS})
 link_directories(${GAZEBO_LIBRARY_DIRS})
 list(APPEND CMAKE_CXX_FLAGS "${GAZEBO_CXX_FLAGS}")
 
-add_library(ActorPlugin SHARED src/ActorPlugin.cc)
-target_link_libraries(ActorPlugin ${GAZEBO_LIBRARIES})
+# add_library(ActorPlugin SHARED src/ActorPlugin.cc)
+# target_link_libraries(ActorPlugin ${GAZEBO_LIBRARIES})
 
 add_executable(drl_gazeboros src/drl_gazeboros.cpp)
 target_link_libraries(drl_gazeboros ${catkin_LIBRARIES} ${OpenCV_LIBS} ${Boost_LIBRARIES} 
@@ -270,16 +270,16 @@ if(catkin_EXPORTED_TARGETS)
 endif()
 
 
-add_executable(cpptest src/cpptest.cpp)
-target_link_libraries(cpptest ${catkin_LIBRARIES} ${OpenCV_LIBS} ${Boost_LIBRARIES} 
--L/opt/ros/kinetic/lib -lstage  -lfltk_images -lfltk_forms -lfltk_gl -lGL -lfltk -lSM -lICE -lX11 -lXext -lm -lGLU -lGL -lGLU -lGL
-${${PROJECT_NAME}_extra_libs})
-if(catkin_EXPORTED_TARGETS)
-  add_dependencies(cpptest ${catkin_EXPORTED_TARGETS})
-endif()
+# add_executable(cpptest src/cpptest.cpp)
+# target_link_libraries(cpptest ${catkin_LIBRARIES} ${OpenCV_LIBS} ${Boost_LIBRARIES} 
+# -L/opt/ros/kinetic/lib -lstage  -lfltk_images -lfltk_forms -lfltk_gl -lGL -lfltk -lSM -lICE -lX11 -lXext -lm -lGLU -lGL -lGLU -lGL
+# ${${PROJECT_NAME}_extra_libs})
+# if(catkin_EXPORTED_TARGETS)
+#   add_dependencies(cpptest ${catkin_EXPORTED_TARGETS})
+# endif()
 
 
-install(TARGETS drl_gazeboros cpptest
+install(TARGETS drl_gazeboros 
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})

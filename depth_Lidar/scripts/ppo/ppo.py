@@ -129,7 +129,7 @@ class PPO(object):
         with tf.name_scope('loss'):
             tf.summary.scalar('critic_loss', self.critic_loss)
 
-    def update(self, paths):
+    def update(self, paths,iteratorcounter):
         self.time_step += 1
 
         acts     = np.concatenate([path["action"] for path in paths])
@@ -155,7 +155,7 @@ class PPO(object):
         advs = (advs - advs.mean()) / (advs.std() + 1e-6)
 
         if self.time_step > 1: # train acotr after trained critic
-            kl = self.actor_update(obs_scan,obs_image, obs_goal, obs_vel, acts, advs)
+            kl = self.actor_update(obs_scan,obs_image, obs_goal, obs_vel, acts, advs,iteratorcounter)
         self.critic_update(obs_scan,obs_image, obs_goal, obs_vel, rets)
 
         stats = OrderedDict()
@@ -228,7 +228,7 @@ class PPO(object):
 
         return stats, succ_agent
 
-    def actor_update(self, obs_scan,obs_image, obs_goal, obs_vel, acts, advs):
+    def actor_update(self, obs_scan,obs_image, obs_goal, obs_vel, acts, advs,iteratorcounter):
         feed_dict = {
             self.obs_scan: obs_scan,
             self.obs_image:obs_image,
@@ -252,14 +252,21 @@ class PPO(object):
             if kl > self.kl_targ * 4:  # early stopping
                 break
 
-        if kl > self.kl_targ * 2:
-            self.beta = np.minimum(35, 1.5 * self.beta)
-            if self.beta > 30 and self.lr_multiplier > 0.1:
-                self.lr_multiplier /= 1.5
-        elif kl < self.kl_targ / 2.0:
-            self.beta = np.maximum(1.0 / 35.0, self.beta / 1.5)
-            if self.beta < (1.0 / 30.0) and self.lr_multiplier < 10:
-                self.lr_multiplier *= 1.5
+        if iteratorcounter < 100:
+            print(iteratorcounter)
+            if kl > self.kl_targ * 2:
+                self.beta = np.minimum(35, 1.5 * self.beta)
+                if self.beta > 30 and self.lr_multiplier > 0.1:
+                    self.lr_multiplier /= 1.5
+            elif kl < self.kl_targ / 2.0:
+                self.beta = np.maximum(1.0 / 35.0, self.beta / 1.5)
+                if self.beta < (1.0 / 30.0) and self.lr_multiplier < 10:
+                    self.lr_multiplier *= 1.5
+        else:
+            if kl < self.kl_targ / 2.0:
+                self.beta = np.maximum(1.0 / 35.0, self.beta / 1.5)
+                if self.beta < (1.0 / 30.0) and self.lr_multiplier < 10:
+                    self.lr_multiplier *= 1.5
 
         return kl
 

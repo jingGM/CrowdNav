@@ -739,7 +739,7 @@ int GazeboTrain::train(){
                     double distx = std::abs(gpose[i].position.x - waypoint_data[i].data[waypoint_index].x);
                     double disty = std::abs(gpose[i].position.y - waypoint_data[i].data[waypoint_index].y); 
                     double distance_to_waypoint = GetDistance(distx,disty);
-                    if (distance_to_waypoint<0.4){reached_way_point +=10;}
+                    if (distance_to_waypoint<0.4){reached_way_point =10;}
                   }
                   
                   
@@ -747,7 +747,7 @@ int GazeboTrain::train(){
 
                   current_transition.terminal = false;
 
-                  reward_approaching_goal = 5*(state.goalObs.goal_prev.goal_dist - state.goalObs.goal_now.goal_dist);
+                  reward_approaching_goal = 8*(state.goalObs.goal_prev.goal_dist - state.goalObs.goal_now.goal_dist);
                   penalty_for_bigvz = std::abs(state.velObs.vel_now.vz) * (-0.1);
                   penalty_for_time = (current_steps+1) *(0);
                   distance_to_obstacle = -(LidarMaxDistance-depthmin)*0.1;
@@ -891,7 +891,7 @@ int main(int argc, char **argv){
   ros::init(argc, argv, "drl_gazeboros");
   //ros::Rate r(10);
 
-  GazeboTrain gazeboc(2);
+  GazeboTrain gazeboc(1);
 
   if(gazeboc.create_sharedmemory() != 0)
         exit(-1);

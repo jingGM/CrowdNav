@@ -37,7 +37,7 @@ parser = argparse.ArgumentParser(
 parser.add_argument(
     '--train', default=True, type=bool, help='train or test')
 parser.add_argument(
-    '--num_agents', default=2, type=int, help='number of robots')
+    '--num_agents', default=1, type=int, help='number of robots')
 parser.add_argument(
     '--num_obstacles', default=0, type=int, help='number of obstacles')
 parser.add_argument(
@@ -83,22 +83,22 @@ parser.add_argument(
     help='max timesteps of the whole training')
 parser.add_argument(
     '--batch_max_steps',
-    default=20, #8000,
+    default=200, #8000,
     type=int,
     help='max timesteps of a batch for updating')
 parser.add_argument(
     '--episode_max_steps',
-    default=10, #400,
+    default=100, #400,
     type=int,
     help='max timesteps of an episode')
 parser.add_argument(
     '--train_max_iters',
-    default=2, #4000,
+    default=800, #4000,
     type=int,
     help='maximum training iterations')
 parser.add_argument(
     '--load_network',
-    default=False,
+    default=True,
     type=bool,
     help='whether to load pretrained networks')
 
@@ -241,7 +241,7 @@ class MultiRobotDRL(object):
             #print("--{}--".format(paths))
             #print("=== path ===")
             if args.train:
-                stats = self.alg.update(paths)
+                stats = self.alg.update(paths,iterCounter)
                 #print("in training===")
             else:
                 stats, succ_agent = self.alg.test(paths)

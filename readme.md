@@ -3,6 +3,15 @@ environment: naviswarm_depth_v2
 	empty environment
 	depth camera
 
+status:
+ depth only training for pedestrians is not enough, may need to train for a longer time
+ rgb is in training for static
+ depth+lidar is in training for pedestrians, also in static environment.
+
+
+
+
+
 double reched_goal_reward = 40;
 double collision_penalty =-40;
 reward_approaching_goal = 5*(state.goalObs.goal_prev.goal_dist - state.goalObs.goal_now.goal_dist);

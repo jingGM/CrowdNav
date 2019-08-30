@@ -62,17 +62,17 @@ class Scenarios(object):
 
         return self.starts, self.goals, self.waypoints
 
-    def corridor_ped(self):
-        sx, sy, sa = 3., -1., 1.57
-        gx, gy, ga = 3., 4., 1.57
-        waypoint = [[4, 1.5],[gx,gy]]
+    def corridor_static(self):
+        sx, sy, sa = 2., -3., 1.57
+        gx, gy, ga = 2., 3., 1.57
+        waypoint = [[3., 0],[gx,gy]]
         self.starts.append([sx, sy, sa])
         self.goals.append([gx, gy, ga])
         self.waypoints.append(waypoint)
 
-        sx, sy, sa = -3., -1., 1.57
-        gx, gy, ga = -3., 4., 1.57
-        waypoint = [[-4, 1.5],[gx,gy]]
+        sx, sy, sa = -2., -3., 1.57
+        gx, gy, ga = -2., 3., 1.57
+        waypoint = [[-3, 0],[gx,gy]]
         self.starts.append([sx, sy, sa])
         self.goals.append([gx, gy, ga])
         self.waypoints.append(waypoint)
@@ -83,6 +83,16 @@ class Scenarios(object):
         sx, sy, sa = 11.5, 0., 3.14
         gx, gy, ga = 3., 0., 3.14
         waypoint = [[gx,gy]]
+        self.starts.append([sx, sy, sa])
+        self.goals.append([gx, gy, ga])
+        self.waypoints.append(waypoint)
+
+        return self.starts, self.goals, self.waypoints
+
+    def zigzag(self):
+        sx, sy, sa = 5., -8.5, 3.14
+        gx, gy, ga = -14., 8., 3.14
+        waypoint = [[0,-6.5],[-0.5,-0.5],[-5.,0.5],[-5.0,8.0],[gx,gy]]
         self.starts.append([sx, sy, sa])
         self.goals.append([gx, gy, ga])
         self.waypoints.append(waypoint)

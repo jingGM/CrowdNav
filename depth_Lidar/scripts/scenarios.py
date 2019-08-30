@@ -79,6 +79,25 @@ class Scenarios(object):
 
         return self.starts, self.goals, self.waypoints
 
+    def narrow_ped(self):
+        sx, sy, sa = 11.5, 0., 3.14
+        gx, gy, ga = 3., 0., 3.14
+        waypoint = [[gx,gy]]
+        self.starts.append([sx, sy, sa])
+        self.goals.append([gx, gy, ga])
+        self.waypoints.append(waypoint)
+
+        return self.starts, self.goals, self.waypoints
+
+    def zigzag(self):
+        sx, sy, sa = 5., -8.5, 3.14
+        gx, gy, ga = -14., 8., 3.14
+        waypoint = [[0,-6.5],[-0.5,-0.5],[-5.,0.5],[-5.0,8.0],[gx,gy]]
+        self.starts.append([sx, sy, sa])
+        self.goals.append([gx, gy, ga])
+        self.waypoints.append(waypoint)
+
+        return self.starts, self.goals, self.waypoints
 
 
 

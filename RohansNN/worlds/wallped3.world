@@ -121,11 +121,11 @@
         <trajectory id='0' type='walking' tension='0'>
           <waypoint>
             <time>0</time>
-            <pose>-10 1 0 0 -0 0</pose>
+            <pose>-10 0.6 0 0 -0 0</pose>
           </waypoint>
           <waypoint>
             <time>60</time>
-            <pose>10 1 0 0 -0 0</pose>
+            <pose>10 0.6 0 0 -0 0</pose>
           </waypoint>
           <waypoint>
             <time>63</time>
@@ -141,7 +141,7 @@
           </waypoint>
           <waypoint>
             <time>72</time>
-            <pose>-10 1 0 0 -0 0</pose>
+            <pose>-10 0.6 0 0 -0 0</pose>
           </waypoint>
 
         </trajectory>
@@ -162,11 +162,11 @@
         <trajectory id='1' type='walking' tension='0'>
           <waypoint>
             <time>0</time>
-            <pose>-2 1 0 0 -0 0</pose>
+            <pose>-2 0.6 0 0 -0 0</pose>
           </waypoint>
           <waypoint>
             <time>36</time>
-            <pose>10 1 0 0 -0 0</pose>
+            <pose>10 0.6 0 0 -0 0</pose>
           </waypoint>
           <waypoint>
             <time>39</time>
@@ -182,11 +182,11 @@
           </waypoint>
           <waypoint>
             <time>54</time>
-            <pose>-10 1 0 0 -0 0</pose>
+            <pose>-10 0.6 0 0 -0 0</pose>
           </waypoint>
           <waypoint>
             <time>72</time>
-            <pose>-2 1 0 0 -0 0</pose>
+            <pose>-2 0.6 0 0 -0 0</pose>
           </waypoint>
         </trajectory>
       </script>
@@ -206,11 +206,11 @@
         <trajectory id='2' type='walking' tension='0'>
           <waypoint>
             <time>0</time>
-            <pose>6 1 0 0 -0 0</pose>
+            <pose>6 0.6 0 0 -0 0</pose>
           </waypoint>
           <waypoint>
             <time>12</time>
-            <pose>10 1 0 0 -0 0</pose>
+            <pose>10 0.6 0 0 -0 0</pose>
           </waypoint>
           <waypoint>
             <time>15</time>
@@ -226,11 +226,11 @@
           </waypoint>
           <waypoint>
             <time>24</time>
-            <pose>-10 1 0 0 -0 0</pose>
+            <pose>-10 0.6 0 0 -0 0</pose>
           </waypoint>
           <waypoint>
             <time>72</time>
-            <pose>6 1 0 0 -0 0</pose>
+            <pose>6 0.6 0 0 -0 0</pose>
           </waypoint>
         </trajectory>
       </script>
@@ -250,11 +250,11 @@
         <trajectory id='3' type='walking' tension='0'>
           <waypoint>
             <time>0</time>
-            <pose>-6 -1 0 0 -0 0</pose>
+            <pose>-6 -0.6 0 0 -0 0</pose>
           </waypoint>
           <waypoint>
             <time>48</time>
-            <pose>10 -1 0 0 -0 0</pose>
+            <pose>10 -0.6 0 0 -0 0</pose>
           </waypoint>
           <waypoint>
             <time>51</time>
@@ -270,11 +270,11 @@
           </waypoint>
           <waypoint>
             <time>60</time>
-            <pose>-10 -1 0 0 -0 0</pose>
+            <pose>-10 -0.6 0 0 -0 0</pose>
           </waypoint>
           <waypoint>
             <time>72</time>
-            <pose>-6 -1 0 0 -0 0</pose>
+            <pose>-6 -0.6 0 0 -0 0</pose>
           </waypoint>
 
         </trajectory>
@@ -295,11 +295,11 @@
         <trajectory id='4' type='walking' tension='0'>
           <waypoint>
             <time>0</time>
-            <pose>2 -1 0 0 -0 0</pose>
+            <pose>2 -0.6 0 0 -0 0</pose>
           </waypoint>
           <waypoint>
             <time>24</time>
-            <pose>10 -1 0 0 -0 0</pose>
+            <pose>10 -0.6 0 0 -0 0</pose>
           </waypoint>
           <waypoint>
             <time>27</time>
@@ -315,11 +315,11 @@
           </waypoint>
           <waypoint>
             <time>36</time>
-            <pose>-10 -1 0 0 -0 0</pose>
+            <pose>-10 -0.6 0 0 -0 0</pose>
           </waypoint>
           <waypoint>
             <time>72</time>
-            <pose>2 -1 0 0 -0 0</pose>
+            <pose>2 -0.6 0 0 -0 0</pose>
           </waypoint>
         </trajectory>
       </script>
@@ -339,7 +339,7 @@
         <trajectory id='5' type='walking' tension='0'>
           <waypoint>
             <time>0</time>
-            <pose>10 -1 0 0 -0 0</pose>
+            <pose>10 -0.6 0 0 -0 0</pose>
           </waypoint>
           <waypoint>
             <time>3</time>
@@ -355,11 +355,11 @@
           </waypoint>
           <waypoint>
             <time>12</time>
-            <pose>-10 -1 0 0 -0 0</pose>
+            <pose>-10 -0.6 0 0 -0 0</pose>
           </waypoint>
           <waypoint>
             <time>72</time>
-            <pose>10 -1 0 0 -0 0</pose>
+            <pose>10 -0.6 0 0 -0 0</pose>
           </waypoint>
         </trajectory>
       </script>
