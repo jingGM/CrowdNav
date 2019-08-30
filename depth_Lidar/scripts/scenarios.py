@@ -79,6 +79,32 @@ class Scenarios(object):
 
         return self.starts, self.goals, self.waypoints
 
+    def narrow_ped(self):
+        sx, sy, sa = 11.5, 0., 3.14
+        gx, gy, ga = 3., 0., 3.14
+        waypoint = [[gx,gy]]
+        self.starts.append([sx, sy, sa])
+        self.goals.append([gx, gy, ga])
+        self.waypoints.append(waypoint)
+
+        return self.starts, self.goals, self.waypoints
+
+    def corridor_straight(self):
+        sx, sy, sa = 2., -3., 1.57
+        gx, gy, ga = 2., 3., 1.57
+        waypoint = [[2., 0],[gx,gy]]
+        self.starts.append([sx, sy, sa])
+        self.goals.append([gx, gy, ga])
+        self.waypoints.append(waypoint)
+
+        sx, sy, sa = -2., -3., 1.57
+        gx, gy, ga = -2., 3., 1.57
+        waypoint = [[-2, 0],[gx,gy]]
+        self.starts.append([sx, sy, sa])
+        self.goals.append([gx, gy, ga])
+        self.waypoints.append(waypoint)
+
+        return self.starts, self.goals, self.waypoints
 
 
 
