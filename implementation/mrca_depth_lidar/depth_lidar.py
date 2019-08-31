@@ -198,7 +198,7 @@ class Environment(object):
             act = self.agent.act([self.scan, goal, self.vel, self.image], terminated)
             
             act[1] = -act[1]
-            print 'linear: ', act[0], ' --- angular: ', act[1]
+            #print 'linear: ', act[0], ' --- angular: ', act[1]
             self.send_command(act)
             self.control_rate.sleep()
             if terminated:
@@ -210,7 +210,7 @@ class Environment(object):
         command = Twist()
         command.linear.x = act[0]
         command.angular.z = act[1]
-        print(command)
+        # print(command)
         self.command_pub.publish(command)
         
     def preprocess_scan(self, scan):
@@ -251,6 +251,7 @@ class Environment(object):
         scan = self.preprocess_scan(data.ranges)
         # print scan
         self.scan = np.concatenate((self.scan[:, 1:], np.asarray([scan]).transpose()), axis=1)
+        rospy.loginfo("===scan===")
         # print 'shape: ', np.shape(self.scan)
         # print(self.scan.shape)
         # print('==========scan==========')
@@ -265,7 +266,7 @@ class Environment(object):
         r,c = np.shape(image_now)
         for k in range(r):
             for j in range(c):
-                if math.isnan(img[i][j]) or img[i][j]>MAXDISTANCE:
+                if math.isnan(image_now[k][j]) or image_now[k][j]>CAMMAXDISTANCE:
                     image_now[k][j] = CAMMAXDISTANCE
 
         #print(image_now.shape)
@@ -297,8 +298,9 @@ class Environment(object):
         # image_now = self.process_rgb_image(data)
         # print(self.image.shape)
         self.image = np.concatenate((self.image[:,:, 1:], image_now), axis=2)
-        print(self.image.shape)
-        print('==========image==========')
+        #print(self.image.shape)
+        rospy.loginfo("===image===")
+        #print('==========image==========')
                 
     def odom_callback(self, data):
         import tf
@@ -313,8 +315,8 @@ class Environment(object):
         self.target_pos[0] = data.linear.x
         self.target_pos[1] = data.linear.y
         self.target_pos[2] = data.linear.z
-        print(self.target_pos)
-        print("========target==========")
+        # print(self.target_pos)
+        # print("========target==========")
         
     
 if __name__ == '__main__':
