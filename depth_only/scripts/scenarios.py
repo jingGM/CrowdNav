@@ -99,6 +99,40 @@ class Scenarios(object):
 
         return self.starts, self.goals, self.waypoints
 
+    def static_obs(self):
+        sx, sy, sa = 0., 0., -3.14
+        gx, gy, ga = 1., 4., 0
+        waypoint = [[0,2],[0,1],[gx,gy]]
+        self.starts.append([sx, sy, sa])
+        self.goals.append([gx, gy, ga])
+        self.waypoints.append(waypoint)
+
+        sx, sy, sa = 0., -1., -1.57
+        gx, gy, ga = 4., -2.5, 1.57
+        waypoint = [[2, -1.5],[gx,gy]]
+        self.starts.append([sx, sy, sa])
+        self.goals.append([gx, gy, ga])
+        self.waypoints.append(waypoint)
+
+        return self.starts, self.goals, self.waypoints
+
+    def empty(self):
+        sx, sy, sa = 0., 1., 0
+        gx, gy, ga = 3., 4., 0
+        waypoint = [[2,3],[1,2],[gx,gy]]
+        self.starts.append([sx, sy, sa])
+        self.goals.append([gx, gy, ga])
+        self.waypoints.append(waypoint)
+
+        sx, sy, sa = 0., -1., 0
+        gx, gy, ga = 3., -4., 0
+        waypoint = [[2, -3],[1, -2],[gx,gy]]
+        self.starts.append([sx, sy, sa])
+        self.goals.append([gx, gy, ga])
+        self.waypoints.append(waypoint)
+
+        return self.starts, self.goals, self.waypoints
+
 
 
 

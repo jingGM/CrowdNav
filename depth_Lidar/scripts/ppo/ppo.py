@@ -252,21 +252,21 @@ class PPO(object):
             if kl > self.kl_targ * 4:  # early stopping
                 break
 
-        if iteratorcounter < 100:
-            print(iteratorcounter)
-            if kl > self.kl_targ * 2:
-                self.beta = np.minimum(35, 1.5 * self.beta)
-                if self.beta > 30 and self.lr_multiplier > 0.1:
-                    self.lr_multiplier /= 1.5
-            elif kl < self.kl_targ / 2.0:
-                self.beta = np.maximum(1.0 / 35.0, self.beta / 1.5)
-                if self.beta < (1.0 / 30.0) and self.lr_multiplier < 10:
-                    self.lr_multiplier *= 1.5
-        else:
-            if kl < self.kl_targ / 2.0:
-                self.beta = np.maximum(1.0 / 35.0, self.beta / 1.5)
-                if self.beta < (1.0 / 30.0) and self.lr_multiplier < 10:
-                    self.lr_multiplier *= 1.5
+        # if iteratorcounter < 100:
+        #     print(iteratorcounter)
+        if kl > self.kl_targ * 2:
+            self.beta = np.minimum(35, 1.5 * self.beta)
+            if self.beta > 30 and self.lr_multiplier > 0.1:
+                self.lr_multiplier /= 1.5
+        elif kl < self.kl_targ / 2.0:
+            self.beta = np.maximum(1.0 / 35.0, self.beta / 1.5)
+            if self.beta < (1.0 / 30.0) and self.lr_multiplier < 10:
+                self.lr_multiplier *= 1.5
+        # else:
+        #     if kl < self.kl_targ / 2.0:
+        #         self.beta = np.maximum(1.0 / 35.0, self.beta / 1.5)
+        #         if self.beta < (1.0 / 30.0) and self.lr_multiplier < 10:
+        #             self.lr_multiplier *= 1.5
 
         return kl
 

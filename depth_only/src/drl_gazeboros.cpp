@@ -102,7 +102,7 @@ using namespace message_filters;
  #define OBSTACLE_NUM 0
  //#define MIN_DIST_BETWEEN_AGENTS ROBOT_RADIUS*2
 
- #define LidarMinDistance 0.5
+ #define LidarMinDistance 0.4
  #define LidarMaxDistance 5
 
 //Class definition
@@ -890,7 +890,7 @@ int main(int argc, char **argv){
   ros::init(argc, argv, "drl_gazeboros");
   //ros::Rate r(10);
 
-  GazeboTrain gazeboc(1);
+  GazeboTrain gazeboc(2);
 
   if(gazeboc.create_sharedmemory() != 0)
         exit(-1);
