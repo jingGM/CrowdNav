@@ -35,7 +35,7 @@ parser = argparse.ArgumentParser(
     'Deep Reinforcement Learning')
 
 parser.add_argument(
-    '--train', default=True, type=bool, help='train or test')
+    '--train', default=False, type=bool, help='train or test')
 parser.add_argument(
     '--num_agents', default=1, type=int, help='number of robots')
 parser.add_argument(
@@ -88,12 +88,12 @@ parser.add_argument(
     help='max timesteps of a batch for updating')
 parser.add_argument(
     '--episode_max_steps',
-    default=100, #400,
+    default=200, #400,
     type=int,
     help='max timesteps of an episode')
 parser.add_argument(
     '--train_max_iters',
-    default=800, #4000,
+    default=20, #4000,
     type=int,
     help='maximum training iterations')
 parser.add_argument(
