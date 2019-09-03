@@ -15,7 +15,7 @@ import cv2
 
 # Hyper parameters
 MAX_LINEAR_VELOCITY = 0.5
-MAX_ANGULAR_VELOCITY = 0.4
+MAX_ANGULAR_VELOCITY = 0.5
 CAMMAXDISTANCE = 5
 STOPDISTANCE = 0.5
 
@@ -175,7 +175,7 @@ class Environment(object):
         self.image_counter = 0
         
         # rospy.Subscriber('/scan', LaserScan, self.scan_callback)
-        rospy.Subscriber('/odom', Odometry, self.odom_callback)
+        # rospy.Subscriber('/odom', Odometry, self.odom_callback)
         rospy.Subscriber('/target/position', Twist, self.target_callback)
         rospy.Subscriber('/camera/depth_registered/image_raw', Image, self.image_callback)
         
@@ -189,6 +189,8 @@ class Environment(object):
             goal, terminated = self.preprocess_nav()
             act = self.agent.act([goal, self.vel, self.image], terminated)
             
+            self.vel[0] = act[0]
+            self.vel[1] = act[1]
             act[1] = -act[1]
 
             if (self.target_pos[0]<STOPDISTANCE and self.target_pos[1]<STOPDISTANCE):
@@ -271,16 +273,16 @@ class Environment(object):
         return image_now
 
     def image_callback(self,data):
-        if self.image_counter>2:
+        if len(self.imagebuffer) > 2:
         	for imageindex in range(3):
 	        	image_now = self.process_depth_image(self.imagebuffer[imageindex])
 	        	self.image = np.concatenate((self.image[:,:, 1:], image_now), axis=2)
         	self.imagebuffer = []
-        	self.image_counter = 0
+        	#self.image_counter = 0
         else:
-        	rospy.loginfo("==image==")
+        	#rospy.loginfo("==image==")
         	self.imagebuffer.append(data)
-        	self.image_counter += 1
+        	#self.image_counter += 1
         
                 
     def odom_callback(self, data):

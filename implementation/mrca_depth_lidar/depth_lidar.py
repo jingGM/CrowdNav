@@ -15,7 +15,7 @@ import cv2
 
 # Hyper parameters
 MAX_LINEAR_VELOCITY = 0.5
-MAX_ANGULAR_VELOCITY = 0.5
+MAX_ANGULAR_VELOCITY = 0.4
 CAMMAXDISTANCE = 5
 
 
@@ -181,8 +181,11 @@ class Environment(object):
         self.odom_x = 0.
         self.odom_y = 0.
         self.odom_heading = 0.
+
+        self.imagebuffer = []
+        self.image_counter = 0
         
-        rospy.Subscriber('/scan', LaserScan, self.scan_callback)
+        rospy.Subscriber('/scan', LaserScan,self.scan_callback)
         rospy.Subscriber('/odom', Odometry, self.odom_callback)
         rospy.Subscriber('/target/position', Twist, self.target_callback)
         rospy.Subscriber('/camera/depth_registered/image_raw', Image, self.image_callback)
@@ -198,7 +201,7 @@ class Environment(object):
             act = self.agent.act([self.scan, goal, self.vel, self.image], terminated)
             
             act[1] = -act[1]
-            #print 'linear: ', act[0], ' --- angular: ', act[1]
+            print 'linear: ', act[0], ' --- angular: ', act[1]
             self.send_command(act)
             self.control_rate.sleep()
             if terminated:
@@ -251,7 +254,7 @@ class Environment(object):
         scan = self.preprocess_scan(data.ranges)
         # print scan
         self.scan = np.concatenate((self.scan[:, 1:], np.asarray([scan]).transpose()), axis=1)
-        rospy.loginfo("===scan===")
+        #rospy.loginfo("===scan===")
         # print 'shape: ', np.shape(self.scan)
         # print(self.scan.shape)
         # print('==========scan==========')
@@ -294,14 +297,20 @@ class Environment(object):
         return image_now
 
     def image_callback(self,data):
-        image_now = self.process_depth_image(data)
-        # image_now = self.process_rgb_image(data)
-        # print(self.image.shape)
-        self.image = np.concatenate((self.image[:,:, 1:], image_now), axis=2)
-        #print(self.image.shape)
-        rospy.loginfo("===image===")
-        #print('==========image==========')
-                
+        #image_now = self.process_depth_image(data)
+        #self.image = np.concatenate((self.image[:,:, 1:], image_now), axis=2)
+        #rospy.loginfo("==image==")
+        
+        if len(self.imagebuffer) > 2:
+            for imageindex in range(3):
+                image_now = self.process_depth_image(self.imagebuffer[imageindex])
+                self.image = np.concatenate((self.image[:,:, 1:], image_now), axis=2)
+            self.imagebuffer = []
+        else:
+            rospy.loginfo("==image==")
+            self.imagebuffer.append(data)
+        
+
     def odom_callback(self, data):
         import tf
         import tf.transformations
