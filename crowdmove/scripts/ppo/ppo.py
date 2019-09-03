@@ -210,7 +210,7 @@ class PPO(object):
         epPathLengths = np.array([len(path["reward"]) for path in paths])
         succ_agent = np.zeros(len(epRewards))
         for i, ep in enumerate(epRewards):
-            if ep > 20:
+            if ep > 19:
                 succ_agent[i] = 1
 
         stats["SuccessNum"]       = succ_agent.sum()

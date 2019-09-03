@@ -891,7 +891,7 @@ int main(int argc, char **argv){
   ros::init(argc, argv, "drl_gazeboros");
   //ros::Rate r(10);
 
-  GazeboTrain gazeboc(1);
+  GazeboTrain gazeboc(4);
 
   if(gazeboc.create_sharedmemory() != 0)
         exit(-1);

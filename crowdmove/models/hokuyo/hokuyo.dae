@@ -219,7 +219,7 @@
         <rotate sid="rotationZ">0 0 1 46.69194</rotate>
         <rotate sid="rotationY">0 1 0 0.619768</rotate>
         <rotate sid="rotationX">1 0 0 63.5593</rotate>
-        <scale sid="scale">1 1 1</scale>
+        <scale sid="scale">3 2 3</scale>
         <instance_camera url="#Camera-camera"/>
       </node>
       <node id="Lamp" name="Lamp" type="NODE">
@@ -227,7 +227,7 @@
         <rotate sid="rotationZ">0 0 1 106.9363</rotate>
         <rotate sid="rotationY">0 1 0 3.163707</rotate>
         <rotate sid="rotationX">1 0 0 37.26105</rotate>
-        <scale sid="scale">1 1 1</scale>
+        <scale sid="scale">3 2 3</scale>
         <instance_light url="#Lamp-light"/>
       </node>
       <node id="Mesh_001" name="Mesh_001" type="NODE">
@@ -235,7 +235,7 @@
         <rotate sid="rotationZ">0 0 1 0</rotate>
         <rotate sid="rotationY">0 1 0 0</rotate>
         <rotate sid="rotationX">1 0 0 90.00001</rotate>
-        <scale sid="scale">2 1 2</scale>
+        <scale sid="scale">3 2 3</scale>
         <instance_geometry url="#Mesh-mesh">
           <bind_material>
             <technique_common>

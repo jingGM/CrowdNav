@@ -155,7 +155,7 @@ class RunningAverageFilter(object):
                              x[i].scan_prev.ranges,
                              x[i].scan_now.ranges),axis=1)
 
-                    data = data - 0.1    
+                    data = (data-0.1)/6 
                 elif self.obstype == "goal":
                     data = [x[i].goal_now.goal_dist, x[i].goal_now.goal_theta]
                 elif self.obstype == "action":
@@ -194,6 +194,7 @@ class RunningAverageFilter(object):
                              x[0].scan_prev.ranges,
                              x[0].scan_now.ranges),
                             axis=1)
+                    data = (data-0.1)/6
             elif self.obstype == "goal":
                     data = np.array([x[0].goal_now.goal_dist, x[0].goal_now.goal_theta])
             elif self.obstype == "action":
