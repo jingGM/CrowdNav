@@ -191,10 +191,13 @@ def callbackfortest(data):
     cv2.waitKey(5)
 
 if __name__ == '__main__':
-    rospy.init_node('test', anonymous=True)
+    a = np.array([1,2,3])
+    b = a -0.1
+    print(b)
+    # rospy.init_node('test', anonymous=True)
 
-    #RobotNumber=5
+    # #RobotNumber=5
 
-    #data = EnvData(RobotNumber)
-    #listener(RobotNumber,data)
-    testcompressed()
+    # #data = EnvData(RobotNumber)
+    # #listener(RobotNumber,data)
+    # testcompressed()

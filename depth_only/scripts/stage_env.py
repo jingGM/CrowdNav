@@ -320,8 +320,9 @@ class StageEnv(object):
         # self.starts, self.goals = self.scenarios.random_obstacles_scene()
         # self.starts, self.goals, self.waypoints = self.scenarios.circle_scene_uniform()
         # self.starts, self.goals = self.scenarios.circle_scene_with_obstacles()
-        self.starts, self.goals, self.waypoints = self.scenarios.corridor_static()
-        # self.starts, self.goals, self.waypoints = self.scenarios.empty()
+        # self.starts, self.goals, self.waypoints = self.scenarios.corridor_static()
+        self.starts, self.goals, self.waypoints = self.scenarios.empty()
+        # print(len(self.goals))
         # self.starts, self.goals, self.waypoints = self.scenarios.narrow_ped()
         
         # self.starts, self.goals = self.scenarios.crossing_scene(6)
