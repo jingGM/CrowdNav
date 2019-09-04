@@ -206,13 +206,19 @@ class PPO(object):
     def test(self, paths):
         stats = OrderedDict()
 
-        epRewards = np.array([path["reward"].sum() for path in paths])
+        for path in paths:
+            print(path["reward"])
+        print("==path reward==")
+        # epRewards = np.array([path["reward"].sum() for path in paths])
+        epRewards = np.array([path["reward"][-1] for path in paths])
         epPathLengths = np.array([len(path["reward"]) for path in paths])
         succ_agent = np.zeros(len(epRewards))
+        # print(succ_agent)
         for i, ep in enumerate(epRewards):
             if ep > 19:
                 succ_agent[i] = 1
-
+        print(succ_agent)
+        print("==successful agents==")
         stats["SuccessNum"]       = succ_agent.sum()
         stats["SuccessRate"]      = succ_agent.sum() / succ_agent.shape[0]
         stats["EpRewardsMean"]    = epRewards.mean()

@@ -83,12 +83,12 @@ parser.add_argument(
     help='max timesteps of the whole training')
 parser.add_argument(
     '--batch_max_steps',
-    default=800, #8000,
+    default=400, #8000,
     type=int,
     help='max timesteps of a batch for updating')
 parser.add_argument(
     '--episode_max_steps',
-    default=200, #400,
+    default=100, #400,
     type=int,
     help='max timesteps of an episode')
 parser.add_argument(
@@ -119,6 +119,7 @@ class MultiRobotDRL(object):
 
         self.num_agents = args.num_agents
         self.episodes_counter = 0
+        self.succ_robot = [0]*self.num_agents
 
     def _rollout(self, env):
         # use multiple agents to collect paths in one episode
@@ -129,6 +130,7 @@ class MultiRobotDRL(object):
         paths = defaultdict(list)
 
         obs_agents = env.reset()
+        self.succ_robot = [0]*self.num_agents
 
         for step in range(args.episode_max_steps):
             env.render()
@@ -159,6 +161,12 @@ class MultiRobotDRL(object):
             #print("===agents reward===")
             if step == 0:
                 reward_agents = np.zeros(args.num_agents)
+            print(reward_agents)
+            print("==reward==")
+            for cas in range(len(reward_agents)):
+                if reward_agents[cas]>=20:
+                    self.succ_robot[cas] = 1
+
             paths["reward"].append(reward_agents)
             self.plot_reward(np.asarray(reward_agents))
 
@@ -204,6 +212,7 @@ class MultiRobotDRL(object):
                 paths_batch.append(path)
                 #print "paths_batch:", len(paths_batch), "/ ", len(paths_batch[0])
                 timesteps_counter += len(path["reward"])
+                print "path rewards:", path["reward"]
 
             if timesteps_counter > args.batch_max_steps or args.train is False:
                 break
@@ -224,11 +233,10 @@ class MultiRobotDRL(object):
         while iterCounter < args.train_max_iters and not rospy.is_shutdown():
             iterCounter += 1
             paths = self._get_paths(seed_iter)
-            #print("--{}--".format(paths))
-            #print("=== path ===")
+            # print("--{}--".format(paths))
+            # print("=== path ===")
             if args.train:
                 stats = self.alg.update(paths,iterCounter)
-                #print("in training===")
             else:
                 stats, succ_agent = self.alg.test(paths)
                 stats["MeanDistance"] = (self.env.perfect_distance * succ_agent).sum() / succ_agent.sum()

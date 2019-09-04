@@ -176,19 +176,41 @@ def callbackfortest(data):
     img = bridge.imgmsg_to_cv2(data, "32FC1")
     img = np.array(img, dtype=np.float32)
     MAXDISTANCE = 5
-
     # img = cv2.normalize(img, img, 0, 255, cv2.NORM_MINMAX)
-
     #print(type(img))
     r,c = np.shape(img)
     for i in range(r):
         for j in range(c):
             if math.isnan(img[i][j]):
                 img[i][j] = MAXDISTANCE
-    np.savetxt("foo.csv", img, delimiter=",")
-    print(img)
-    cv2.imshow("Depth", img)
-    cv2.waitKey(5)
+    shrinkedlist = np.amin(img, axis = 0)
+
+
+    MINANGLE = 10
+    ImageFOV = 70
+    THRESHOLDCOLLISION = 0.5
+
+    minpixelnumber = MINANGLE*len(shrinkedlist)/ImageFOV
+    counter_near = 0
+    emergency_trigger = False
+    for i in range(len(shrinkedlist)):
+        if shrinkedlist[i] < THRESHOLDCOLLISION:
+            counter_near += 1
+            if counter_near >= minpixelnumber:
+                emergency_trigger = True
+        else:
+            counter_near = 0
+    print(emergency_trigger)
+    # print(len(shrinkedlist))
+
+    # np.savetxt("foo.csv", img, delimiter=",")
+    # print(img)
+    # cv2.imshow("Depth", img)
+    # cv2.waitKey(5)
+    
+
+
+
 
 if __name__ == '__main__':
     rospy.init_node('test', anonymous=True)
