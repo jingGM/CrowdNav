@@ -17,6 +17,11 @@ import cv2
 MAX_LINEAR_VELOCITY = 0.5
 MAX_ANGULAR_VELOCITY = 0.4
 CAMMAXDISTANCE = 5
+STOPDISTANCE = 0.5
+
+MINANGLE = 10
+ImageFOV = 70
+THRESHOLDCOLLISION = 0.5
 
 
 class MLSHAgent(object):
@@ -186,6 +191,7 @@ class Environment(object):
 
         self.imagebuffer = []
         self.image_counter = 0
+        self.emergency_trigger =False
         
         rospy.Subscriber('/scan', LaserScan,self.scan_callback)
         #rospy.Subscriber('/odom', Odometry, self.odom_callback)
@@ -196,7 +202,7 @@ class Environment(object):
         # self.command_pub = rospy.Publisher('/turtlebot0/cmd_vel_mux/input/navi', Twist, queue_size=1)
         
         time.sleep(1)
-        
+
     def run(self):
         while not rospy.is_shutdown():
             goal, terminated = self.preprocess_nav()
@@ -205,6 +211,14 @@ class Environment(object):
             self.vel[0] = act[0] #*2
             self.vel[1] = act[1]
             act[1] = -act[1]
+
+            if self.emergency_trigger:
+                act[0] = 0
+                act[1] = MAX_ANGULAR_VELOCITY
+
+            if (self.target_pos[0]<STOPDISTANCE and self.target_pos[1]<STOPDISTANCE):
+                act[0] = 0
+                act[1] = 0
             #act[0] = act[0]*2
             print 'linear: ', act[0], ' --- angular: ', act[1]
             self.send_command(act)
@@ -302,19 +316,30 @@ class Environment(object):
         return image_now
 
     def image_callback(self,data):
-        image_now = self.process_depth_image(data)
-        self.image = np.concatenate((self.image[:,:, 1:], image_now), axis=2)
+        # image_now = self.process_depth_image(data)
+        # self.image = np.concatenate((self.image[:,:, 1:], image_now), axis=2)
         #rospy.loginfo("==image==")
-        '''
+        
+        self.imagebuffer.append(data)
         if len(self.imagebuffer) > 2:
             for imageindex in range(3):
                 image_now = self.process_depth_image(self.imagebuffer[imageindex])
                 self.image = np.concatenate((self.image[:,:, 1:], image_now), axis=2)
             self.imagebuffer = []
-        else:
-            #rospy.loginfo("==image==")
-            self.imagebuffer.append(data)
-        '''
+            
+        
+        shrinkedlist = np.amin(self.image[2], axis = 0)
+        
+        minpixelnumber = MINANGLE*len(shrinkedlist)/ImageFOV
+        counter_near = 0
+        self.emergency_trigger = False
+        for i in range(len(shrinkedlist)):
+            if shrinkedlist[i] < THRESHOLDCOLLISION:
+                counter_near += 1
+                if counter_near >= minpixelnumber:
+                    self.emergency_trigger = True
+            else:
+                counter_near = 0
 
     def odom_callback(self, data):
         import tf

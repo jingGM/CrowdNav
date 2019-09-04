@@ -200,7 +200,9 @@ def callbackfortest(data):
                 emergency_trigger = True
         else:
             counter_near = 0
+    print(shrinkedlist)
     print(emergency_trigger)
+    print("-------------------")
     # print(len(shrinkedlist))
 
     # np.savetxt("foo.csv", img, delimiter=",")
