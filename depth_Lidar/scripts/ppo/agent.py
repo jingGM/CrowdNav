@@ -56,10 +56,16 @@ class Agent(object):
 
         image_filtered = np.array(image_filtered,dtype=float)/5
 
+        # np.savetxt("lidar.csv", scan_filtered[0,::,2], delimiter=",")
+        # np.savetxt("image.csv", image_filtered[0,::,::,2], delimiter=",")
         # fig = plt.figure(figsize=(10, 5))
-        # ax = fig.add_subplot(221)
+        # ax = fig.add_subplot(121)
         # toplot = image_filtered[0,::,::,2]
         # plt.imshow(toplot)
+        # ax = fig.add_subplot(122)
+        # toplot = scan_filtered[0,::,2]
+        # plt.plot(toplot)
+        # plt.savefig('predictions.png')
         # ax = fig.add_subplot(222)
         # toplot = image_filtered[1,::,::,2]
         # plt.imshow(toplot)

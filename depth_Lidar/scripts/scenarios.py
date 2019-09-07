@@ -18,7 +18,7 @@ import math
 import numpy as np
 
 from gym.utils import seeding
-
+import random
 
 class Scenarios(object):
     def __init__(self, num_agents, num_obstacles, agent_size, env_size):
@@ -26,6 +26,7 @@ class Scenarios(object):
         self.num_obstacles = num_obstacles
         self.agent_size = agent_size
         self.env_size = env_size
+        self.collisiondis = 0.8
 
         self._seed()
         self.reset()
@@ -81,7 +82,7 @@ class Scenarios(object):
 
     def narrow_ped(self):
         sx, sy, sa = 11.5, 0., 3.14
-        gx, gy, ga = -10.0, 0., 3.14
+        gx, gy, ga = 3.0, 0., 3.14
         waypoint = [[gx,gy]]
         self.starts.append([sx, sy, sa])
         self.goals.append([gx, gy, ga])
@@ -117,23 +118,107 @@ class Scenarios(object):
         return self.starts, self.goals, self.waypoints
 
     def empty(self):
-        sx, sy, sa = 0., 1., 0
-        gx, gy, ga = 3., 4., 0
-        waypoint = [[2,3],[1,2],[gx,gy]]
+        sx, sy, sa = 0., 0., 0
+        gx, gy, ga = 4,4, 0
+        waypoint = [[1,1],[2,2],[3,3],[gx,gy]]
         self.starts.append([sx, sy, sa])
         self.goals.append([gx, gy, ga])
         self.waypoints.append(waypoint)
 
-        sx, sy, sa = 0., -1., 0
-        gx, gy, ga = 3., -4., 0
-        waypoint = [[2, -3],[1, -2],[gx,gy]]
+        sx, sy, sa = 10., 0., 0
+        gx, gy, ga = 14,-4, 0
+        waypoint = [[11,-1],[12,-2],[13,-3],[gx,gy]]
         self.starts.append([sx, sy, sa])
         self.goals.append([gx, gy, ga])
         self.waypoints.append(waypoint)
 
         return self.starts, self.goals, self.waypoints
 
+    def random_empty(self):
+        sx, sy, sa = 0., 0., random.uniform(0, 1)*6.28-3.14
+        gx, gy, ga = 8*random.uniform(0, 1)-4, 8*random.uniform(0, 1)-4, 0
+        waypoint = [[gx,gy]]
+        self.starts.append([sx, sy, sa])
+        self.goals.append([gx, gy, ga])
+        self.waypoints.append(waypoint)
 
+        sx, sy, sa = 10., 0., random.uniform(0, 1)*6.28-3.14
+        gx, gy, ga = 8*random.uniform(0, 1)+6, 8*random.uniform(0, 1)-4, 0
+        waypoint = [[gx,gy]]
+        self.starts.append([sx, sy, sa])
+        self.goals.append([gx, gy, ga])
+        self.waypoints.append(waypoint)
+
+        return self.starts, self.goals, self.waypoints
+
+    def test_location(self,x,y,obstacles):
+        success = True
+
+        for obs in obstacles:
+          #obs: x,y,w,h
+          left = obs[0]-obs[2]/2-self.collisiondis 
+          right = obs[0]+obs[2]/2+self.collisiondis 
+          up = obs[1] + obs[3]/2+self.collisiondis 
+          down = obs[1]-obs[3]/2-self.collisiondis 
+          if x<right and x>left and y<up and y>down:
+            success = False
+        return success
+
+    def generate_position(self,obstacles):
+        environ_size = 5
+        success_set = False
+        x,y =0.0,0.0
+        while not success_set:
+          x = random.random()*environ_size
+          y = random.random()*environ_size
+          success_set = self.test_location(x,y,obstacles)
+        a = 2*np.pi*random.uniform(0, 1)-np.pi
+        return [x,y,a]
+
+    def random_environment(self):
+        obstacles = [[2,0,1,0.5],[5,0,0.5,1],[1,2,0.5,1],[1,4,1,0.5],[3,3,0.5,1],[4,2,1,0.5],[4,5,0.5,1]]
+        sx, sy, sa = self.generate_position(obstacles)
+        obstacles.append([sx,sy,self.collisiondis ,self.collisiondis ])
+        gx, gy, ga = self.generate_position(obstacles)
+        waypoint = []
+        self.starts.append([sx, sy, sa])
+        self.goals.append([gx, gy, ga])
+        self.waypoints.append(waypoint)
+        print(sx,sy,gx,gy)
+
+        # obstacles = [[5,5,1,1],[4,1,1,1],[3,3,1,1],[1,1,1,0.5],[1,4,0.5,1]]
+        # sx, sy, sa = self.generate_position(obstacles)
+        # sx, sy = 10+sx, sy
+        # obstacles.append([sx,sy,self.collisiondis ,self.collisiondis ])
+        # gx, gy, ga = self.generate_position(obstacles)
+        # gx, gy = 10+gx, gy
+        # waypoint = []
+        # self.starts.append([sx, sy, sa])
+        # self.goals.append([gx, gy, ga])
+        # self.waypoints.append(waypoint)
+        # print(sx,sy,gx,gy)
+
+        # obstacles = []
+        # sx, sy, sa = 0., -10., 2*np.pi*random.uniform(0, 1)-np.pi
+        # obstacles.append([sx,sy,self.collisiondis ,self.collisiondis ])
+        # gx, gy, ga = 5*random.uniform(0, 1), 5*random.uniform(0, 1)-10, 0
+        # waypoint = []
+        # self.starts.append([sx, sy, sa])
+        # self.goals.append([gx, gy, ga])
+        # self.waypoints.append(waypoint)
+        # print(sx,sy,gx,gy)
+
+        obstacles = []
+        sx, sy, sa = 0., -10., 2*np.pi*random.uniform(0, 1)-np.pi
+        obstacles.append([sx,sy,self.collisiondis ,self.collisiondis ])
+        gx, gy, ga = 5*random.uniform(0, 1), 5*random.uniform(0, 1)-10, 0
+        waypoint = []
+        self.starts.append([sx, sy, sa])
+        self.goals.append([gx, gy, ga])
+        self.waypoints.append(waypoint)
+        print(sx,sy,gx,gy)
+
+        return self.starts, self.goals, self.waypoints
 
 
 

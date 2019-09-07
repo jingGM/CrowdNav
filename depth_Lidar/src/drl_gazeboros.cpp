@@ -102,7 +102,7 @@ using namespace message_filters;
  #define OBSTACLE_NUM 0
  //#define MIN_DIST_BETWEEN_AGENTS ROBOT_RADIUS*2
 
- #define LidarMinDistance 0.5
+ #define LidarMinDistance 0.3
  #define LidarMaxDistance 5
 
 //Class definition
@@ -315,7 +315,7 @@ void GazeboTrain::image_Callback(const sensor_msgs::ImageConstPtr& image, int i)
 
     if (img_data[i].data.data.size()>0){substatus[0] =1;}
     //ROS_INFO("running image callback");
-    usleep(100000);
+    usleep(200000);
   }
   
 }
@@ -360,10 +360,10 @@ void GazeboTrain::scan_Callback(const sensor_msgs::LaserScanConstPtr& scan, int 
       collision_status[i] = true;
       //std::cout<<"set collision: "<<i<<std::endl;
     }
-    //std::cout<<"min lidar: "<<min_range<<std::endl;
+    // std::cout<<"min lidar: "<<min_range<<std::endl;
     //std::cout<<i<<"/"<<collision_status[0]<<"/"<<collision_status[1]<<"/"<<collision_status[2]<<"/"<<collision_status[3]<<std::endl;
     //ROS_INFO("running scan callback");
-    usleep(100000);
+    usleep(200000);
   }
 
 }
@@ -586,191 +586,194 @@ int GazeboTrain::train(){
     naviswarm::Transitions current_transitions;
 
     for(int i = 0; i < num_robots; i++){
-      current_robot = i;
+        current_robot = i;
 
-      //Robotinfo const * robotmodel = this->robots_info[i];
-
-
-    //std::cout<<substatus[0]<<"/"<<substatus[1]<<"/"<<substatus[2]<<"/"<<substatus[3]<<std::endl;
-     int checkstatus[4] = {1,1,0,1};
-     bool condition=(substatus[0]!=checkstatus[0])||(substatus[1]!=checkstatus[1])||(substatus[3]!=checkstatus[3])||(substatus[2]!=checkstatus[2]);
-     while(condition){
-      condition=(substatus[0]!=checkstatus[0])||(substatus[1]!=checkstatus[1])||(substatus[3]!=checkstatus[3])||(substatus[2]!=checkstatus[2]);}
-     for(int ind=0;ind<4;ind++){substatus[ind]=0;}
+        //Robotinfo const * robotmodel = this->robots_info[i];
 
 
-      naviswarm::Transition current_transition;
+        //std::cout<<substatus[0]<<"/"<<substatus[1]<<"/"<<substatus[2]<<"/"<<substatus[3]<<std::endl;
+        int checkstatus[4] = {1,1,0,1};
+        bool condition=(substatus[0]!=checkstatus[0])||(substatus[1]!=checkstatus[1])||(substatus[3]!=checkstatus[3])||(substatus[2]!=checkstatus[2]);
+        while(condition){condition=(substatus[0]!=checkstatus[0])||(substatus[1]!=checkstatus[1])||(substatus[3]!=checkstatus[3])||(substatus[2]!=checkstatus[2]);}
+        for(int ind=0;ind<4;ind++){substatus[ind]=0;}
 
-      current_transition.pose.push_back(gpose[i].position.x);
-      current_transition.pose.push_back(gpose[i].position.y);
-      tf::Quaternion q(gpose[i].orientation.x, gpose[i].orientation.y, gpose[i].orientation.z, gpose[i].orientation.w);
-      tf::Matrix3x3  m(q);
-      double roll, pitch, yaw;
-      m.getRPY(roll, pitch, yaw);
-      current_transition.pose.push_back(yaw);
+        int image_size = last_states.ImageObsBatch[i].image_now.data.data.size();
+        //std::cout<<"image_size: "<<image_size<<std::endl;
+        while(image_size<1){
+            image_size = last_states.ImageObsBatch[i].image_now.data.data.size();
+            //std::cout<<"image_size: "<<image_size<<std::endl;
+        }
 
-      naviswarm::State state;
-      tf::Transform gt = pose2transform(gpose[i]);
-      
+        naviswarm::Transition current_transition;
 
-      vec2 local_goal = getTransformedPoint(current_goal[i], gt.inverse());
-      state.goalObs.goal_now.goal_dist = GetDistance(local_goal.x, local_goal.y);
-      state.goalObs.goal_now.goal_theta = atan2(local_goal.y, local_goal.x);
+        current_transition.pose.push_back(gpose[i].position.x);
+        current_transition.pose.push_back(gpose[i].position.y);
+        tf::Quaternion q(gpose[i].orientation.x, gpose[i].orientation.y, gpose[i].orientation.z, gpose[i].orientation.w);
+        tf::Matrix3x3  m(q);
+        double roll, pitch, yaw;
+        m.getRPY(roll, pitch, yaw);
+        current_transition.pose.push_back(yaw);
+
+        naviswarm::State state;
+        tf::Transform gt = pose2transform(gpose[i]);
 
 
- //std::cout<<"goal"<<i<<": "<< state.goalObs.goal_now.goal_theta << std::endl;
+        vec2 local_goal = getTransformedPoint(current_goal[i], gt.inverse());
+        state.goalObs.goal_now.goal_dist = GetDistance(local_goal.x, local_goal.y);
+        state.goalObs.goal_now.goal_theta = atan2(local_goal.y, local_goal.x);
 
 
-      state.velObs.vel_now.vx = last_states.actionObsBatch[i].ac_prev.vx;
-      state.velObs.vel_now.vz = last_states.actionObsBatch[i].ac_prev.vz;
-      
+        //std::cout<<"goal"<<i<<": "<< state.goalObs.goal_now.goal_theta << std::endl;
 
-      if (last_states.goalObsBatch.size() == 0) {
+
+        state.velObs.vel_now.vx = last_states.actionObsBatch[i].ac_prev.vx;
+        state.velObs.vel_now.vz = last_states.actionObsBatch[i].ac_prev.vz;
+
+
+        if (last_states.goalObsBatch.size() == 0) {
           state.goalObs.goal_pprev = state.goalObs.goal_now; 
           state.goalObs.goal_prev = state.goalObs.goal_now;
-      }
-      else {
+        }
+        else {
           state.goalObs.goal_pprev = last_states.goalObsBatch[i].goal_prev;
           state.goalObs.goal_prev = last_states.goalObsBatch[i].goal_now;
-      }
+        }
 
 
-      state.scanObs.scan_now = last_states.scanObsBatch[i].scan_now;
-      if (last_states.goalObsBatch.size() == 0) {
+        state.scanObs.scan_now = last_states.scanObsBatch[i].scan_now;
+        if (last_states.goalObsBatch.size() == 0) {
           state.scanObs.scan_pprev = state.scanObs.scan_now;
           state.scanObs.scan_prev = state.scanObs.scan_now;
-      }
-      else {
+        }
+        else {
           state.scanObs.scan_pprev = last_states.scanObsBatch[i].scan_pprev;
           state.scanObs.scan_prev = last_states.scanObsBatch[i].scan_prev;
-      }
+        }
 
-//std::cout<<"scan"<<i<<":  "<< state.scanObs.scan_pprev.ranges.size()<<"/"<<state.scanObs.scan_prev.ranges.size()<<"/"<<state.scanObs.scan_now.ranges.size()<<"/"<<std::endl;
+        //std::cout<<"scan"<<i<<":  "<< state.scanObs.scan_pprev.ranges.size()<<"/"<<state.scanObs.scan_prev.ranges.size()<<"/"<<state.scanObs.scan_now.ranges.size()<<"/"<<std::endl;
 
-      state.ImageObs.image_now.data = last_states.ImageObsBatch[i].image_now.data;
-      if (last_states.goalObsBatch.size() == 0) {
+        state.ImageObs.image_now.data = last_states.ImageObsBatch[i].image_now.data;
+        if (last_states.goalObsBatch.size() == 0) {
           state.ImageObs.image_p1rev.data = state.ImageObs.image_now.data;
           state.ImageObs.image_p2rev.data = state.ImageObs.image_now.data;
-      }
-      else {
+        }
+        else {
           state.ImageObs.image_p2rev.data = last_states.ImageObsBatch[i].image_p2rev.data;
           state.ImageObs.image_p1rev.data = last_states.ImageObsBatch[i].image_p1rev.data;
-//std::cout<<state.ImageObs.image_now.data.header.frame_id<<":  "<<state.ImageObs.image_p2rev.data.header.stamp<<"/"<<state.ImageObs.image_p1rev.data.header.stamp<<"/"<<state.ImageObs.image_now.data.header.stamp<<std::endl;
-      }
-      
+        //std::cout<<state.ImageObs.image_now.data.header.frame_id<<":  "<<state.ImageObs.image_p2rev.data.header.stamp<<"/"<<state.ImageObs.image_p1rev.data.header.stamp<<"/"<<state.ImageObs.image_now.data.header.stamp<<std::endl;
+        }
 
 
-      //
-      if (last_states.goalObsBatch.size() == 0) {
+        if (last_states.goalObsBatch.size() == 0) {
           state.actionObs.ac_pprev.vx = 0.0;
           state.actionObs.ac_pprev.vz = 0.;
           state.actionObs.ac_prev.vx = 0.;
           state.actionObs.ac_prev.vz = 0.;
-      }
-      else {
+        }
+        else {
           state.actionObs.ac_pprev = last_states.actionObsBatch[current_robot].ac_pprev;
           state.actionObs.ac_prev = last_states.actionObsBatch[current_robot].ac_prev;
-      }
-//ROS_INFO("------actions------");
-      if (last_states.goalObsBatch.size() == 0) {
+        }
+        //ROS_INFO("------actions------");
+        if (last_states.goalObsBatch.size() == 0) {
           current_transition.state = state;
           current_transition.reward = 0.;
           current_transition.terminal = false;
-      }
-      else
-      {
-          naviswarm::Reward reward;
-          reward.sum = 0.;
-          reward.collision = 0.;
-          reward.reached_goal = 0.;
-          reward.penalty_for_deviation = 0.;
-          reward.reward_approaching_goal = 0.;
+        }
+        else
+        {
+        naviswarm::Reward reward;
+        reward.sum = 0.;
+        reward.collision = 0.;
+        reward.reached_goal = 0.;
+        reward.penalty_for_deviation = 0.;
+        reward.reward_approaching_goal = 0.;
 
-          current_transition.state = state;
+        current_transition.state = state;
 
-          double reward_approaching_goal = 0;
-          double penalty_for_bigvz = 0;
-          double penalty_for_time = 0;
-          double distance_to_obstacle = 0;
-          double reached_way_point = 0;
-          
-          if (state.goalObs.goal_now.goal_dist < 0.5) {  // arrived the goal
-              current_transition.terminal = true;
-              double reched_goal_reward = 20;
-              current_transition.reward = reched_goal_reward;
-              reward.reached_goal = reched_goal_reward;
-          }
-          else // if goal has not been reached
-          {
+        double reward_approaching_goal = 0;
+        double penalty_for_bigvz = 0;
+        double penalty_for_time = 0;
+        double distance_to_obstacle = 0;
+        double reached_way_point = 0;
+
+        if (state.goalObs.goal_now.goal_dist < 0.5) {  // arrived the goal
+          current_transition.terminal = true;
+          double reched_goal_reward = 20;
+          current_transition.reward = reched_goal_reward;
+          reward.reached_goal = reched_goal_reward;
+        }
+        else // if goal has not been reached
+        {
             //ROS_INFO("----reward----");
-              // rs.stalled[r] = collision;
+            // rs.stalled[r] = collision;
             std::cout<<"collision status"<<i<<":  "<<collision_status[i]<<std::endl;
 
-              if(collision_status[i] == true) { // stalled is obtained from an in-built function from stage. we must write a function to detect collisions
-                  current_transition.terminal = true;
-                  double collision_penalty =-20;
-                  current_transition.reward = collision_penalty;
-                  reward.collision = collision_penalty;
+            if(collision_status[i] == true) { // stalled is obtained from an in-built function from stage. we must write a function to detect collisions
+              current_transition.terminal = true;
+              double collision_penalty =-20;
+              current_transition.reward = collision_penalty;
+              reward.collision = collision_penalty;
+            }
+            else { // Goal not reached and no collisions
+              //ROS_INFO("in else");
+              double penalty_for_deviation = 0.0;
+              
+              if (std::abs(state.goalObs.goal_now.goal_theta) > 0.785)
+              {
+                  penalty_for_deviation = -0.1 * (std::abs(state.goalObs.goal_now.goal_theta) - 0.785);
               }
-              else { // Goal not reached and no collisions
-                  //ROS_INFO("in else");
-                  double penalty_for_deviation = 0.0;
-                  
-                  if (std::abs(state.goalObs.goal_now.goal_theta) > 0.785)
-                  {
-                      penalty_for_deviation = -0.1 * (std::abs(state.goalObs.goal_now.goal_theta) - 0.785);
-                  }
 
-                  // cv_bridge::CvImagePtr cvPtr;
-                  // try {
-                  //   cvPtr = cv_bridge::toCvCopy(state.ImageObs.image_now.data, "32FC1");
-                  // } 
-                  // catch (cv_bridge::Exception& e) {
-                  //   ROS_ERROR("cv_bridge exception: %s", e.what());
-                  // }
-                  // cv::Mat cam_data = cvPtr->image;
-                  // cam_data.setTo(5, cam_data!=cam_data );  
-                  // double depthmin, depthmax;
-                  // cv::minMaxLoc(cam_data, &depthmin, &depthmax);
-                  // std::cout<<"min:"<<depthmin<<",  max:"<<depthmax<<std::endl;
-                  
+              // cv_bridge::CvImagePtr cvPtr;
+              // try {
+              //   cvPtr = cv_bridge::toCvCopy(state.ImageObs.image_now.data, "32FC1");
+              // } 
+              // catch (cv_bridge::Exception& e) {
+              //   ROS_ERROR("cv_bridge exception: %s", e.what());
+              // }
+              // cv::Mat cam_data = cvPtr->image;
+              // cam_data.setTo(5, cam_data!=cam_data );  
+              // double depthmin, depthmax;
+              // cv::minMaxLoc(cam_data, &depthmin, &depthmax);
+              // std::cout<<"min:"<<depthmin<<",  max:"<<depthmax<<std::endl;
+              
 
-                  for (int waypoint_index =0;waypoint_index<waypoint_data[i].data.size();waypoint_index++){
-                    double distx = std::abs(gpose[i].position.x - waypoint_data[i].data[waypoint_index].x);
-                    double disty = std::abs(gpose[i].position.y - waypoint_data[i].data[waypoint_index].y); 
-                    double distance_to_waypoint = GetDistance(distx,disty);
-                    if (distance_to_waypoint<0.4){reached_way_point =10;}
-                  }
-                  
-                  
-
-
-                  current_transition.terminal = false;
-
-                  reward_approaching_goal = 8*(state.goalObs.goal_prev.goal_dist - state.goalObs.goal_now.goal_dist);
-                  penalty_for_bigvz = std::abs(state.velObs.vel_now.vz) * (-0.1);
-                  penalty_for_time = (current_steps+1) *(0);
-                  distance_to_obstacle = -(LidarMaxDistance-depthmin)*0.1;
-                  
-                  current_transition.reward = reward_approaching_goal + penalty_for_bigvz + penalty_for_time+distance_to_obstacle+reached_way_point;
-                  reward.reward_approaching_goal = reward_approaching_goal;
-                  reward.penalty_for_deviation = penalty_for_deviation;
-                  
+              for (int waypoint_index =0;waypoint_index<waypoint_data[i].data.size();waypoint_index++){
+                double distx = std::abs(gpose[i].position.x - waypoint_data[i].data[waypoint_index].x);
+                double disty = std::abs(gpose[i].position.y - waypoint_data[i].data[waypoint_index].y); 
+                double distance_to_waypoint = GetDistance(distx,disty);
+                if (distance_to_waypoint<0.4){reached_way_point =10;}
               }
-          }
+              
+              
+
+
+              current_transition.terminal = false;
+
+              reward_approaching_goal = 8*(state.goalObs.goal_prev.goal_dist - state.goalObs.goal_now.goal_dist);
+              penalty_for_bigvz = std::abs(state.velObs.vel_now.vz) * (-0.1);
+              penalty_for_time = (current_steps+1) *(0);
+              distance_to_obstacle = -(LidarMaxDistance-depthmin)*0.1;
+              
+              current_transition.reward = reward_approaching_goal + penalty_for_bigvz + penalty_for_time+distance_to_obstacle+reached_way_point;
+              reward.reward_approaching_goal = reward_approaching_goal;
+              reward.penalty_for_deviation = penalty_for_deviation;
+              
+            }
+        }
 
         std::cout<<"Robot:"<<i<<" Rew: "<<current_transition.reward<<"  AG: "<<reward_approaching_goal<<" CurrSt: "<<penalty_for_time<<" Osc:"<<penalty_for_bigvz<<"  DtO: "<<distance_to_obstacle<<" RW:"<<reached_way_point<<"  GDist: "<<state.goalObs.goal_now.goal_dist<<" CollStat: "<<std::to_string(collision_status[i])<<std::endl;
         reward.sum = reward.collision + reward.reached_goal + reward.reward_approaching_goal + reward.penalty_for_deviation;
         reward_pub.publish(reward); // We need a publisher for reward
-      }
+        }
 
-      current_transitions.data.push_back(current_transition);
-      current_states.scanObsBatch.push_back(state.scanObs);
-      current_states.goalObsBatch.push_back(state.goalObs);
-      current_states.actionObsBatch.push_back(state.actionObs);
-      current_states.velObsBatch.push_back(state.velObs);
-      current_states.ImageObsBatch.push_back(state.ImageObs);
-      //current_states.DepthObsBatch.push_back(state.DepthObs);
+        current_transitions.data.push_back(current_transition);
+        current_states.scanObsBatch.push_back(state.scanObs);
+        current_states.goalObsBatch.push_back(state.goalObs);
+        current_states.actionObsBatch.push_back(state.actionObs);
+        current_states.velObsBatch.push_back(state.velObs);
+        current_states.ImageObsBatch.push_back(state.ImageObs);
+        //current_states.DepthObsBatch.push_back(state.DepthObs);
 
     } // end of for loop
 

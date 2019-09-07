@@ -305,6 +305,9 @@ class StageEnv(object):
         return [self.trajectory.mean(), self.trajectory.max(), self.trajectory.min()]
 
     def _update_stage(self):
+        self.resetenvironment()
+        time.sleep(1)
+
         self.starts = []
         self.goals = []
         self.waypoints = []
@@ -320,7 +323,7 @@ class StageEnv(object):
         # self.starts, self.goals = self.scenarios.random_obstacles_scene()
         # self.starts, self.goals, self.waypoints = self.scenarios.circle_scene_uniform()
         # self.starts, self.goals = self.scenarios.circle_scene_with_obstacles()
-        self.starts, self.goals, self.waypoints = self.scenarios.empty()
+        self.starts, self.goals, self.waypoints = self.scenarios.random_environment()
         # self.starts, self.goals = self.scenarios.crossing_scene(6)
         # self.starts, self.goals = self.scenarios.ten_cross_scene(0.8, 6)
         # self.starts, self.goals = self.scenarios.crossing_with_obstacle_scene(6)
@@ -329,7 +332,7 @@ class StageEnv(object):
 
         self.perfect_distance = self.get_perfect_distance()
 
-        #self.resetenvironment()
+        
 
         update_goal_request = UpdateModelRequest()
         i = 0
@@ -379,7 +382,7 @@ class StageEnv(object):
             resp = self.update_model_srv(update_goal_request)
         except rospy.ServiceException, e:
             print "Service call failed: %s"%e
-        time.sleep(2.5)
+        time.sleep(3)
         return resp.success
 
     def resetenvironment(self):
@@ -529,7 +532,7 @@ class StageEnv(object):
             self.goal_markers_id += 1
         if ns == "usv":
             marker.type = marker.MESH_RESOURCE
-            marker.mesh_resource = "file:///home/jing/Documents/catkin_workspace/catkin_CamNavi/src/depth_Lidar/rviz/usv.dae"
+            marker.mesh_resource = "file:///home/adarshjs/catkin_ws/src/depth_Lidar/rviz/usv.dae"
             marker.id = self.agent_markers_id
             self.agent_markers.markers.append(marker)
             self.agent_markers_id += 1
