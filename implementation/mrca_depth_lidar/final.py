@@ -303,35 +303,31 @@ class Environment(object):
         except CvBridgeError as e:
           print(e)
         image_now = np.array(image_now_cv)
-        r,c = np.shape(image_now)
-        for k in range(r):
-            for j in range(c):
-                if math.isnan(image_now[k][j]) or image_now[k][j]>CAMMAXDISTANCE:
-                    image_now[k][j] = CAMMAXDISTANCE
+        image_now = np.where(np.isnan(image_now), CAMMAXDISTANCE, image_now)
 
         #print(image_now.shape)
-        image_now = np.array(cv2.resize(image_now,(150,120)),dtype=float)
+        image_now = np.array(cv2.resize(image_now,(400,360)),dtype=float)
         image_now = np.expand_dims(image_now, axis=2)        
         return image_now
 
-    def rgb2gray(self,rgb):
-        #print(rgb.shape)
-        r, g, b = rgb[:,:,0], rgb[:,:,1], rgb[:,:,2]
-        gray = 0.2989 * r + 0.5870 * g + 0.1140 * b
-        return gray
+    # def rgb2gray(self,rgb):
+    #     #print(rgb.shape)
+    #     r, g, b = rgb[:,:,0], rgb[:,:,1], rgb[:,:,2]
+    #     gray = 0.2989 * r + 0.5870 * g + 0.1140 * b
+    #     return gray
 
-    def process_rgb_image(self,imagedata):
-        bridge = CvBridge()
-        try:
-          image_now_cv = bridge.imgmsg_to_cv2(imagedata.data, "bgr8")
-          # print("0")
-        except CvBridgeError as e:
-          print(e)
-        image_now = self.rgb2gray(np.array(image_now_cv))
+    # def process_rgb_image(self,imagedata):
+    #     bridge = CvBridge()
+    #     try:
+    #       image_now_cv = bridge.imgmsg_to_cv2(imagedata.data, "bgr8")
+    #       # print("0")
+    #     except CvBridgeError as e:
+    #       print(e)
+    #     image_now = self.rgb2gray(np.array(image_now_cv))
 
-        image_now = np.array(cv2.resize(image_now,(150,120)),dtype=float)
-        image_now = np.expand_dims(image_now, axis=2)
-        return image_now
+    #     image_now = np.array(cv2.resize(image_now,(150,120)),dtype=float)
+    #     image_now = np.expand_dims(image_now, axis=2)
+    #     return image_now
 
     def image_callback(self,data):
         # image_now = self.process_depth_image(data)
